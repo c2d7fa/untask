@@ -65,6 +65,7 @@
       ((equal? (car query) 'has-tag) (has-tag? id (cadr query) state))
       ((equal? (car query) 'not) (not (matches-query? (cadr query) id state)))
       ((equal? (car query) 'and) (andmap (λ (q) (matches-query? q id state)) (cdr query)))
+      ((equal? (car query) 'or) (ormap (λ (q) (matches-query? q id state)) (cdr query)))
       (else (error (format "unknwon query type: ~s" query)))))
   (set-filter (λ (id) (matches-query? query id state)) (all-ids state)))
 
@@ -177,7 +178,7 @@
 (displayln "  all:")
 (execute '(list-all))
 (displayln "  search:")
-(execute '(search (not (and active (has-tag "health")))))
+(execute '(search (or (has-tag "outside") (not (and active (has-tag "health"))))))
 
 
 
