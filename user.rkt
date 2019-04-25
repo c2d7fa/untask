@@ -15,7 +15,7 @@
     (string-join (set->list (item-tags item)) " "))
   (define (format-active item)
     (if (active? item) "active" "inactive"))
-  (for ((item items))
+  (for ((item (sort-items-by-urgency-descending items)))
     (printf "~a. ~a (~a, ~a) [~a] - ~a~n"
             (item-id item)
             (item-description item)
