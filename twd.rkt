@@ -22,9 +22,7 @@
 (displayln "  all:")
 (execute !state '(list-all))
 (displayln "  search:")
-(execute !state '(search (or (has-tag "outside") (not (and active (has-tag "health"))))))
-
-
+(execute !state '(search (or (tag "outside") (not (and active (tag "health"))))))
 
 
 

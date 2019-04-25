@@ -2,48 +2,63 @@
 
 (require "state.rkt"
          "item.rkt"
-         "filtering.rkt")
+         "filtering.rkt"
+         (only-in "util.rkt" set-filter))
 
-;;
+(provide (all-defined-out))
 
-(define (user-add-task description)
-  (define-values (next-id state-with-new-item) (increment-id current-state))
-  (set! current-state (set-description next-id state-with-new-item description)))
+;; Helper procedures
 
-(define (user-add-tag task-id tag-label)
-  (set! current-state (add-tag task-id tag-label current-state)))
+(define (list-items items)
+  (define (format-tags item)
+    (string-join (set->list (item-tags item)) " "))
+  (define (format-active item)
+    (if (active? item) "active" "inactive"))
+  (for ((item items))
+    (printf "~a. ~a (~a, ~a) [~a]~n"
+            (item-id item)
+            (item-description item)
+            (item-status item)
+            (format-active item)
+            (format-tags item))))
 
-(define (user-remove-tag task-id tag-label)
-  (set! current-state (remove-tag task-id tag-label current-state)))
+;; User interaction procedues
 
-(define (user-mark-done task-id)
-  (set! current-state (set-status-done task-id current-state))
-  (void))
-(define (user-mark-todo task-id)
-  (set! current-state (set-status-todo task-id current-state)))
-(define (user-mark-paused task-id)
-  (set! current-state (set-status-paused task-id current-state)))
+(define (user-add-task !state description)
+  (define-values (next-id state-with-new-item) (increment-id (unbox !state)))
+  (set-box! !state (set-description next-id state-with-new-item description)))
 
-(define (user-list-ids ids)
-  (define (format-tags tag-set)
-    (string-join (set->list tag-set) " "))
-  (for ((id ids))
-    (define active-string
-      (if (is-active id current-state) "active" "inactive"))
-    (printf "~a. ~a (~a, ~a) [~a]~n" id (get-description id current-state) (get-status id current-state) active-string (format-tags (get-tags id current-state))))
-  (void))
+(define (user-add-tag !state task-id tag-label)
+  (set-box! !state (add-tag task-id tag-label (unbox !state))))
 
-(define (user-list-active-tasks)
-  (user-list-ids (all-active-ids current-state)))
-(define (user-list-all-tasks)
-  (user-list-ids (all-ids current-state)))
-(define (user-list-uncompleted-tasks)
-  (user-list-ids (all-uncompleted-ids current-state)))
-(define (user-list-search-tasks query)
-  (user-list-ids (search-ids-matching-query query current-state)))
+(define (user-remove-tag !state task-id tag-label)
+  (set-box! !state (remove-tag task-id tag-label (unbox !state))))
 
-(define (user-set-description id new-description)
-  (set! current-state (set-description id current-state new-description)))
+(define (user-mark-done !state task-id)
+  (set-box! !state (set-status-done task-id (unbox !state))))
+
+(define (user-mark-todo !state task-id)
+  (set-box! !state (set-status-todo task-id (unbox !state))))
+
+(define (user-mark-paused !state task-id)
+  (set-box! !state (set-status-paused task-id (unbox !state))))
+
+(define (user-list-active-tasks !state)
+  (list-items (filter-active (all-items (unbox !state)))))
+
+(define (user-list-all-tasks !state)
+  (list-items (all-items (unbox !state))))
+
+(define (user-list-uncompleted-tasks !state)
+  (list-items (filter-uncompleted (all-items (unbox !state)))))
+
+(define (user-list-search-tasks !state query)
+  (list-items (filter-matching-query query (all-items (unbox !state)))))
+
+(define (user-set-description !state id description)
+  (set-box! !state (set-description id (unbox !state) description)))
+
+;; Command Line
 
 (define (execute !state command)
   (match command
@@ -66,31 +81,3 @@
         (begin
           (execute !state command)
           (start-command-line-loop)))))
-
-;; TESTING
-
-;;
-
-(define !state (box empty-state))
-
-;; testing setup:
-(execute !state '(add "eat food"))
-(execute !state '(tag 0 "health"))
-(execute !state '(add "buy milk"))
-(execute !state '(tag 1 "shopping"))
-(execute !state '(tag 1 "outside"))
-(execute !state '(add "drink milk"))
-(execute !state '(tag 2 "health"))
-(execute !state '(add "go for a walk"))
-(execute !state '(tag 3 "outside"))
-(execute !state '(tag 3 "health"))
-(execute !state '(done 1))
-(execute !state '(pause 0))
-(displayln "  all:")
-(execute !state '(list-all))
-(displayln "  search:")
-(execute !state '(search (or (has-tag "outside") (not (and active (has-tag "health"))))))
-
-
-
-

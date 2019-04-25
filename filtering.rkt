@@ -1,13 +1,10 @@
 #lang racket
 
-(require "state.rkt")
-(require "item.rkt")
+(require "state.rkt"
+         "item.rkt"
+         (only-in "util.rkt" set-filter))
 
-(provide
- (except-out (all-defined-out) set-filter))
-
-(define (set-filter pred set)
-  (list->set (filter pred (set->list set))))
+(provide (all-defined-out))
 
 ;;;
 
