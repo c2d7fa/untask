@@ -47,28 +47,6 @@
 (define (get-tags id state)
   (hash-ref (state-tag-sets state) id (set)))
 
-(define (is-active id state)
-  (equal? (get-status id state) 'todo))
-
-(define (all-active-ids state)
-  (set-filter (λ (id) (is-active id state)) (all-ids state)))
-(define (all-uncompleted-ids state)
-  (set-filter (λ (id) (not (equal? (get-status id state) 'done))) (all-ids state)))
-
-(define (has-tag? id tag state)
-  (set-member? (get-tags id state) tag))
-
-(define (search-ids-matching-query query state)
-  (define (matches-query? query id state)
-    (cond
-      ((equal? query 'active) (is-active id state))
-      ((equal? (car query) 'has-tag) (has-tag? id (cadr query) state))
-      ((equal? (car query) 'not) (not (matches-query? (cadr query) id state)))
-      ((equal? (car query) 'and) (andmap (λ (q) (matches-query? q id state)) (cdr query)))
-      ((equal? (car query) 'or) (ormap (λ (q) (matches-query? q id state)) (cdr query)))
-      (else (error (format "unknwon query type: ~s" query)))))
-  (set-filter (λ (id) (matches-query? query id state)) (all-ids state)))
-
 ;; Updating state
 
 (define (set-tags id new-tags state)

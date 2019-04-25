@@ -1,6 +1,7 @@
 #lang racket
 
 (require "state.rkt")
+(require "filtering.rkt")
 
 ;;; USER INTERACTION
 
