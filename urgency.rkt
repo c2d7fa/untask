@@ -8,7 +8,4 @@
   (item-base-urgency item))
 
 (define (sort-items-by-urgency-descending items)
-  (sort (set->list items)
-        (λ (a b)
-          (>= (urgency a)
-              (urgency b)))))
+  (sort (set->list items) >= #:key urgency))
