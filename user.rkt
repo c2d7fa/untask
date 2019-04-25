@@ -6,11 +6,6 @@
 
 ;;
 
-(define current-state empty-state)
-
-(define (id->item id)
-  (item id current-state))
-
 (define (user-add-task description)
   (define-values (next-id state-with-new-item) (increment-id current-state))
   (set! current-state (set-description next-id state-with-new-item description)))
@@ -50,32 +45,27 @@
 (define (user-set-description id new-description)
   (set! current-state (set-description id current-state new-description)))
 
-(define (execute command)
-  (let ((args (cdr command)))
-    (case (car command)
-      ((add) (user-add-task (car args)))
-      ((done) (user-mark-done (car args)))
-      ((todo) (user-mark-todo (car args)))
-      ((pause) (user-mark-paused (car args)))
-      ((list) (user-list-active-tasks))
-      ((search) (user-list-search-tasks (car args)))
-      ((list-all) (user-list-all-tasks))
-      ((list-uncompleted) (user-list-uncompleted-tasks))
-      ((desc) (user-set-description (car args) (cadr args)))
-      ((tag) (user-add-tag (car args) (cadr args)))
-      ((untag) (user-remove-tag (car args) (cadr args)))
-      )))
+(define (execute !state command)
+  (match command
+    (`(add ,desc) (user-add-task !state desc))
+    (`(done ,id) (user-mark-done !state id))
+    (`(todo ,id) (user-mark-todo !state id))
+    (`(pause ,id) (user-mark-paused !state id))
+    (`(list) (user-list-active-tasks !state))
+    (`(search ,query) (user-list-search-tasks !state query))
+    (`(list-all) (user-list-all-tasks !state))
+    (`(list-uncompleted) (user-list-uncompleted-tasks !state))
+    (`(desc ,id ,desc) (user-set-description !state id desc))
+    (`(tag ,id ,tag) (user-add-tag !state id tag))
+    (`(untag ,id ,tag) (user-remove-tag !state id tag))))
 
-(define (start-command-line-loop)
+(define (start-command-line-loop !state)
   (let ((command (read)))
     (if (equal? command '(quit))
         (void)
         (begin
-          (execute command)
+          (execute !state command)
           (start-command-line-loop)))))
-
-
-
 
 ;; TESTING
 
