@@ -19,6 +19,7 @@
 (define-item-property status)
 (define-item-property tags)
 (define-item-property description)
+(define-item-property base-urgency)
 
 (define (all-items state)
   (set-map (state:all-ids state)

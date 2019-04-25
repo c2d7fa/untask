@@ -19,10 +19,9 @@
 (execute !state '(tag 3 "health"))
 (execute !state '(done 1))
 (execute !state '(pause 0))
+(execute !state '(urg 0 +1.50))
+(execute !state '(urg 1 -0.75))
 (displayln "  all:")
 (execute !state '(list-all))
 (displayln "  search:")
 (execute !state '(search (or (tag "outside") (not (and active (tag "health"))))))
-
-
-

@@ -3,6 +3,7 @@
 (require "state.rkt"
          "item.rkt"
          "filtering.rkt"
+         "urgency.rkt"
          (only-in "util.rkt" set-filter))
 
 (provide (all-defined-out))
@@ -15,12 +16,13 @@
   (define (format-active item)
     (if (active? item) "active" "inactive"))
   (for ((item items))
-    (printf "~a. ~a (~a, ~a) [~a]~n"
+    (printf "~a. ~a (~a, ~a) [~a] - ~a~n"
             (item-id item)
             (item-description item)
             (item-status item)
             (format-active item)
-            (format-tags item))))
+            (format-tags item)
+            (urgency item))))
 
 ;; User interaction procedues
 
@@ -58,6 +60,9 @@
 (define (user-set-description !state id description)
   (set-box! !state (set-description id (unbox !state) description)))
 
+(define (user-set-base-urgency !state id base-urgency)
+  (set-box! !state (set-base-urgency id (unbox !state) base-urgency)))
+
 ;; Command Line
 
 (define (execute !state command)
@@ -71,6 +76,7 @@
     (`(list-all) (user-list-all-tasks !state))
     (`(list-uncompleted) (user-list-uncompleted-tasks !state))
     (`(desc ,id ,desc) (user-set-description !state id desc))
+    (`(urg ,id ,urg) (user-set-base-urgency !state id urg))
     (`(tag ,id ,tag) (user-add-tag !state id tag))
     (`(untag ,id ,tag) (user-remove-tag !state id tag))))
 
