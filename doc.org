@@ -1,0 +1,153 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Documentation
+* Selections and filters
+Some subset of all the items in the database is called a *selection*. Selections
+are usually constructed by using *filters*.
+
+TWD commands always act on the current selection. A command in TWD takes the
+form
+#+BEGIN_EXAMPLE
+> [filter] [command] [arguments]
+#+END_EXAMPLE
+where =[filter]= is a filter that changes the selection, =[command]= is the name
+of a command that will act on that selection, and =[arguments]= may be a list of
+arguments given to the command.
+
+The command /list/ simply lists all of the items in the current selection; it
+does not take arguments. If no command is specified, /list/ is the default. This
+means that typing a filter on the command line will list all items in the
+database matching that filter.
+** List of filter properties
+*** Global ID (=id=)
+*Type:* text\\
+
+The simplest possible filter simply specifies the global ID of a single task;
+for example, the task with global ID /a4/ is written =id:{a4}=:
+#+BEGIN_EXAMPLE
+> id:a4
+ # | ID | Desc
+---+----+---------------
+ 1 | 4v | Do the dishes
+#+END_EXAMPLE
+*** Description (=description=)
+*Type:* text\\
+
+This is the default property; when no property is specified, /description/ is
+assumed. For example, to list all items whose description contains "buy":
+#+BEGIN_EXAMPLE
+> /buy
+  | Description
+--+------------------
+1 | Buy milk
+2 | Buy chocolate
+3 | Decide which car to buy
+#+END_EXAMPLE
+(This command is equivalent to =desc/{buy} list=.)
+Note that simply typing =example= will not list all items whose description
+exactly matches "example", because this could be confused with the name of a
+command; instead, use either ={example}= or =:example= to abbreviate
+=description:{example}=.
+*** All tags (=tags=)
+*Type:* set of text\\
+
+(Missing documentation.)
+*** Any tag (=tag=)
+*Type:* text\\
+
+(Missing documentation.)
+** Filter property types
+Each filter property has a type. The types are /text/, /date/, /number/, /item/
+and /set/. Each type supports various prediates.
+*** Text
+Note that all of the text predicates are case insensitive by default.
+
+*Supported prediates:*
+| Operation         | Example            | Meaning                                     |
+|-------------------+--------------------+---------------------------------------------|
+| =:= (is)          | =prop:{value}=     | =prop= is exactly "=value="                 |
+| =/= (contains)    | =prop/{substring}= | =prop= contains "=substring="               |
+| =<= (starts with) | =prop<{prefix}=    | =prop= starts with "=prefix="               |
+| =>= (ends with)   | =prop>{suffix}=    | =prop= ends with "=suffix="                 |
+| =~= (matches)     | =prop~{regex}=     | =prop= matches regular expression "=regex=" |
+*** Date
+(Missing documentation.)
+*** Number
+(Missing documentation.)
+*** Item
+(Missing documentation.)
+*** Set
+(Missing documentation.)
+** Filter operations
+*** Invert (=not=, =!=)
+(Missing documentation.)
+*** Dependencies (=dependencies=)
+The operation /dependencies/ gives the dependencies of all items matching a
+given filter. It is the opposite operation of /blocking/.
+
+For example, the following command adds the tag "soon" to the dependencies of
+all items that either have the tag "design" or which begin with the string
+"consider":
+#+BEGIN_EXAMPLE
+> (tag:{design}, desc<{consider}).dependencies modify tags+{soon}
+#+END_EXAMPLE
+Equivalent abbreviated command:
+#+BEGIN_EXAMPLE
+> (#design, <consider).dep mod #soon
+#+END_EXAMPLE
+*** Blocking (=blocking=)
+The operation /blocking/ gives all the items that are being (directly) blocked
+by the items matching a given filter. It is the opposite operation of
+/dependencies/.
+** Default filter
+* Commands
+** List selection (=list=)
+This is the default command.
+** Modify selection (=modify=)
+(Missing documentation.)
+*** Arguments
+(Missing documentation.)
+* Examples of commands
+** Adding task with description
+In TaskWarrior, a task can be added from the shell simply using the following
+syntax:
+#+BEGIN_EXAMPLE
+$ task add "this is a new task"
+Created task 1.
+#+END_EXAMPLE
+TWD also uses the /add/ command to add new tasks. The task can be given a
+description by specifying a value for the /desc/ field. We use curly braces as
+quotation marks to better avoid conflicts with user strings. Thus, the
+equivalent command in TWD is:
+#+BEGIN_EXAMPLE
+> add desc:{this is a new task}
+1   todo   this is a new task   1.00
+#+END_EXAMPLE
+Since /desc/ is the most common field, it is chosen by default if no other field
+is specified. This means that the following command is equivalent to the one
+above:
+#+BEGIN_EXAMPLE
+> add {this is a new task}
+1   todo   this is a new task   1.00
+#+END_EXAMPLE
+** Adding task with tags
+When adding a task in TaskWarrior, it is possible to specify any number of tags
+with the following syntax:
+#+BEGIN_EXAMPLE
+$ task add +tag1 +tag2 "this is a new task" +tag3
+Created task 1.
+#+END_EXAMPLE
+The equivalent syntax in TWD is:
+#+BEGIN_EXAMPLE
+> add tag:{tag1} tag:{tag2} desc:{this is a new task} tag:{tag3}
+1 | todo | tag1 tag2 tag3 | this is a new task | 1.00
+#+END_EXAMPLE
+In this example, the tags contain no spaces, so we can simply write:
+#+BEGIN_EXAMPLE
+> add tag:tag1 tag:tag2 desc:{this is a new task} tag:tag3
+#+END_EXAMPLE
+Additionally, it is possible to abbreviate =tag:tag-name= as =#tag-name= for any
+=tag-name=, which means that the above command can actually be written as:
+#+BEGIN_EXAMPLE
+> add #tag1 #tag2 {this is a new task} #tag3
+#+END_EXAMPLE
+
