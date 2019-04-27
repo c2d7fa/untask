@@ -58,7 +58,8 @@ command; instead, use either ={example}= or =:example= to abbreviate
 *** Active (=active=)
 *Type:* boolean\\
 
-(Missing documentation.)
+This property is on if the item is active (meaning it can be completed) and off
+if it is inactive.
 ** Filter property types
 Each filter property has a type. The types are /text/, /date/, /number/, /item/
 and /set/. Each type supports various prediates.
@@ -74,7 +75,11 @@ Note that all of the text predicates are case insensitive by default.
 | =>= (ends with)   | =prop>{suffix}=    | =prop= ends with "=suffix="                 |
 | =~= (matches)     | =prop~{regex}=     | =prop= matches regular expression "=regex=" |
 *** Boolean
-(Missing documentation.)
+*Supported prediates:*
+| Operation    | Example | Meaning       |
+|--------------+---------+---------------|
+| =+= (has)    | =+prop= | =prop= is on  |
+| =-= (hasn't) | =-prop= | =prop= is off |
 *** Date
 (Missing documentation.)
 *** Number
