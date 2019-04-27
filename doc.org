@@ -55,6 +55,10 @@ command; instead, use either ={example}= or =:example= to abbreviate
 *Type:* text\\
 
 (Missing documentation.)
+*** Active (=active=)
+*Type:* boolean\\
+
+(Missing documentation.)
 ** Filter property types
 Each filter property has a type. The types are /text/, /date/, /number/, /item/
 and /set/. Each type supports various prediates.
@@ -69,6 +73,8 @@ Note that all of the text predicates are case insensitive by default.
 | =<= (starts with) | =prop<{prefix}=    | =prop= starts with "=prefix="               |
 | =>= (ends with)   | =prop>{suffix}=    | =prop= ends with "=suffix="                 |
 | =~= (matches)     | =prop~{regex}=     | =prop= matches regular expression "=regex=" |
+*** Boolean
+(Missing documentation.)
 *** Date
 (Missing documentation.)
 *** Number
@@ -77,27 +83,85 @@ Note that all of the text predicates are case insensitive by default.
 (Missing documentation.)
 *** Set
 (Missing documentation.)
-** Filter operations
-*** Invert (=not=, =!=)
-(Missing documentation.)
-*** Dependencies (=dependencies=)
-The operation /dependencies/ gives the dependencies of all items matching a
-given filter. It is the opposite operation of /blocking/.
+** Filter operators
+Filter operators can be used to modify and compose filters. Operators can be
+unary or binary.
+*** Unary operators
+Most unary operators are written as =filter .operator=. Note
+that parentheses can be used to specify how the operator binds to its argument,
+and that spacing influences this as well. For example, the following commands
+are equivalent:
+#+BEGIN_EXAMPLE
+> ((!#a, !#b).dep).not, #c
+> !#a, !#b .dep.not, #c
+#+END_EXAMPLE
+Some unary operators can be written using prefix syntax. For example, =A.not=
+can also be written =!A=.
+**** Invert (=not=)
+*Arity:* unary\\
+*Alias:* =!= (prefix)\\
 
-For example, the following command adds the tag "soon" to the dependencies of
-all items that either have the tag "design" or which begin with the string
+This operator inverts the filter argument; that is, it selects all items that do
+not match the filter. For example, the equivalent commands
+#+BEGIN_EXAMPLE
+> #cleaning (/wash, /wash.blocks).not
+#+END_EXAMPLE
+shows all items that are tagged with "cleaning", but which do not contain the
+word "wash" or are blocking a task containing the word "wash". The same command
+can be written using the prefix form of the =not= operator, which is called =!=:
+#+BEGIN_EXAMPLE
+> #cleaning !(/wash, /wash.b)
+#+END_EXAMPLE
+**** Dependencies (=depends=)
+*Arity:* unary\\
+*Alias:* =dep=, =d=\\
+
+The operation /depends/ gives all the items that are (directly) dependent on any
+of the items matching a given filter. It is the opposite operation of /blocks/.
+
+For example, the following command adds the tag "maybe" to dependencies of tasks
+that are already tagged "maybe":
+#+BEGIN_EXAMPLE
+> #maybe .dep mod #maybe
+#+END_EXAMPLE
+**** Blocking (=blocks=)
+*Arity:* unary\\
+*Alias*: =blo=, =b=\\
+
+The operation /blocks/ gives all the items that are (directly) blocking any of
+the items matching a given filter. It is the opposite operation of /depends/.
+
+For example, the following command adds the tag "soon" to the tasks that are
+blocking a task that is either tagged with "design" or which begin with the word
 "consider":
 #+BEGIN_EXAMPLE
-> (tag:{design}, desc<{consider}).dependencies modify tags+{soon}
+> #design, <consider .blo mod #soon
 #+END_EXAMPLE
-Equivalent abbreviated command:
+*** Binary operators
+Binary operators are written in infix notation.
+**** Intersection (space)
+*Arity:* binary\\
+*Alias:* --- \\
+
+When two filters are written next to each other with spaces between them, this
+operator is used to combine the two filters.
+
+The result of =A B= is the set of items that match both filters =A= and =B=. For
+example, the following returns all items that are tagged "reading", but which
+are not tagged "research":
 #+BEGIN_EXAMPLE
-> (#design, <consider).dep mod #soon
+> #reading !#research
 #+END_EXAMPLE
-*** Blocking (=blocking=)
-The operation /blocking/ gives all the items that are being (directly) blocked
-by the items matching a given filter. It is the opposite operation of
-/dependencies/.
+**** Union (=,=)
+*Arity:* binary\\
+*Alias:* --- \\
+
+The result of =A, B= is the set of items that match the filter =A= /or/ the
+filter =B=. For example, the following command lists all items which depend on
+an item that is either active or tagged as "soon":
+#+BEGIN_EXAMPLE
+> (+active, #soon).depends
+#+END_EXAMPLE
 ** Default filter
 * Commands
 ** List selection (=list=)
