@@ -60,6 +60,20 @@ command; instead, use either ={example}= or =:example= to abbreviate
 
 This property is on if the item is active (meaning it can be completed) and off
 if it is inactive.
+*** Completed (=done=)
+*Type:* boolean\\
+
+This property is on if the item has been marked as completed and off otherwise.
+*** Base urgency (=baseurgency=)
+*Type:* number\\
+
+The base urgency of an item is the urgency that has been manually assigned to
+that item. The =urgency= property is a read-only property that is computed from
+the base urgency after taking into account various other factors.
+*** Urgency (=urgency=)
+*Type:* number\\
+
+(Missing documentation.)
 ** Filter property types
 Each filter property has a type. The types are /text/, /date/, /number/, /item/
 and /set/. Each type supports various prediates.
