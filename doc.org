@@ -181,7 +181,6 @@ an item that is either active or tagged as "soon":
 #+BEGIN_EXAMPLE
 > (+active, #soon).depends
 #+END_EXAMPLE
-** Default filter
 * Contexts
 It is possible to activate any number of different *contexts*. A context
 specifies the default filter, as well as a list of properties that will be
@@ -220,4 +219,6 @@ This is the default command.
 ** Modify selection (=modify=)
 (Missing documentation.)
 *** Arguments
+(Missing documentation.)
+** Add task (=add=)
 (Missing documentation.)
