@@ -181,6 +181,58 @@ an item that is either active or tagged as "soon":
 #+BEGIN_EXAMPLE
 > (+active, #soon).depends
 #+END_EXAMPLE
+** Local ids and listing references
+When listing the items matching a certain filter, the output looks like this:
+#+BEGIN_EXAMPLE
+> @week #important list
+A | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #research    | mon | Research bobcats
+2 | #important #appointment | tue | Meeting with Bob about bobcats
+3 | #important              | tue | Send documentation
+4 | #important              | fri | Respond to Jane's email
+#+END_EXAMPLE
+Note the letter "A" in leftmost column of the header. This is called the
+*listing reference*. When used in a filter, this reference represents all of the
+items in that listing. For example, the command below narrows the above
+selection to the tasks that are due later than monday and which don't contain
+the word "send":
+#+BEGIN_EXAMPLE
+> A due>mon !/send
+B | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #appointment | tue | Meeting with Bob about bobcats
+2 | #important              | fri | Respond to Jane's email
+#+END_EXAMPLE
+Note that the listing reference has changed to "B". The listing reference will
+cycle through the letters A-Z. Also note the numbers in the leftmost column;
+these are the *local ids* of each item. These numbers can be used to refer to an
+item inside of a filter. For example, this command shows the second item in the
+listing of =@week #important 2= (i.e. "Meeting with Bob about bobcats"), as well
+as any items tagged "research":
+#+BEGIN_EXAMPLE
+> @week #important 2, @none #research
+C | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #research    | mon | Research bobcats
+2 | #research               |     | Figure out why penguins can't fly
+3 | #important #appointment | tue | Meeting with Bob about bobcats
+#+END_EXAMPLE
+Most commonly, local ids are used together with listing references to refer to
+an item from an earlier listing. Thus, the previous command could also take
+advantage of the listing labeled "A", shortening it it to:
+#+BEGIN_EXAMPLE
+> A 2, #research
+#+END_EXAMPLE
+As a special abbreviation, the space between the reference and the id may be
+omitted. For example:
+#+BEGIN_EXAMPLE
+> A4, B1
+B | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #appointment | tue | Meeting with Bob about bobcats
+2 | #important              | fri | Respond to Jane's email
+#+END_EXAMPLE
 * Contexts
 It is possible to activate any number of different *contexts*. A context
 specifies the default filter, as well as a list of properties that will be
