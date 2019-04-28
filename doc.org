@@ -182,6 +182,38 @@ an item that is either active or tagged as "soon":
 > (+active, #soon).depends
 #+END_EXAMPLE
 ** Default filter
+* Contexts
+It is possible to activate any number of different *contexts*. A context
+specifies the default filter, as well as a list of properties that will be
+automatically added to newly created items. Contexts can either be enabled or
+disabled globally, or they can be set for a single command. It is possible to
+enable multiple contexts at the same time.
+
+To cretae a new context, use the command =context new [filter] (default
+[properties])= (the modify part is optional). The following will create a
+context called "leasure" in which only items that are tagged with "fun" as well
+as items that are active, due and whose urgency exceeds 10 are shown, and where
+items are given the property =review:tomorrow= by default:
+#+BEGIN_EXAMPLE
+> context add leasure #fun, (+active due<=now urgency>=10) default review:tomorrow
+#+END_EXAMPLE
+To active the context, use =context enable=:
+#+BEGIN_EXAMPLE
+> context enable
+#+END_EXAMPLE
+It is possible to override the current contexts for a single command by
+prefixing the context name with the =@= character. Contexts stack in the order
+they are given, while the special context =@none= disables all contexts. For
+instance, the following command enables the contexts "appointments" and
+"important" in addition to any contexts that are already enabled:
+#+BEGIN_EXAMPLE
+> @appointments @important list
+#+END_EXAMPLE
+This command adds a new item without using any of the default properties from
+currently enabled contexts:
+#+BEGIN_EXAMPLE
+> @none add +shopping {Buy groceries} due:tomorrow@17:00
+#+END_EXAMPLE
 * Commands
 ** List selection (=list=)
 This is the default command.
