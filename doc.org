@@ -190,16 +190,16 @@ disabled globally, or they can be set for a single command. It is possible to
 enable multiple contexts at the same time.
 
 To cretae a new context, use the command =context new [filter] (default
-[properties])= (the modify part is optional). The following will create a
-context called "leasure" in which only items that are tagged with "fun" as well
+[properties])= (the default part is optional). The following will create a
+context called "leisure" in which only items that are tagged with "fun" as well
 as items that are active, due and whose urgency exceeds 10 are shown, and where
 items are given the property =review:tomorrow= by default:
 #+BEGIN_EXAMPLE
-> context add leasure #fun, (+active due<=now urgency>=10) default review:tomorrow
+> context add leisure #fun, (+active due<=now urgency>=10) default review:tomorrow
 #+END_EXAMPLE
 To active the context, use =context enable=:
 #+BEGIN_EXAMPLE
-> context enable
+> context enable leisure
 #+END_EXAMPLE
 It is possible to override the current contexts for a single command by
 prefixing the context name with the =@= character. Contexts stack in the order
