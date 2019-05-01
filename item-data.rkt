@@ -50,20 +50,9 @@
   (define default-value (cdr property-metadata))
   (hash-ref (hash-ref item-properties item (hash)) key default-value))
 
-;;; EXAMPLE:
+;;;;
 
-(define d0 item-data-empty)
-(define-values (d1 _1) (new-property d0 #:key 'description #:name "Description" #:default "(No description.)"))
-(define-values (d2 _2) (new-property d1 #:key 'base-urgency #:name "Base Urgency" #:default 0))
-(define-values (d3 i1) (new-item d2))
-(define-values (d4 i2) (new-item d3))
-(define d5 (set-property d4 i1 'description "Item 1"))
-(define d6 (set-property d5 i1 'base-urgency 1))
-(define d7 (set-property d6 i2 'base-urgency -2))
-
-(values
- (get-property d7 i1 'description)
- (get-property d7 i1 'base-urgency)
- (get-property d7 i2 'description)
- (get-property d7 i2 'base-urgency))
+;; Returns new-item-data.
+(define (update-property item-data item key f)
+  (set-property item-data item key (f (get-property item-data item key))))
 
