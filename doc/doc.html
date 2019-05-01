@@ -1,0 +1,1075 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-04-28 Sun 22:10 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Documentation</title>
+<meta name="generator" content="Org mode" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Documentation</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org2674fb7">1. Data types</a>
+<ul>
+<li><a href="#org41e1436">1.1. Text</a>
+<ul>
+<li><a href="#orga55706e">1.1.1. Predicates</a></li>
+<li><a href="#org55d1670">1.1.2. Properties</a></li>
+</ul>
+</li>
+<li><a href="#org5dd1e1f">1.2. Item</a></li>
+<li><a href="#orgf423567">1.3. Number</a></li>
+<li><a href="#org1db427c">1.4. Boolean</a></li>
+<li><a href="#org9f79b8b">1.5. Date</a></li>
+<li><a href="#org5237418">1.6. Set</a></li>
+</ul>
+</li>
+<li><a href="#org9d709bf">2. Selections and filters</a>
+<ul>
+<li><a href="#org1509695">2.1. List of filter properties</a>
+<ul>
+<li><a href="#orgeea9e90">2.1.1. Global ID (<code>id</code>)</a></li>
+<li><a href="#org3bd1804">2.1.2. Description (<code>description</code>)</a></li>
+<li><a href="#org6b942dd">2.1.3. All tags (<code>tags</code>)</a></li>
+<li><a href="#org1fa1cd3">2.1.4. Any tag (<code>tag</code>)</a></li>
+<li><a href="#org58e4600">2.1.5. Active (<code>active</code>)</a></li>
+<li><a href="#org622ef31">2.1.6. Completed (<code>done</code>)</a></li>
+<li><a href="#org7ecbae8">2.1.7. Base urgency (<code>baseurgency</code>)</a></li>
+<li><a href="#org11c81b9">2.1.8. Urgency (<code>urgency</code>)</a></li>
+</ul>
+</li>
+<li><a href="#orgf6e67d8">2.2. Filter property types</a>
+<ul>
+<li><a href="#org73e1235">2.2.1. Text</a></li>
+<li><a href="#orgd7cfa7a">2.2.2. Boolean</a></li>
+<li><a href="#orgcaf6e48">2.2.3. Date</a></li>
+<li><a href="#orgf282b89">2.2.4. Number</a></li>
+<li><a href="#org068b0a8">2.2.5. Item</a></li>
+<li><a href="#orga414a27">2.2.6. Set</a></li>
+</ul>
+</li>
+<li><a href="#org079087c">2.3. Filter operators</a>
+<ul>
+<li><a href="#orgaa2b5f4">2.3.1. Unary operators</a></li>
+<li><a href="#org28c6b5e">2.3.2. Binary operators</a></li>
+</ul>
+</li>
+<li><a href="#orgcc49855">2.4. Local ids and listing references</a></li>
+</ul>
+</li>
+<li><a href="#orgea011e2">3. Contexts</a></li>
+<li><a href="#org6eead94">4. Commands</a>
+<ul>
+<li><a href="#orgc75908d">4.1. List selection (<code>list</code>)</a></li>
+<li><a href="#orgdcbfd54">4.2. Modify selection (<code>modify</code>)</a>
+<ul>
+<li><a href="#orgfd74ad1">4.2.1. Arguments</a></li>
+</ul>
+</li>
+<li><a href="#org5a979c1">4.3. Add task (<code>add</code>)</a></li>
+<li><a href="#orgdddc6f7">4.4. Evaluating expressions (<code>eval</code>)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2674fb7" class="outline-2">
+<h2 id="org2674fb7"><span class="section-number-2">1</span> Data types</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+TWD has seven types. The types are text, number, boolean, date, regular
+expression, item and <i>t</i> set for any type <i>t</i>.
+</p>
+</div>
+<div id="outline-container-org41e1436" class="outline-3">
+<h3 id="org41e1436"><span class="section-number-3">1.1</span> Text</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The syntax for a text string is <code>{text body}</code>, where <code>text body</code> can be any
+string of characters. Matching pairs of curly braces inside the text body are
+automatically escaped. To escape an unmatched closing curly brace, use a double
+curly brace <code>}}</code>.
+</p>
+</div>
+<div id="outline-container-orga55706e" class="outline-4">
+<h4 id="orga55706e"><span class="section-number-4">1.1.1</span> Predicates</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Operation</th>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Result</th>
+<th scope="col" class="org-left">Example</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>:</code> (is)</td>
+<td class="org-left"><i>text</i></td>
+<td class="org-left"><i>bool</i></td>
+<td class="org-left"><code>prop:{value}</code></td>
+<td class="org-left"><code>prop</code> is exactly "<code>value</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>/</code> (contains)</td>
+<td class="org-left"><i>text</i></td>
+<td class="org-left"><i>bool</i></td>
+<td class="org-left"><code>prop/{substring}</code></td>
+<td class="org-left"><code>prop</code> contains "<code>substring</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>&lt;</code> (prefix)</td>
+<td class="org-left"><i>text</i></td>
+<td class="org-left"><i>bool</i></td>
+<td class="org-left"><code>prop&lt;{prefix}</code></td>
+<td class="org-left"><code>prop</code> starts with "<code>prefix</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>&gt;</code> (suffix)</td>
+<td class="org-left"><i>text</i></td>
+<td class="org-left"><i>bool</i></td>
+<td class="org-left"><code>prop&gt;{suffix}</code></td>
+<td class="org-left"><code>prop</code> ends with "<code>suffix</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>~</code> (matches)</td>
+<td class="org-left"><i>regex</i></td>
+<td class="org-left"><i>bool</i></td>
+<td class="org-left"><code>prop~{regex}</code></td>
+<td class="org-left"><code>prop</code> matches regular expression "<code>regex</code>"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org55d1670" class="outline-4">
+<h4 id="org55d1670"><span class="section-number-4">1.1.2</span> Properties</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Operation</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>.length</code></td>
+<td class="org-left"><i>num</i></td>
+<td class="org-left">Number of characters in the string</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-org5dd1e1f" class="outline-3">
+<h3 id="org5dd1e1f"><span class="section-number-3">1.2</span> Item</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+(Missing documentation)
+</p>
+</div>
+</div>
+<div id="outline-container-orgf423567" class="outline-3">
+<h3 id="orgf423567"><span class="section-number-3">1.3</span> Number</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-org1db427c" class="outline-3">
+<h3 id="org1db427c"><span class="section-number-3">1.4</span> Boolean</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-org9f79b8b" class="outline-3">
+<h3 id="org9f79b8b"><span class="section-number-3">1.5</span> Date</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-org5237418" class="outline-3">
+<h3 id="org5237418"><span class="section-number-3">1.6</span> Set</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+(Missing documentation.)
+</p>
+
+<p>
+For some operation <code>.op</code> and a set <code>set</code> of <i>t</i>, the meaning of <code>set.op</code> depends
+on the type of <i>op</i>. If op has type <i>t</i> &rarr; <i>u set</i>, then <code>set.op</code> will return
+the union of <code>x.op</code> for each <code>x</code> in <code>set</code>, while <code>set&amp;.op</code> will return the
+intersection. Otherwise, <code>set*.op</code> for some operator <code>*</code> of type <i>(u, u) &rarr; u</i>
+will return the result of mapping each element <code>x</code> to <code>x.op</code> and reducing by <code>*</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org9d709bf" class="outline-2">
+<h2 id="org9d709bf"><span class="section-number-2">2</span> Selections and filters</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Some subset of all the items in the database is called a <b>selection</b>. Selections
+are usually constructed by using <b>filters</b>.
+</p>
+
+<p>
+TWD commands always act on the current selection. A command in TWD takes the
+form
+</p>
+<pre class="example">
+&gt; [filter] [command] [arguments]
+</pre>
+<p>
+where <code>[filter]</code> is a filter that changes the selection, <code>[command]</code> is the name
+of a command that will act on that selection, and <code>[arguments]</code> may be a list of
+arguments given to the command.
+</p>
+
+<p>
+The command <i>list</i> simply lists all of the items in the current selection; it
+does not take arguments. If no command is specified, <i>list</i> is the default. This
+means that typing a filter on the command line will list all items in the
+database matching that filter.
+</p>
+</div>
+<div id="outline-container-org1509695" class="outline-3">
+<h3 id="org1509695"><span class="section-number-3">2.1</span> List of filter properties</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-orgeea9e90" class="outline-4">
+<h4 id="orgeea9e90"><span class="section-number-4">2.1.1</span> Global ID (<code>id</code>)</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+<b>Type:</b> text<br />
+</p>
+
+<p>
+The simplest possible filter simply specifies the global ID of a single task;
+for example, the task with global ID <i>a4</i> is written <code>id:{a4}</code>:
+</p>
+<pre class="example">
+&gt; id:a4
+ # | ID | Desc
+---+----+---------------
+ 1 | 4v | Do the dishes
+</pre>
+</div>
+</div>
+<div id="outline-container-org3bd1804" class="outline-4">
+<h4 id="org3bd1804"><span class="section-number-4">2.1.2</span> Description (<code>description</code>)</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+<b>Type:</b> text<br />
+</p>
+
+<p>
+This is the default property; when no property is specified, <i>description</i> is
+assumed. For example, to list all items whose description contains "buy":
+</p>
+<pre class="example">
+&gt; /buy
+  | Description
+--+------------------
+1 | Buy milk
+2 | Buy chocolate
+3 | Decide which car to buy
+</pre>
+<p>
+(This command is equivalent to <code>desc/{buy} list</code>.)
+Note that simply typing <code>example</code> will not list all items whose description
+exactly matches "example", because this could be confused with the name of a
+command; instead, use either <code>{example}</code> or <code>:example</code> to abbreviate
+<code>description:{example}</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org6b942dd" class="outline-4">
+<h4 id="org6b942dd"><span class="section-number-4">2.1.3</span> All tags (<code>tags</code>)</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<p>
+<b>Type:</b> set of text<br />
+</p>
+
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-org1fa1cd3" class="outline-4">
+<h4 id="org1fa1cd3"><span class="section-number-4">2.1.4</span> Any tag (<code>tag</code>)</h4>
+<div class="outline-text-4" id="text-2-1-4">
+<p>
+<b>Type:</b> text<br />
+</p>
+
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-org58e4600" class="outline-4">
+<h4 id="org58e4600"><span class="section-number-4">2.1.5</span> Active (<code>active</code>)</h4>
+<div class="outline-text-4" id="text-2-1-5">
+<p>
+<b>Type:</b> boolean<br />
+</p>
+
+<p>
+This property is on if the item is active (meaning it can be completed) and off
+if it is inactive.
+</p>
+</div>
+</div>
+<div id="outline-container-org622ef31" class="outline-4">
+<h4 id="org622ef31"><span class="section-number-4">2.1.6</span> Completed (<code>done</code>)</h4>
+<div class="outline-text-4" id="text-2-1-6">
+<p>
+<b>Type:</b> boolean<br />
+</p>
+
+<p>
+This property is on if the item has been marked as completed and off otherwise.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ecbae8" class="outline-4">
+<h4 id="org7ecbae8"><span class="section-number-4">2.1.7</span> Base urgency (<code>baseurgency</code>)</h4>
+<div class="outline-text-4" id="text-2-1-7">
+<p>
+<b>Type:</b> number<br />
+</p>
+
+<p>
+The base urgency of an item is the urgency that has been manually assigned to
+that item. The <code>urgency</code> property is a read-only property that is computed from
+the base urgency after taking into account various other factors.
+</p>
+</div>
+</div>
+<div id="outline-container-org11c81b9" class="outline-4">
+<h4 id="org11c81b9"><span class="section-number-4">2.1.8</span> Urgency (<code>urgency</code>)</h4>
+<div class="outline-text-4" id="text-2-1-8">
+<p>
+<b>Type:</b> number<br />
+</p>
+
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf6e67d8" class="outline-3">
+<h3 id="orgf6e67d8"><span class="section-number-3">2.2</span> Filter property types</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Each filter property has a type. The types are <i>text</i>, <i>date</i>, <i>number</i>, <i>item</i>
+and <i>set</i>. Each type supports various prediates.
+</p>
+</div>
+<div id="outline-container-org73e1235" class="outline-4">
+<h4 id="org73e1235"><span class="section-number-4">2.2.1</span> Text</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+Note that all of the text predicates are case insensitive by default.
+</p>
+
+<p>
+<b>Supported prediates:</b>
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Operation</th>
+<th scope="col" class="org-left">Example</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>:</code> (is)</td>
+<td class="org-left"><code>prop:{value}</code></td>
+<td class="org-left"><code>prop</code> is exactly "<code>value</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>/</code> (contains)</td>
+<td class="org-left"><code>prop/{substring}</code></td>
+<td class="org-left"><code>prop</code> contains "<code>substring</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>&lt;</code> (starts with)</td>
+<td class="org-left"><code>prop&lt;{prefix}</code></td>
+<td class="org-left"><code>prop</code> starts with "<code>prefix</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>&gt;</code> (ends with)</td>
+<td class="org-left"><code>prop&gt;{suffix}</code></td>
+<td class="org-left"><code>prop</code> ends with "<code>suffix</code>"</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>~</code> (matches)</td>
+<td class="org-left"><code>prop~{regex}</code></td>
+<td class="org-left"><code>prop</code> matches regular expression "<code>regex</code>"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-orgd7cfa7a" class="outline-4">
+<h4 id="orgd7cfa7a"><span class="section-number-4">2.2.2</span> Boolean</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+<b>Supported prediates:</b>
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Operation</th>
+<th scope="col" class="org-left">Example</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>+</code> (has)</td>
+<td class="org-left"><code>+prop</code></td>
+<td class="org-left"><code>prop</code> is on</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>-</code> (hasn't)</td>
+<td class="org-left"><code>-prop</code></td>
+<td class="org-left"><code>prop</code> is off</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-orgcaf6e48" class="outline-4">
+<h4 id="orgcaf6e48"><span class="section-number-4">2.2.3</span> Date</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-orgf282b89" class="outline-4">
+<h4 id="orgf282b89"><span class="section-number-4">2.2.4</span> Number</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-org068b0a8" class="outline-4">
+<h4 id="org068b0a8"><span class="section-number-4">2.2.5</span> Item</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-orga414a27" class="outline-4">
+<h4 id="orga414a27"><span class="section-number-4">2.2.6</span> Set</h4>
+<div class="outline-text-4" id="text-2-2-6">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org079087c" class="outline-3">
+<h3 id="org079087c"><span class="section-number-3">2.3</span> Filter operators</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Filter operators can be used to modify and compose filters. Operators can be
+unary or binary.
+</p>
+</div>
+<div id="outline-container-orgaa2b5f4" class="outline-4">
+<h4 id="orgaa2b5f4"><span class="section-number-4">2.3.1</span> Unary operators</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+Most unary operators are written as <code>filter .operator</code>. Note
+that parentheses can be used to specify how the operator binds to its argument,
+and that spacing influences this as well. For example, the following commands
+are equivalent:
+</p>
+<pre class="example">
+&gt; ((!#a, !#b).dep).not, #c
+&gt; !#a, !#b .dep.not, #c
+</pre>
+<p>
+Some unary operators can be written using prefix syntax. For example, <code>A.not</code>
+can also be written <code>!A</code>.
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="org46b2613"></a>Invert (<code>not</code>)<br />
+<div class="outline-text-5" id="text-2-3-1-1">
+<p>
+<b>Arity:</b> unary<br />
+<b>Alias:</b> <code>!</code> (prefix)<br />
+</p>
+
+<p>
+This operator inverts the filter argument; that is, it selects all items that do
+not match the filter. For example, the equivalent commands
+</p>
+<pre class="example">
+&gt; #cleaning (/wash, /wash.blocks).not
+</pre>
+<p>
+shows all items that are tagged with "cleaning", but which do not contain the
+word "wash" or are blocking a task containing the word "wash". The same command
+can be written using the prefix form of the <code>not</code> operator, which is called <code>!</code>:
+</p>
+<pre class="example">
+&gt; #cleaning !(/wash, /wash.b)
+</pre>
+</div>
+</li>
+<li><a id="orgac025c7"></a>Dependencies (<code>depends</code>)<br />
+<div class="outline-text-5" id="text-2-3-1-2">
+<p>
+<b>Arity:</b> unary<br />
+<b>Alias:</b> <code>dep</code>, <code>d</code><br />
+</p>
+
+<p>
+The operation <i>depends</i> gives all the items that are (directly) dependent on any
+of the items matching a given filter. It is the opposite operation of <i>blocks</i>.
+</p>
+
+<p>
+For example, the following command adds the tag "maybe" to dependencies of tasks
+that are already tagged "maybe":
+</p>
+<pre class="example">
+&gt; #maybe .dep mod #maybe
+</pre>
+</div>
+</li>
+<li><a id="org67ae6a5"></a>Blocking (<code>blocks</code>)<br />
+<div class="outline-text-5" id="text-2-3-1-3">
+<p>
+<b>Arity:</b> unary<br />
+<b>Alias</b>: <code>blo</code>, <code>b</code><br />
+</p>
+
+<p>
+The operation <i>blocks</i> gives all the items that are (directly) blocking any of
+the items matching a given filter. It is the opposite operation of <i>depends</i>.
+</p>
+
+<p>
+For example, the following command adds the tag "soon" to the tasks that are
+blocking a task that is either tagged with "design" or which begin with the word
+"consider":
+</p>
+<pre class="example">
+&gt; #design, &lt;consider .blo mod #soon
+</pre>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org28c6b5e" class="outline-4">
+<h4 id="org28c6b5e"><span class="section-number-4">2.3.2</span> Binary operators</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+Binary operators are written in infix notation.
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="org7910e05"></a>Intersection (space)<br />
+<div class="outline-text-5" id="text-2-3-2-1">
+<p>
+<b>Arity:</b> binary<br />
+<b>Alias:</b> &#x2014; <br />
+</p>
+
+<p>
+When two filters are written next to each other with spaces between them, this
+operator is used to combine the two filters.
+</p>
+
+<p>
+The result of <code>A B</code> is the set of items that match both filters <code>A</code> and <code>B</code>. For
+example, the following returns all items that are tagged "reading", but which
+are not tagged "research":
+</p>
+<pre class="example">
+&gt; #reading !#research
+</pre>
+</div>
+</li>
+<li><a id="orgb340a43"></a>Union (<code>,</code>)<br />
+<div class="outline-text-5" id="text-2-3-2-2">
+<p>
+<b>Arity:</b> binary<br />
+<b>Alias:</b> &#x2014; <br />
+</p>
+
+<p>
+The result of <code>A, B</code> is the set of items that match the filter <code>A</code> <i>or</i> the
+filter <code>B</code>. For example, the following command lists all items which depend on
+an item that is either active or tagged as "soon":
+</p>
+<pre class="example">
+&gt; (+active, #soon).depends
+</pre>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgcc49855" class="outline-3">
+<h3 id="orgcc49855"><span class="section-number-3">2.4</span> Local ids and listing references</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+When listing the items matching a certain filter, the output looks like this:
+</p>
+<pre class="example">
+&gt; @week #important list
+A | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #research    | mon | Research bobcats
+2 | #important #appointment | tue | Meeting with Bob about bobcats
+3 | #important              | tue | Send documentation
+4 | #important              | fri | Respond to Jane's email
+</pre>
+<p>
+Note the letter "A" in leftmost column of the header. This is called the
+<b>listing reference</b>. When used in a filter, this reference represents all of the
+items in that listing. For example, the command below narrows the above
+selection to the tasks that are due later than monday and which don't contain
+the word "send":
+</p>
+<pre class="example">
+&gt; A due&gt;mon !/send
+B | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #appointment | tue | Meeting with Bob about bobcats
+2 | #important              | fri | Respond to Jane's email
+</pre>
+<p>
+Note that the listing reference has changed to "B". The listing reference will
+cycle through the letters A-Z. Also note the numbers in the leftmost column;
+these are the <b>local ids</b> of each item. These numbers can be used to refer to an
+item inside of a filter. For example, this command shows the second item in the
+listing of <code>@week #important 2</code> (i.e. "Meeting with Bob about bobcats"), as well
+as any items tagged "research":
+</p>
+<pre class="example">
+&gt; @week #important 2, @none #research
+C | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #research    | mon | Research bobcats
+2 | #research               |     | Figure out why penguins can't fly
+3 | #important #appointment | tue | Meeting with Bob about bobcats
+</pre>
+<p>
+Most commonly, local ids are used together with listing references to refer to
+an item from an earlier listing. Thus, the previous command could also take
+advantage of the listing labeled "A", shortening it it to:
+</p>
+<pre class="example">
+&gt; A 2, #research
+</pre>
+<p>
+As a special abbreviation, the space between the reference and the id may be
+omitted. For example:
+</p>
+<pre class="example">
+&gt; A4, B1
+B | Tags                    | Due | Description
+--+-------------------------+-----+--------------------------------
+1 | #important #appointment | tue | Meeting with Bob about bobcats
+2 | #important              | fri | Respond to Jane's email
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgea011e2" class="outline-2">
+<h2 id="orgea011e2"><span class="section-number-2">3</span> Contexts</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+It is possible to activate any number of different <b>contexts</b>. A context
+specifies the default filter, as well as a list of properties that will be
+automatically added to newly created items. Contexts can either be enabled or
+disabled globally, or they can be set for a single command. It is possible to
+enable multiple contexts at the same time.
+</p>
+
+<p>
+To cretae a new context, use the command <code>context new [filter] (default
+[properties])</code> (the default part is optional). The following will create a
+context called "leisure" in which only items that are tagged with "fun" as well
+as items that are active, due and whose urgency exceeds 10 are shown, and where
+items are given the property <code>review:tomorrow</code> by default:
+</p>
+<pre class="example">
+&gt; context add leisure #fun, (+active due&lt;=now urgency&gt;=10) default review:tomorrow
+</pre>
+<p>
+To active the context, use <code>context enable</code>:
+</p>
+<pre class="example">
+&gt; context enable leisure
+</pre>
+<p>
+It is possible to override the current contexts for a single command by
+prefixing the context name with the <code>@</code> character. Contexts stack in the order
+they are given, while the special context <code>@none</code> disables all contexts. For
+instance, the following command enables the contexts "appointments" and
+"important" in addition to any contexts that are already enabled:
+</p>
+<pre class="example">
+&gt; @appointments @important list
+</pre>
+<p>
+This command adds a new item without using any of the default properties from
+currently enabled contexts:
+</p>
+<pre class="example">
+&gt; @none add #shopping {Buy groceries} due:tomorrow@17:00
+</pre>
+</div>
+</div>
+<div id="outline-container-org6eead94" class="outline-2">
+<h2 id="org6eead94"><span class="section-number-2">4</span> Commands</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgc75908d" class="outline-3">
+<h3 id="orgc75908d"><span class="section-number-3">4.1</span> List selection (<code>list</code>)</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+This is the default command.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdcbfd54" class="outline-3">
+<h3 id="orgdcbfd54"><span class="section-number-3">4.2</span> Modify selection (<code>modify</code>)</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+(Missing documentation.)
+</p>
+</div>
+<div id="outline-container-orgfd74ad1" class="outline-4">
+<h4 id="orgfd74ad1"><span class="section-number-4">4.2.1</span> Arguments</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5a979c1" class="outline-3">
+<h3 id="org5a979c1"><span class="section-number-3">4.3</span> Add task (<code>add</code>)</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+<div id="outline-container-orgdddc6f7" class="outline-3">
+<h3 id="orgdddc6f7"><span class="section-number-3">4.4</span> Evaluating expressions (<code>eval</code>)</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+(Missing documentation.)
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2019-04-28 Sun 22:10</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
