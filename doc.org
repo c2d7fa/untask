@@ -1,5 +1,47 @@
 #+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
 #+TITLE: Documentation
+* Data types
+TWD has seven types. The types are text, number, boolean, date, regular
+expression, item and /t/ set for any type /t/.
+** Text
+The syntax for a text string is ={text body}=, where =text body= can be any
+string of characters. Matching pairs of curly braces inside the text body are
+automatically escaped. To escape an unmatched closing curly brace, use a double
+curly brace =}}=.
+*** Predicates
+| Operation      | Parameter | Result | Example            | Meaning                                     |
+|----------------+-----------+--------+--------------------+---------------------------------------------|
+| =:= (is)       | /text/    | /bool/ | =prop:{value}=     | =prop= is exactly "=value="                 |
+| =/= (contains) | /text/    | /bool/ | =prop/{substring}= | =prop= contains "=substring="               |
+| =<= (prefix)   | /text/    | /bool/ | =prop<{prefix}=    | =prop= starts with "=prefix="               |
+| =>= (suffix)   | /text/    | /bool/ | =prop>{suffix}=    | =prop= ends with "=suffix="                 |
+| =~= (matches)  | /regex/   | /bool/ | =prop~{regex}=     | =prop= matches regular expression "=regex=" |
+*** Properties
+| Operation | Type  | Result                             |
+|-----------+-------+------------------------------------|
+| =.length= | /num/ | Number of characters in the string |
+** Item
+(Missing documentation)
+** Number
+(Missing documentation.)
+** Boolean
+(Missing documentation.)
+** Date
+(Missing documentation.)
+** Set
+(Missing documentation.)
+
+For some operation =.op= and a set =set= of /t/, the meaning of =set.op= depends
+on the type of /op/. If op has type /t/ \to /u set/, then =set.op= will return
+the union of =x.op= for each =x= in =set=, while =set&.op= will return the
+intersection. Otherwise, =set*.op= for some operator =*= of type /(u, u) \to u/
+will return the result of mapping each element =x= to =x.op= and reducing by
+=*=.
+
+1. =set.op= (op on t)
+2. =set..op= (op on set)
+3. =set*arg= (op on set)
+4. =set.*arg= (op on t)
 * Selections and filters
 Some subset of all the items in the database is called a *selection*. Selections
 are usually constructed by using *filters*.
@@ -263,7 +305,7 @@ instance, the following command enables the contexts "appointments" and
 This command adds a new item without using any of the default properties from
 currently enabled contexts:
 #+BEGIN_EXAMPLE
-> @none add +shopping {Buy groceries} due:tomorrow@17:00
+> @none add #shopping {Buy groceries} due:tomorrow@17:00
 #+END_EXAMPLE
 * Commands
 ** List selection (=list=)
@@ -273,4 +315,6 @@ This is the default command.
 *** Arguments
 (Missing documentation.)
 ** Add task (=add=)
+(Missing documentation.)
+** Evaluating expressions (=eval=)
 (Missing documentation.)
