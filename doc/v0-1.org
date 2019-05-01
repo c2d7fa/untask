@@ -1,0 +1,126 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Notes on Implementation of Version 0.1
+
+This file contains some temporary implementation notes about what we need to
+implement next. Eventually, the text here should be merged into the main
+documentation or be deleted. This document essentially describes a boiled-down
+version of the main program that we can implement in the near future.
+
+* Syntax
+Every command in version 0.1 has the form:
+#+BEGIN_EXAMPLE
+[filter] [command] [arguments]
+#+END_EXAMPLE
+where =[filter]= is a filter expression and =[command]= is the name of a
+command; the meaning of =[arguments]= depends on the given command. There are
+three commands: =list=, =modify= and =add=.
+** Filter expressions
+A filter expression consists of a comma-separated lists of subexpressions. A
+filter expression matches an item if any of the subexpressions do. Each
+subexpression is a space-separated list of pairs of the form:
+#+BEGIN_EXAMPLE
+[key][op][value]
+#+END_EXAMPLE
+The subexpression matches if each pair does. In the pair, =[key]= must be a
+valid property key. The meaning of =[op]= depends on the property type; see
+below. The =[value]= must be a value expression of the correct type; see the
+relevant section.
+
+An expression or subexpression may be placed inside a parenthesis.  Finally, any
+expression, subexpression or pair may be prefixed with =!=; in this case the
+meaning of the expression is inverted.
+
+For some ID =123=, the filter expression =id:123= can be abbreviated as simply
+=123=. If no =[key]= is given, =description= is assumed; if neither =[key]= nor
+=[op]= is given, =description:= is assumed.
+
+The operators on *string* are as follows:
+| Operator | Argument Type | Meaning                           |
+|----------+---------------+-----------------------------------|
+| =:=      | string        | String matches exactly            |
+| =+=      | string        | String contains substring         |
+| =-=      | string        | String does not contain substring |
+| =<=      | string        | String starts with prefix         |
+| =>=      | string        | String ends with suffix           |
+
+For any type /t/, the oprators on a */t/ set* are as follows:
+| Operator | Argument Type | Meaning                                  |
+|----------+---------------+------------------------------------------|
+| =:=      | /t/ set       | Set only contains exact values           |
+| =+=      | /t/           | Set contains element                     |
+| =-=      | /t/           | Set does not contain element             |
+| =<=      | /t/ set       | Set contains only elements from superset |
+| =>=      | /t/ set       | Set contains all elements from subset    |
+** Modify expressions
+The syntax for modify expressions mimics that of a filter expression, but the
+operators and their meanings are different.
+
+The operators on *string* are as follows:
+| Operator | Argument Type | Meaning                  |
+|----------+---------------+--------------------------|
+| =:=      | string        | Set value of string      |
+| =<=      | string        | Prepend prefix to string |
+| =>=      | string        | Append suffix to string  |
+
+For any type /t/, the oprators on a */t/ set* are as follows:
+| Operator | Argument Type | Meaning                |
+|----------+---------------+------------------------|
+| =:=      | /t/ set       | Change contents of set |
+| =+=      | /t/           | Add new value to set   |
+| =-=      | /t/           | Remove value from set  |
+| =>=      | /t/ set       | Add all values to set  |
+** Values
+1. ={...}= (string)
+2. =$1234= (number)
+3. =[...]= (set)
+4. =value.property= (depends on value and property)
+5. =(filter)= (item set)
+6. =(id:id)= (item)
+7. =value*value= (depends on values and operator =*=)
+
+string abbreviation
+
+id:id abbreviation
+
+
+
+** Commands
+There are three commands: =list=, =add= and =modify=.
+
+The =list= command is the default. It is invoked with one of the following two
+forms:
+#+BEGIN_EXAMPLE
+[filter] list
+[filter]
+#+END_EXAMPLE
+where =[filter]= is a filter expression. It prints a listing of all the items
+matching the given filter expression.
+
+The =modify= and =add= commands are invoked as
+#+BEGIN_EXAMPLE
+[filter] modify [modify]
+#+END_EXAMPLE
+(where =[filter]= is a filter expression and =[modify]= is a modify expression)
+and
+#+BEGIN_EXAMPLE
+add [modify]
+#+END_EXAMPLE
+(where =[modify]= is a modify expression), respectively. The =modify= command
+modifies the properties of each item matched by the filter expression according
+to the given modify expression. The =add= command creates a new item with
+properties given by the modify expression.
+* Properties
+The following table lists all valid properties. Properties that are marked as
+/read-only/ cannot be modified directly.
+| Key           | Modifable  | Type       | Description                                |
+|---------------+------------+------------+--------------------------------------------|
+| =id=          | Modifiable | string     | Unique global ID                           |
+| =description= | Modifiable | string     | Description of item                        |
+| =tags=        | Modifiable | string set | List of tags                               |
+| =depends=     | Modifiable | item set   | Items that the item depends on             |
+| =blocks=      | Modifabile | item set   | Items that depend on the item              |
+| =basestatus=  | Modifiable | string     | Manually set status (active/inactive/done) |
+| =status=      | Read-only  | string     | Calculated status (active/inactive/done)   |
+| =baseurgency= | Modifiable | number     | Manually set urgency                       |
+| =urgency=     | Read-only  | number     | Calculated urgency                         |
+
