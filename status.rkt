@@ -21,14 +21,23 @@
 
 (define base-status-active 'active)
 (define base-status-inactive 'inactive)
-(define base-status-done 'finishde)
+(define base-status-done 'done)
 
 (define (register-property-base-status item-data)
   (data:new-property item-data #:key base-status-key #:name "Base Status" #:default base-status-active))
+
+(define (finished? item-data item)
+  (eq? (data:get-property item-data item base-status-key) base-status-done))
+
+(define (unfinished? item-data item)
+  (not (finished? item-data item)))
 
 (define (active? item-data item)
   (eq? (data:get-property item-data item base-status-key) base-status-active))
 
 (define (inactive? item-data item)
   (not (active? item-data item)))
+
+
+
 

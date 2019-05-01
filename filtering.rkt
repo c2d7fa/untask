@@ -1,35 +1,30 @@
 #lang racket
 
-(require "state.rkt"
-         "item.rkt"
-         (only-in "util.rkt" set-filter))
+(require (prefix-in status: "status.rkt")
+         (prefix-in tags: "tags.rkt")
+         (only-in "util.rkt" set-filter filter-item-set))
 
 (provide (all-defined-out))
 
 ;;;
 
-(define (active? item)
-  (equal? (item-status item) 'todo))
 
-(define (uncompleted? item)
-  (not (equal? (item-status item) 'done)))
+(define (filter-active item-data item-set)
+  (filter-item-set item-data item-set status:active?))
 
-(define (filter-active item-set)
-  (set-filter active? item-set))
+(define (filter-uncompleted item-data item-set)
+  (filter-item-set item-data item-set status:unfinished?))
 
-(define (filter-uncompleted item-set)
-  (set-filter uncompleted? item-set))
-
-(define (has-tag? tag item)
-  (set-member? (item-tags item) tag))
-
-(define (filter-matching-query query item-set)
-  (define (matches-query? query item)
+(define (filter-matching-query item-data item-set query)
+  (define (matches-query? item query)
     (match query
-      ('active (active? item))
-      ((list 'tag tag) (has-tag? tag item))
-      ((list 'not subquery) (not (matches-query? subquery item)))
-      ((list 'and subqueries ...) (andmap (λ (subquery) (matches-query? subquery item)) subqueries))
-      ((list 'or subqueries ...) (ormap (λ (subquery) (matches-query? subquery item)) subqueries))
+      ('active (status:active? item-data item))
+      (`(tag ,tag) (tags:has-tag? item-data item tag))
+      (`(not ,subquery) (not (matches-query? subquery item)))
+      (`(and ,subqueries ...) (andmap (λ (subquery) (matches-query? item subquery)) subqueries))
+      (`(or ,subqueries ...) (ormap (λ (subquery) (matches-query? item subquery)) subqueries))
       (else (error (format "unknown query type: ~s" query)))))
-  (set-filter (λ (item) (matches-query? query item)) item-set))
+  (set-filter
+   (λ (item)
+     (matches-query? item query))
+   item-set))
