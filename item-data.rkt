@@ -50,6 +50,11 @@
   (define default-value (cdr property-metadata))
   (hash-ref (hash-ref item-properties item (hash)) key default-value))
 
+;; Returns set of all items.
+(define (all-items item-data)
+  (define item-properties (cadr item-data))
+  (list->set (hash-keys item-properties)))
+
 ;;;;
 
 ;; Returns new-item-data.
