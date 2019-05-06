@@ -32,25 +32,21 @@ meaning of the expression is inverted.
 
 For some ID =123=, the filter expression =id:123= can be abbreviated as simply
 =123=. If no =[key]= is given, =description= is assumed; if neither =[key]= nor
-=[op]= is given, =description:= is assumed.
+=[op]= is given, =description/= is assumed.
 
 The operators on *string* are as follows:
 | Operator | Argument Type | Meaning                           |
 |----------+---------------+-----------------------------------|
 | =:=      | string        | String matches exactly            |
-| =+=      | string        | String contains substring         |
-| =-=      | string        | String does not contain substring |
+| =/=      | string        | String contains substring         |
 | =<=      | string        | String starts with prefix         |
 | =>=      | string        | String ends with suffix           |
 
 For any type /t/, the oprators on a */t/ set* are as follows:
 | Operator | Argument Type | Meaning                                  |
 |----------+---------------+------------------------------------------|
-| =:=      | /t/ set       | Set only contains exact values           |
 | =+=      | /t/           | Set contains element                     |
 | =-=      | /t/           | Set does not contain element             |
-| =<=      | /t/ set       | Set contains only elements from superset |
-| =>=      | /t/ set       | Set contains all elements from subset    |
 ** Modify expressions
 The syntax for modify expressions mimics that of a filter expression, but the
 operators and their meanings are different.
@@ -65,25 +61,22 @@ The operators on *string* are as follows:
 For any type /t/, the oprators on a */t/ set* are as follows:
 | Operator | Argument Type | Meaning                |
 |----------+---------------+------------------------|
-| =:=      | /t/ set       | Change contents of set |
 | =+=      | /t/           | Add new value to set   |
 | =-=      | /t/           | Remove value from set  |
-| =>=      | /t/ set       | Add all values to set  |
 ** Values
-1. ={...}= (string)
-2. =$1234= (number)
-3. =[...]= (set)
-4. =value.property= (depends on value and property)
-5. =(filter)= (item set)
-6. =(id:id)= (item)
-7. =value*value= (depends on values and operator =*=)
+*Items.* An item is referred to by its ID. For exmaple, =2 mod depends+3= adds
+the item with ID 3 to the dependencies of the item with ID 2.
 
-string abbreviation
+*Strings.* A string is placed inside curly braces like so: ={string
+body}=. Matching curly braces are automatically escaped. To escape an unmatched
+closing brace, write it twice. If a string contains only lower-case characters
+and dashes, it can be written as a bare string, e.g. =this-is-a-string=.
 
-id:id abbreviation
+*Numbers.* Number literals begin with the character =$=.
 
-
-
+*Sets.* A set is written as a comma-separated list of its values, enclosed in
+square brackets. For example, a set containing integers between 1 and 3 would be
+written =[$1, $2, $3]=.
 ** Commands
 There are three commands: =list=, =add= and =modify=.
 
