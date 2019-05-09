@@ -15,6 +15,10 @@
    (hash)  ;; Property metadata
    ))
 
+(define (item-data-after item-data-mutator . arguments)
+  (let-values (((new-item-data return-value) (apply item-data-mutator arguments)))
+    new-item-data))
+
 ;; Returns (values new-item-data new-item).
 (define (new-item item-data)
   (define next-item (car item-data))
