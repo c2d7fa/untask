@@ -1,11 +1,5 @@
 #lang racket
 
-;; todo: we should allow modules to register their properties with
-;; value. we should also support read-only properties in this way.
-;;
-;; (register-property 'base-urgency #:type 'number)
-;; (register-calulated-property 'urgency #:calculate compute-urgency)
-
 (require
  (prefix-in data: "item-data.rkt")
 
@@ -72,40 +66,3 @@
 (define (search item-data filter-expression)
   (set-filter (λ (item) ((evaluate-filter-expression filter-expression) item-data item))
               (data:all-items item-data)))
-
-;; EXAMPLE
-
-(define example-item-data
-  (let ((register-property-s
-         (list status:register-property-base-status
-               tags:register-property-tags
-               description:register-property-description
-               urgency:register-property-base-urgency)))
-    (foldl
-     (λ (register-property item-data)
-       (let-values (((new-item-data _) (register-property item-data)))
-         new-item-data))
-     data:item-data-empty
-     register-property-s)))
-
-(set! example-item-data
-      ((evaluate-modify-expression '(and (description : "tagged a, b")
-                                         (tags + "a")
-                                         (tags + "b")))
-       example-item-data
-       0))
-(set! example-item-data
-      ((evaluate-modify-expression '(and (description : "tagged a")
-                                         (tags + "a")))
-       example-item-data
-       1))
-(set! example-item-data
-      ((evaluate-modify-expression '(and (description : "tagged b")
-                                         (tags + "b")))
-       example-item-data
-       2))
-
-(search example-item-data
-        '(and (description / "tag")
-              (not (or (description / ",")
-                       (tags - "b")))))
