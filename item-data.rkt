@@ -55,6 +55,11 @@
   (define item-properties (cadr item-data))
   (list->set (hash-keys item-properties)))
 
+;; Returns the ID (an integer uniquely representing a reference to an
+;; item) of an item in item-data.
+(define (item-id item-data item)
+  item)
+
 ;;;;
 
 ;; Returns new-item-data.

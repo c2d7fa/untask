@@ -32,7 +32,9 @@
      (not ((evaluate-filter-expression subexpr) item-data item)))
     (`(,property ,operator ,value) #:when (symbol? operator)
      ((evaluate-filter-operator operator) (data:get-property item-data item property)
-                                          value))))
+                                          value))
+    (id #:when (integer? id)
+     (= (data:item-id item-data item) id))))
 
 ;; Returns a set of all items with values in item-data matching
 ;; filter-expression.
