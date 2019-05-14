@@ -27,3 +27,11 @@
               ((evaluate-modify-expression subexpression) item-data  item))
             item-data
             subexpressions))))
+
+;; Returns new-item-data after modifying all items in item-data
+;; according to modify-expression.
+(define (modify-items item-data items modify-expression)
+  (foldl (λ (item item-data)
+           ((evaluate-modify-expression modify-expression) item-data item))
+         item-data
+         (set->list items)))

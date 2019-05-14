@@ -24,15 +24,14 @@
    (list* (add1 next-item) item-properties property-metadata)
    next-item))
 
-;; Returns (values new-item-data defined-property-key)
+;; Returns new-item-data.
 (define (new-property item-data #:key key #:name name #:default default)
   (define next-item (car item-data))
   (define item-properties (cadr item-data))
   (define properties-metadata (cddr item-data))
   (define property (list* name default))
-  (values
-   (list* next-item item-properties (hash-set properties-metadata key property))
-   key))
+  (list* next-item item-properties (hash-set properties-metadata key property)))
+
 
 ;; Returns new-item-data.
 (define (set-property item-data item key value)

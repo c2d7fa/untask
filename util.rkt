@@ -9,3 +9,9 @@
   (set-filter (λ (item)
                 (pred item-data item))
               item-set))
+
+(define-syntax (thread stx)
+  (syntax-case stx ()
+    ((thread x) #'x)
+    ((thread x (f ...) tail ...)
+     #'(thread (f ... x) tail ...))))
