@@ -18,3 +18,5 @@
 (define (remove-tag item-data item tag)
   (data:update-property item-data item tags-key (λ (tags) (set-remove tags tag))))
 
+(define (get-tags item-data item)
+  (data:get-property item-data item tags-key))
