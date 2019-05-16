@@ -6,6 +6,7 @@
  (only-in "src/util.rkt" thread)
 
  "src/user/execute.rkt"
+ "src/user/loop.rkt"
 
  (prefix-in status: "src/properties/status.rkt")
  (prefix-in description: "src/properties/description.rkt")
@@ -14,10 +15,11 @@
 
 (define (render-listing item-data items)
   (define (render-item item-data item)
-    (format "* <~a> ~a [~a]"
-            (urgency:urgency item-data item)
+    (format "~a. ~a [~a] <~a>"
+            (data:item-id item-data item)
             (description:get-description item-data item)
             (string-join (set->list (tags:get-tags item-data item)) " ")
+            (urgency:urgency item-data item)
             )
     )
   (string-join
@@ -42,4 +44,8 @@
     (execute* '((tags + "not-third") modify (base-urgency : 2)))
     ))
 
-(displayln (render-listing example-item-data (set->list (data:all-items example-item-data))))
+(define current-item-data-box (box example-item-data))
+
+(user-loop! current-item-data-box
+            #:parse (λ (s) (read (open-input-string s)))
+            #:render-listing render-listing)

@@ -24,7 +24,7 @@
                (list new-item))))
     (`(,filter-expression modify ,modify-expression)
      (values (modify-items item-data (search item-data filter-expression) modify-expression)
-             (search item-data filter-expression)))))
+             (set->list (search item-data filter-expression))))))
 
 ;; A version of execute with its parameter order and return values
 ;; modified to be better suited to constructing examples for testing.
