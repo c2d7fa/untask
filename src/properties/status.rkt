@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in data: "item-data.rkt"))
+(require (prefix-in data: "../data/item-data.rkt"))
 
 ;; Each task has a status, which is one of active, inactive and done. Active
 ;; means that the task still needs to be completed and can be worked on now;

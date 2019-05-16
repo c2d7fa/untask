@@ -1,16 +1,16 @@
 #lang racket
 
 (require
- (prefix-in data: "item-data.rkt")
+ (prefix-in data: "src/data/item-data.rkt")
 
- (only-in "util.rkt" thread)
+ (only-in "src/util.rkt" thread)
 
- "execute.rkt"
+ "src/user/execute.rkt"
 
- (prefix-in status: "status.rkt")
- (prefix-in description: "description.rkt")
- (prefix-in tags: "tags.rkt")
- (prefix-in urgency: "urgency.rkt"))
+ (prefix-in status: "src/properties/status.rkt")
+ (prefix-in description: "src/properties/description.rkt")
+ (prefix-in tags: "src/properties/tags.rkt")
+ (prefix-in urgency: "src/properties/urgency.rkt"))
 
 (define (render-listing item-data items)
   (define (render-item item-data item)

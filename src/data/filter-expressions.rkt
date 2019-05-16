@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require
- (only-in "util.rkt" set-filter)
+ (only-in "../util.rkt" set-filter)
 
  (prefix-in data: "item-data.rkt"))
 

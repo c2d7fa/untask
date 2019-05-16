@@ -3,10 +3,10 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in data: "item-data.rkt")
- 
- "filter-expressions.rkt"
- "modify-expressions.rkt")
+ (prefix-in data: "../data/item-data.rkt")
+
+ "../data/filter-expressions.rkt"
+ "../data/modify-expressions.rkt")
 
 ;; Convert a representation of a user-inputted command-line into a
 ;; function that takes the current item-data state and returns

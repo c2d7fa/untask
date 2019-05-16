@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in data: "item-data.rkt"))
+(require (prefix-in data: "../data/item-data.rkt"))
 
 (define tags-key 'tags)
 
