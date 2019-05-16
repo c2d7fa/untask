@@ -7,24 +7,13 @@
 
  "src/user/execute.rkt"
  "src/user/loop.rkt"
+ "src/user/listing.rkt"
 
  (prefix-in status: "src/properties/status.rkt")
  (prefix-in description: "src/properties/description.rkt")
  (prefix-in tags: "src/properties/tags.rkt")
- (prefix-in urgency: "src/properties/urgency.rkt"))
-
-(define (render-listing item-data items)
-  (define (render-item item-data item)
-    (format "~a. ~a [~a] <~a>"
-            (data:item-id item-data item)
-            (description:get-description item-data item)
-            (string-join (set->list (tags:get-tags item-data item)) " ")
-            (urgency:urgency item-data item)
-            )
-    )
-  (string-join
-   (map (λ (item) (render-item item-data item)) items)
-   "\n"))
+ (prefix-in urgency: "src/properties/urgency.rkt")
+ )
 
 ;;; EXAMPLE
 
@@ -46,6 +35,7 @@
 
 (define current-item-data-box (box example-item-data))
 
+#;
 (user-loop! current-item-data-box
             #:parse (λ (s) (read (open-input-string s)))
             #:render-listing render-listing)
