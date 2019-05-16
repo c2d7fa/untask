@@ -30,12 +30,12 @@
     (execute* '(add (and (description : "here is another item") (tags + "another-tag"))))
     (execute* '(add (and (description : "third item") (tags + "some-tag") (tags + "yet-another-tag"))))
     (execute* '((not (description / "third")) modify (and (tags - "some-tag") (tags + "not-third"))))
-    (execute* '((tags + "not-third") modify (base-urgency : 2)))
+    (execute* '((tags + "not-third") modify (base-urgency : (number . 2))))
+    (execute* '((or 1 2) modify (base-urgency + (number . 0.5))))
     ))
 
 (define current-item-data-box (box example-item-data))
 
-#;
 (user-loop! current-item-data-box
             #:parse (λ (s) (read (open-input-string s)))
             #:render-listing render-listing)

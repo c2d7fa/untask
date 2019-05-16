@@ -7,7 +7,7 @@
 (define base-urgency-key 'base-urgency)
 
 (define (register-property-base-urgency item-data)
-  (data:new-property item-data #:key base-urgency-key #:name "Base Urgency" #:default 0))
+  (data:new-property item-data #:key base-urgency-key #:name "Base Urgency" #:default (cons 'number 0)))
 
 (define (get-base-urgency item-data item)
   (data:get-property item-data item base-urgency-key))

@@ -5,20 +5,13 @@
 (require
  (only-in "../util.rkt" set-filter)
 
+ (prefix-in operators: "operators.rkt")
+
  (prefix-in data: "item-data.rkt"))
 
 ;; Take a filter expression and return a function that returns whether
 ;; an item matches the filter.
 (define ((evaluate-filter-expression filter-expression) item-data item)
-  (define ((evaluate-filter-operator operator) property-value argument)
-    (case operator
-      ((:) (equal? property-value argument))
-      ((/) (string-contains? property-value argument))
-      ((<) (string-prefix? property-value argument))
-      ((>) (string-suffix? property-value argument))
-      ((+) (set-member? property-value argument))
-      ((-) (not (set-member? property-value argument)))
-      ))
   (match filter-expression
     (`(and ,subexprs ...)
      (andmap (λ (subexpr)
@@ -31,8 +24,13 @@
     (`(not ,subexpr)
      (not ((evaluate-filter-expression subexpr) item-data item)))
     (`(,property ,operator ,value) #:when (symbol? operator)
-     ((evaluate-filter-operator operator) (data:get-property item-data item property)
-                                          value))
+     (if (eq? operator ':)
+         (equal? (data:get-property item-data item property) value)
+         (operators:evaluate-operator-expression operators:common-operators
+                                                 (list (data:get-property item-data item property)
+                                                       operator
+                                                       value)
+                                                 #t)))
     (id #:when (integer? id)
      (= (data:item-id item-data item) id))))
 

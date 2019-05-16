@@ -15,3 +15,9 @@
     ((thread x) #'x)
     ((thread x (f ...) tail ...)
      #'(thread (f ... x) tail ...))))
+
+(define-syntax (thread-first stx)
+  (syntax-case stx ()
+    ((thread-first x) #' x)
+    ((thread-first x (f args ...) tail ...)
+     #'(thread-first (f x args ...) tail ...))))
