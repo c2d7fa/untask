@@ -26,12 +26,12 @@
 
 (define example-item-data
   (thread item-data-empty-with-properties
-    (execute* '(add (and (description : "this is a brand new item") (tags + "some-tag") (tags + "another-tag"))))
-    (execute* '(add (and (description : "here is another item") (tags + "another-tag"))))
-    (execute* '(add (and (description : "third item") (tags + "some-tag") (tags + "yet-another-tag"))))
-    (execute* '((not (description / "third")) modify (and (tags - "some-tag") (tags + "not-third"))))
-    (execute* '((tags + "not-third") modify (base-urgency : (number . 2))))
-    (execute* '((or 1 2) modify (base-urgency + (number . 0.5))))
+    (execute* '(add (and (description : (string . "this is a brand new item")) (tags + (string . "some-tag")) (tags + (string . "another-tag")))))
+    (execute* '(add (and (description : (string . "here is another item")) (tags + (string . "another-tag")))))
+    (execute* '(add (and (description : (string . "third item")) (tags + (string . "some-tag")) (tags + (string . "yet-another-tag")))))
+    (execute* '((not (description / (string . "third"))) modify (and (tags - (string . "some-tag")) (tags + (string . "not-third")))))
+    (execute* '((tags + (string . "not-third")) modify (base-urgency : (number . 2))))
+    (execute* '((or (item . 1) (item . 2)) modify (base-urgency + (number . 0.5))))
     ))
 
 (define current-item-data-box (box example-item-data))
