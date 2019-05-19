@@ -7,7 +7,7 @@
 
 (define (make-string string-content)
   `(string . ,string-content))
-(define (make-set (set-value '(set)))
+(define (make-set (set-value (set)))
   `(set . ,set-value))
 (define (make-number x)
   `(number . ,x))
