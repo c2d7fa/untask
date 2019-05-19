@@ -5,6 +5,13 @@
 (require
  (prefix-in expr: "expressions.rkt"))
 
+(define (make-string string-content)
+  `(string . ,string-content))
+(define (make-set)
+  `(set . ,(set)))
+(define (make-number x)
+  `(number . ,x))
+
 (define (evaluate-literal literal-expression)
   (match literal-expression
     (`(string . ,string-content) `(string . ,string-content))

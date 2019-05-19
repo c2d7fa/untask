@@ -2,12 +2,15 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in data: "../data/item-data.rkt"))
+(require
+ (prefix-in data: "../data/item-data.rkt")
+ (prefix-in val: "..data/values.rkt")
+ )
 
 (define description-key 'description)
 
 (define (register-property-description item-data)
-  (data:new-property item-data #:key description-key #:name "Description" #:default "(No description)"))
+  (data:new-property item-data #:key description-key #:name "Description" #:default (val:make-string "(No description)")))
 
 (define (get-description item-data item)
   (data:get-property item-data item description-key))

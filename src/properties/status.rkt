@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in data: "../data/item-data.rkt"))
+(require (prefix-in data: "../data/item-data.rkt")
+         (prefix-in val: "../data/values.rkt"))
 
 ;; Each task has a status, which is one of active, inactive and done. Active
 ;; means that the task still needs to be completed and can be worked on now;
@@ -19,9 +20,9 @@
 
 (define base-status-key 'base-status)
 
-(define base-status-active 'active)
-(define base-status-inactive 'inactive)
-(define base-status-done 'done)
+(define base-status-active (val:make-string "active"))
+(define base-status-inactive (val:make-string "inactive"))
+(define base-status-done (val:make-string "done"))
 
 (define (register-property-base-status item-data)
   (data:new-property item-data #:key base-status-key #:name "Base Status" #:default base-status-active))
