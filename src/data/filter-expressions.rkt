@@ -32,7 +32,7 @@
                                                        operator
                                                        (val:evaluate-literal literal-expr))
                                                  #t)))
-    (id #:when (integer? id)  ;; TODO: After implementing parsing: Do we still want this?
+    (`(item . ,id)
      (= (data:item-id item-data item) id))))
 
 ;; Returns a set of all items with values in item-data matching

@@ -2,7 +2,8 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../util.rkt" thread-first))
+(require (only-in "../util.rkt" thread-first)
+         (prefix-in val: "values.rkt"))
 
 (define (create-operator #:name name
                          #:object object-type
@@ -37,29 +38,17 @@
   (hash-ref opdefs (list* name object-type filter-context?)))
 
 (define (type-of value)
-  (cond
-    ((string? value) 'string)
-    ((number? value) 'item)
-    ((set? value) 'set)
-    ((boolean? value) 'boolean)
-    ((and (pair? value) (eq? 'number (car value))) 'number)
-    (else 'any)))
+  (car value))  ;; TODO: Temporary hack. Should probably be handled by values module.
 
 ;; TODO: This should be allowed to access item-data (for resolving
 ;; properties on items mentioned.)
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
-    (`(,object ,operator ,arguments ...)
+    (`(,object ,operator ,argument-literal-exprs ...)
      (apply operator-eval
             (operator-definitions-find opdefs operator (type-of object) filter-context?)
             object
-            arguments))))
-
-;; TODO: This should definitely be somewhere else
-(define (number-value x)
-  (cdr x))
-(define (make-number x)
-  (cons 'number x))
+            (map val:evaluate-literal argument-literal-exprs)))))
 
 ;;; COMMON OPERATORS
 ;; (TODO: Move this somewhere else.)
@@ -69,39 +58,39 @@
                    #:object 'string
                    #:arguments '(string)
                    #:return 'string
-                   #:body (λ (str sfx) (string-append str sfx))))
+                   #:body (λ (str sfx) (val:make-string (string-append (val:unwrap-string str) (val:unwrap-string sfx))))))
 (define op-string-prefix
   (create-operator #:name '<
                    #:object 'string
                    #:arguments '(string)
                    #:return 'string
-                   #:body (λ (str pfx) (string-append pfx pfx))))
+                   #:body (λ (str pfx) (val:make-string (string-append (val:unwrap-string pfx) (val:unwrap-string pfx))))))
 
 (define op-number-add
   (create-operator #:name '+
                    #:object 'number
                    #:arguments '(number)
                    #:return 'number
-                   #:body (λ (x y) (make-number (+ (number-value x) (number-value y))))))
+                   #:body (λ (x y) (val:make-number (+ (val:unwrap-number x) (val:unwrap-number y))))))
 (define op-number-subtract
   (create-operator #:name '-
                    #:object 'number
                    #:arguments '(number)
                    #:return 'number
-                   #:body (λ (x y) (make-number (- (number-value x) (number-value y))))))
+                   #:body (λ (x y) (val:make-number (- (val:unwrap-number x) (val:unwrap-number y))))))
 
 (define op-set-add
   (create-operator #:name '+
                    #:object 'set
                    #:arguments '(any)
                    #:return 'set
-                   #:body (λ (xs x) (set-add xs x))))
+                   #:body (λ (xs x) (val:make-set (set-add (val:unwrap-set xs) x)))))
 (define op-set-remove
   (create-operator #:name '-
                    #:object 'set
                    #:arguments '(any)
                    #:return 'set
-                   #:body (λ (xs x) (set-remove xs x))))
+                   #:body (λ (xs x) (val:make-set (set-remove (val:unwrap-set xs) x)))))
 
 (define op-string-match?
   (create-operator #:name '/
@@ -109,21 +98,21 @@
                    #:arguments '(string)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (str sst) (string-contains? str sst))))
+                   #:body (λ (str sst) (val:make-boolean (string-contains? (val:unwrap-string str) (val:unwrap-string sst))))))
 (define op-string-prefix?
   (create-operator #:name '<
                    #:object 'string
                    #:arguments '(string)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (str prf) (string-prefix? str prf))))
+                   #:body (λ (str prf) (val:make-boolean (string-prefix? (val:unwrap-string str) (val:unwrap-string prf))))))
 (define op-string-suffix?
   (create-operator #:name '>
                    #:object 'string
                    #:arguments '(string)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (str sfx) (string-suffix? str sfx))))
+                   #:body (λ (str sfx) (val:make-boolean (string-suffix? (val:unwrap-string str) (val:unwrap-string sfx))))))
 
 (define op-set-contains?
   (create-operator #:name '+
@@ -131,14 +120,14 @@
                    #:arguments '(any)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (xs x) (set-member? xs x))))
+                   #:body (λ (xs x) (val:make-boolean (set-member? (val:unwrap-set xs) x)))))
 (define op-set-doesnt-contain?
   (create-operator #:name '-
                    #:object 'set
                    #:arguments '(any)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (xs x) (not (set-member? xs x)))))
+                   #:body (λ (xs x) (val:make-boolean (not (set-member? (val:unwrap-set xs) x))))))
 
 (define op-number-greater-than?
   (create-operator #:name '>
@@ -146,14 +135,14 @@
                    #:arguments '(number)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (x y) (> (number-value x) (number-value y)))))
+                   #:body (λ (x y) (val:make-boolean (> (val:unwrap-number x) (val:unwrap-number y))))))
 (define op-number-less-than?
   (create-operator #:name '<
                    #:object 'number
                    #:arguments '(number)
                    #:return 'boolean
                    #:filter? #t
-                   #:body (λ (x y) (< (number-value x) (number-value y)))))
+                   #:body (λ (x y) (val:make-boolean (< (val:unwrap-number x) (val:unwrap-number y))))))
 
 ;;
 

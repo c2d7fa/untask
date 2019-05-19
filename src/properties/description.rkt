@@ -4,7 +4,7 @@
 
 (require
  (prefix-in data: "../data/item-data.rkt")
- (prefix-in val: "..data/values.rkt")
+ (prefix-in val: "../data/values.rkt")
  )
 
 (define description-key 'description)
