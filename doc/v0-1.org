@@ -1,5 +1,5 @@
 #+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
-#+TITLE: Notes on Implementation of Version 0.1
+#+TITLE: Notes on Version 0.1
 
 This file contains some temporary implementation notes about what we need to
 implement next. Eventually, the text here should be merged into the main
@@ -116,4 +116,22 @@ The following table lists all valid properties. Properties that are marked as
 | =status=      | Read-only  | string     | Calculated status (active/inactive/done)   |
 | =baseurgency= | Modifiable | number     | Manually set urgency                       |
 | =urgency=     | Read-only  | number     | Calculated urgency                         |
+* Implementation
+TWD stores the current program state in a boxed variable, which is
+updated based on the user's input. The program state contains a
+mapping /(item, property key) \rightarrow value/, where:
+- /item/ is represented as a number, which is the ID of the item;
+- /property key/ is a symbol; and
+- /value/ is a value, represented in the manner described below.
+** Expressions and values
+When TWD parses a command line, it generates an
+*expression*. Expressions are simple types whose representation does
+not depend on any context (state).
+
+When expressions are evaluated, the result is a *value*. Types of
+values include the following:
+- /strings/, represented as =`(string . "string content")=;
+- /numbers/, represented as =`(number . -2.5)=;
+- /items/, represented as =`(item . 62)=;
+- /sets/, represented as =`(set . ,(set '(item . 1) '(item . 2) '(item . 3)))=.
 

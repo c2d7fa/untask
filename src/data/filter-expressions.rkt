@@ -6,8 +6,9 @@
  (only-in "../util.rkt" set-filter)
 
  (prefix-in operators: "operators.rkt")
-
- (prefix-in data: "item-data.rkt"))
+ (prefix-in data: "item-data.rkt")
+ (prefix-in val: "values.rkt")
+ )
 
 ;; Take a filter expression and return a function that returns whether
 ;; an item matches the filter.
@@ -23,15 +24,15 @@
             subexprs))
     (`(not ,subexpr)
      (not ((evaluate-filter-expression subexpr) item-data item)))
-    (`(,property ,operator ,value) #:when (symbol? operator)
+    (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (if (eq? operator ':)
-         (equal? (data:get-property item-data item property) value)
+         (equal? (data:get-property item-data item property) (val:evaluate-literal literal-expr))
          (operators:evaluate-operator-expression operators:common-operators
                                                  (list (data:get-property item-data item property)
                                                        operator
-                                                       value)
+                                                       (val:evaluate-literal literal-expr))
                                                  #t)))
-    (id #:when (integer? id)
+    (`(item . ,id)
      (= (data:item-id item-data item) id))))
 
 ;; Returns a set of all items with values in item-data matching
