@@ -66,7 +66,7 @@
 (define filter-pair/p
   (or/p (f:do (char/p #\!)
               (fp <- filter-or-modify-pair/p)
-              (f:pure (cons 'not fp)))
+              (f:pure (list 'not fp)))
         filter-or-modify-pair/p
         literal-item-expression/p))
 

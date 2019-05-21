@@ -13,7 +13,7 @@
  (prefix-in description: "src/properties/description.rkt")
  (prefix-in tags: "src/properties/tags.rkt")
  (prefix-in urgency: "src/properties/urgency.rkt")
- (prefix-in parse: "src/user/parser.rkt")
+ (only-in "src/user/parser.rkt" parse)
  )
 
 ;;; EXAMPLE
@@ -27,16 +27,16 @@
 
 (define example-item-data
   (thread item-data-empty-with-properties
-    (execute* '(add (and (description : (string . "this is a brand new item")) (tags + (string . "some-tag")) (tags + (string . "another-tag")))))
-    (execute* '(add (and (description : (string . "here is another item")) (tags + (string . "another-tag")))))
-    (execute* '(add (and (description : (string . "third item")) (tags + (string . "some-tag")) (tags + (string . "yet-another-tag")))))
-    (execute* '((not (description / (string . "third"))) modify (and (tags - (string . "some-tag")) (tags + (string . "not-third")))))
-    (execute* '((tags + (string . "not-third")) modify (base-urgency : (number . 2))))
-    (execute* '((or (item . 1) (item . 2)) modify (base-urgency + (number . 0.5))))
+    (execute* (parse "add description:{this is a brand new item} tags+some-tag tags+another-tag"))
+    (execute* (parse "add description:{here is another item} tags+another-tag"))
+    (execute* (parse "add description:{third item} tags+some-tag tags+yet-another-tag"))
+    (execute* (parse "!description/third modify tags-some-tag tags+not-third"))
+    (execute* (parse "tags+not-third modify baseurgency+$2"))
+    (execute* (parse "1, 2 modify baseurgency-$1"))
     ))
 
 (define current-item-data-box (box example-item-data))
 
 (user-loop! current-item-data-box
-            #:parse parse:parse
+            #:parse parse
             #:render-listing render-listing)
