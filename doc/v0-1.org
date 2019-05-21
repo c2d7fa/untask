@@ -95,7 +95,8 @@ The =modify= and =add= commands are invoked as
 #+BEGIN_EXAMPLE
 [filter] modify [modify]
 #+END_EXAMPLE
-(where =[filter]= is a filter expression and =[modify]= is a modify
+(where =[filter]= is a filter expression an
+d =[modify]= is a modify
 expression) and
 #+BEGIN_EXAMPLE
 add [modify]
@@ -159,5 +160,4 @@ Tasks that we need to finish before version 0.1:
 - Implement =save= and =load= commands
 - Implement special property /blocks/
 - Sort listing by urgency
-- Support list command with no filter
-- Support implicit list command
+- Handle parse errors in REPL

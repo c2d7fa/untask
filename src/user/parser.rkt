@@ -82,21 +82,30 @@
                             (many/p filter-or-modify-pair/p #:sep whitespace/p))))
     and-list/p))
 
+(define (opt/p parser #:default (default (void)))
+  (or/p (try/p parser)
+        (f:pure default)))
+
+(define (command/p command-name #:takes-filter? (takes-filter? #t) #:arguments (arguments/p #f))
+  (f:do (fe <- (if takes-filter?
+                   (opt/p (f:do (e <- filter-expression/p)
+                                whitespace/p
+                                (f:pure (list e)))
+                          #:default (list '(and)))
+                   (f:pure (list))))
+        (string/p (symbol->string command-name))
+        (args <- (if arguments/p
+                     (f:do whitespace/p
+                           (args <- arguments/p)
+                           (f:pure args))
+                     (f:pure (list))))
+        (f:pure (append fe (list command-name) args))))
+
 (define command-line-input/p
-  (or/p (try/p (f:do (fe <- filter-expression/p)
-                     whitespace/p
-                     (string/p "modify")
-                     whitespace/p
-                     (me <- modify-expression/p)
-                     (f:pure (list fe 'modify me))))
-        (try/p (f:do (fe <- filter-expression/p)
-                     whitespace/p
-                     (string/p "list")
-                     (f:pure (list fe 'list))))
-        (try/p (f:do (string/p "add")
-                     whitespace/p
-                     (me <- modify-expression/p)
-                     (f:pure (list 'add me))))))
+  (or/p (try/p (command/p 'modify #:arguments (list/p modify-expression/p)))
+        (try/p (command/p 'list))
+        (try/p (command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p)))
+        (f:map (λ (fe) `(,fe list)) filter-expression/p)))
 
 (define (parse command-line-input)
   (parse-result! (parse-string command-line-input/p command-line-input)))
