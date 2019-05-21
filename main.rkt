@@ -13,6 +13,7 @@
  (prefix-in description: "src/properties/description.rkt")
  (prefix-in tags: "src/properties/tags.rkt")
  (prefix-in urgency: "src/properties/urgency.rkt")
+ (prefix-in parse: "src/user/parser.rkt")
  )
 
 ;;; EXAMPLE
@@ -37,5 +38,5 @@
 (define current-item-data-box (box example-item-data))
 
 (user-loop! current-item-data-box
-            #:parse (λ (s) (read (open-input-string s)))
+            #:parse parse:parse
             #:render-listing render-listing)

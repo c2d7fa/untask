@@ -45,10 +45,11 @@
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
     (`(,object ,operator ,argument-literal-exprs ...)
-     (apply operator-eval
-            (operator-definitions-find opdefs operator (type-of object) filter-context?)
-            object
-            (map val:evaluate-literal argument-literal-exprs)))))
+     (let ((result (apply operator-eval
+                          (operator-definitions-find opdefs operator (type-of object) filter-context?)
+                          object
+                          (map val:evaluate-literal argument-literal-exprs))))
+       (if filter-context? (val:unwrap-boolean result) result)))))
 
 ;;; COMMON OPERATORS
 ;; (TODO: Move this somewhere else.)

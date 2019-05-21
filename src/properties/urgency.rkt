@@ -5,7 +5,7 @@
 (require (prefix-in data: "../data/item-data.rkt")
          (prefix-in val: "../data/values.rkt"))
 
-(define base-urgency-key 'base-urgency)
+(define base-urgency-key 'baseurgency)
 
 (define (register-property-base-urgency item-data)
   (data:new-property item-data #:key base-urgency-key #:name "Base Urgency" #:default (val:make-number 0)))
