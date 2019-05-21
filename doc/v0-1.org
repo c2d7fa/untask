@@ -78,30 +78,43 @@ and dashes, it can be written as a bare string, e.g. =this-is-a-string=.
 square brackets. For example, a set containing integers between 1 and 3 would be
 written =[$1, $2, $3]=.
 ** Commands
-There are three commands: =list=, =add= and =modify=.
+There are five commands: =list=, =add=, =modify=, =save= and =load=.
 
-The =list= command is the default. It is invoked with one of the following two
-forms:
+The =list= command is the default. It is invoked with one of the
+following three forms:
 #+BEGIN_EXAMPLE
 [filter] list
 [filter]
+list
 #+END_EXAMPLE
-where =[filter]= is a filter expression. It prints a listing of all the items
-matching the given filter expression.
+where =[filter]= is a filter expression. It prints a listing of all
+the items matching the given filter expression (or, if no filter is
+given, a list of all items in the database).
 
 The =modify= and =add= commands are invoked as
 #+BEGIN_EXAMPLE
 [filter] modify [modify]
 #+END_EXAMPLE
-(where =[filter]= is a filter expression and =[modify]= is a modify expression)
-and
+(where =[filter]= is a filter expression and =[modify]= is a modify
+expression) and
 #+BEGIN_EXAMPLE
 add [modify]
 #+END_EXAMPLE
-(where =[modify]= is a modify expression), respectively. The =modify= command
-modifies the properties of each item matched by the filter expression according
-to the given modify expression. The =add= command creates a new item with
-properties given by the modify expression.
+(where =[modify]= is a modify expression), respectively. The =modify=
+command modifies the properties of each item matched by the filter
+expression according to the given modify expression. The =add= command
+creates a new item with properties given by the modify expression.
+
+The =save= and =load= commands are used to export and import items
+respectively. They are invoked as such:
+#+BEGIN_EXAMPLE
+[filter] save [file]
+[filter] load [file]
+#+END_EXAMPLE
+In each case, the filter is optional The =save= commands saves all of
+the items matching =[filter]= (or, if no filter is given, all items)
+to the given file. The =load= command loads all items matching the
+given filter from the given file.
 * Properties
 The following table lists all valid properties. Properties that are marked as
 /read-only/ cannot be modified directly.
@@ -135,3 +148,16 @@ values include the following:
 - /items/, represented as =`(item . 62)=;
 - /sets/, represented as =`(set . ,(set '(item . 1) '(item . 2) '(item . 3)))=.
 
+* List of unimplemented features
+Tasks that we need to finish before version 0.1:
+
+- Use active and inactive status
+  - Add a way of marking tasks as finished or unfinished
+  - Allow user to show only active tasks
+  - Calculate active status from dependencies
+- Implement "read-only" properties /status/ and /urgency/
+- Implement =save= and =load= commands
+- Implement special property /blocks/
+- Sort listing by urgency
+- Support list command with no filter
+- Support implicit list command
