@@ -17,7 +17,7 @@
     (user-loop! item-data-box #:parse parse #:render-listing render-listing))
   (let ((input (with-handlers ((exn:break? (λ (e) #f)))
                  (prompt-line "> "))))
-    (if (or (eq? input #f) "exit")
+    (if (or (eq? input #f) (equal? input "exit"))
         (goodbye)
         (let ((parsed (with-handlers ((exn? (λ (e) #f)))
                         (parse input))))

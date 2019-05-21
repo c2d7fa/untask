@@ -21,6 +21,8 @@
 
 ;; Takes item-data and a set of items, returns sorted list of items.
 (define (sort-items-by-urgency-descending item-data item-set)
-  (sort (set->list item-set) >=
+  (define (number>= x y)
+    (>= (val:unwrap-number x) (val:unwrap-number y)))
+  (sort (set->list item-set) number>=
         #:key (λ (item)
                 (urgency item-data item))))

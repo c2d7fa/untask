@@ -4,6 +4,7 @@
 
 (require
  (prefix-in data: "../data/item-data.rkt")
+ (prefix-in urgency: "../properties/urgency.rkt")
 
  "../data/filter-expressions.rkt"
  "../data/modify-expressions.rkt")
@@ -17,7 +18,9 @@
 ;; input in the form (filter-expression command-name arguments...)
 (define ((execute command-line-representation) item-data)
   (match command-line-representation
-    (`(,filter-expression list) (values item-data (set->list (search item-data filter-expression))))
+    (`(,filter-expression list) (values item-data (urgency:sort-items-by-urgency-descending
+                                                   item-data
+                                                   (search item-data filter-expression))))
     (`(add ,modify-expression)
      (let-values (((new-item-data-1 new-item) (data:new-item item-data)))
        (values ((evaluate-modify-expression modify-expression) new-item-data-1 new-item)

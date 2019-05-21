@@ -159,4 +159,3 @@ Tasks that we need to finish before version 0.1:
 - Implement "read-only" properties /status/ and /urgency/
 - Implement =save= and =load= commands
 - Implement special property /blocks/
-- Sort listing by urgency
