@@ -12,23 +12,24 @@
 
 ;; Take a filter expression and return a function that returns whether
 ;; an item matches the filter.
-(define ((evaluate-filter-expression filter-expression) item-data item)
+(define ((evaluate-filter-expression filter-expression #:property-types property-types) item-data item)
   (match filter-expression
     (`(and ,subexprs ...)
      (andmap (λ (subexpr)
-               ((evaluate-filter-expression subexpr) item-data item))
+               ((evaluate-filter-expression subexpr #:property-types property-types) item-data item))
              subexprs))
     (`(or ,subexprs ...)
      (ormap (λ (subexpr)
-              ((evaluate-filter-expression subexpr) item-data item))
+              ((evaluate-filter-expression subexpr #:property-types property-types) item-data item))
             subexprs))
     (`(not ,subexpr)
-     (not ((evaluate-filter-expression subexpr) item-data item)))
+     (not ((evaluate-filter-expression subexpr #:property-types property-types) item-data item)))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (if (eq? operator ':)
-         (equal? (data:get-property item-data item property) (val:evaluate-literal literal-expr))
+         (equal? (data:get-property-by-key item-data item property #:property-types property-types)
+                 (val:evaluate-literal literal-expr))
          (operators:evaluate-operator-expression operators:common-operators
-                                                 (list (data:get-property item-data item property)
+                                                 (list (data:get-property-by-key item-data item property #:property-types property-types)
                                                        operator
                                                        (val:evaluate-literal literal-expr))
                                                  #t)))
@@ -37,6 +38,6 @@
 
 ;; Returns a set of all items with values in item-data matching
 ;; filter-expression.
-(define (search item-data filter-expression)
-  (set-filter (λ (item) ((evaluate-filter-expression filter-expression) item-data item))
+(define (search item-data filter-expression #:property-types property-types)
+  (set-filter (λ (item) ((evaluate-filter-expression filter-expression #:property-types property-types) item-data item))
               (data:all-items item-data)))

@@ -4,24 +4,9 @@
 
 (require
  (prefix-in data: "../data/item-data.rkt")
- (prefix-in val: "../data/values.rkt")
- )
+ (prefix-in prop: "../data/property-type.rkt")
+ (prefix-in val: "../data/values.rkt"))
 
-(define description-key 'description)
-
-(define (register-property-description item-data)
-  (data:new-property item-data #:key description-key #:name "Description" #:default (val:make-string "(No description)")))
-
-(define (get-description item-data item)
-  (data:get-property item-data item description-key))
-
-(define (set-description item-data item description)
-  (data:set-property item-data item description-key description))
-
-;; Returns (values new-item-data new-item).
-(define (new-item-with-description item-data description)
-  (define-values (new-item-data new-item) (data:new-item item-data))
-  (values
-   (set-description new-item-data new-item description)
-   new-item))
-
+(define description-property-type
+  (prop:make-property-type #:key 'description
+                           #:default (val:make-string "(Missing description)")))

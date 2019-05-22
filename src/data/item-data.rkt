@@ -1,57 +1,58 @@
 #lang racket
 
-(provide (all-defined-out))
-
 ;; The term 'item-data' is used to refer to the database containing all items
 ;; and information about them. Individual items are indexed by a key. Many
 ;; functions in this project take an 'item-data' and an 'item' as arguments;
 ;; functions that modify item properties usually do so by returning an updated
 ;; 'item-data'.
 
+(provide (all-defined-out))
+
+(require
+  (prefix-in prop: "./property-type.rkt"))
+
 (define item-data-empty
   (list*
    0       ;; Next item
    (hash)  ;; Item properties
-   (hash)  ;; Property metadata
    ))
 
 ;; Returns (values new-item-data new-item).
 (define (new-item item-data)
   (define next-item (car item-data))
-  (define item-properties (cadr item-data))
-  (define property-metadata (cddr item-data))
+  (define item-properties (cdr item-data))
   (values
-   (list* (add1 next-item) item-properties property-metadata)
+   (list* (add1 next-item) item-properties)
    next-item))
 
 ;; Returns new-item-data.
-(define (new-property item-data #:key key #:name name #:default default)
+(define (set-property item-data item property-type value)
   (define next-item (car item-data))
-  (define item-properties (cadr item-data))
-  (define properties-metadata (cddr item-data))
-  (define property (list* name default))
-  (list* next-item item-properties (hash-set properties-metadata key property)))
-
-
-;; Returns new-item-data.
-(define (set-property item-data item key value)
-  (define next-item (car item-data))
-  (define items-properties (cadr item-data))
+  (define items-properties (cdr item-data))
   (define item-properties (hash-ref items-properties item (hash)))
-  (define properties-metadata (cddr item-data))
-  (list* next-item (hash-set items-properties item (hash-set item-properties key value)) properties-metadata))
+  (list* next-item
+         (hash-set items-properties
+                   item
+                   (hash-set item-properties
+                             (prop:property-type-key property-type)
+                             value))))
+
+(define (set-property-by-key item-data item key value #:property-types property-types)
+  (set-property item-data item (prop:get-property-type property-types key) value))
+
+(define (get-property-by-key item-data item key #:property-types property-types)
+  (get-property item-data item (prop:get-property-type property-types key)))
 
 ;; Returns value.
-(define (get-property item-data item key)
-  (define item-properties (cadr item-data))
-  (define properties-metadata (cddr item-data))
-  (define property-metadata (hash-ref properties-metadata key))
-  (define default-value (cdr property-metadata))
-  (hash-ref (hash-ref item-properties item (hash)) key default-value))
+(define (get-property item-data item property-type)
+  (define item-properties (cdr item-data))
+  (hash-ref (hash-ref item-properties item (hash))
+            (prop:property-type-key property-type)
+            (prop:property-type-default property-type)))
 
 ;; Returns set of all items.
 (define (all-items item-data)
-  (define item-properties (cadr item-data))
+  (define item-properties (cdr item-data))
   (list->set (hash-keys item-properties)))
 
 ;; Returns the ID (an integer uniquely representing a reference to an
@@ -62,6 +63,6 @@
 ;;;;
 
 ;; Returns new-item-data.
-(define (update-property item-data item key f)
-  (set-property item-data item key (f (get-property item-data item key))))
+(define (update-property item-data item property-type f)
+  (set-property item-data item property-type (f (get-property item-data item property-type))))
 

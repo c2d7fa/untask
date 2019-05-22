@@ -2,8 +2,10 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in data: "../data/item-data.rkt")
-         (prefix-in val: "../data/values.rkt"))
+(require
+  (prefix-in data: "../data/item-data.rkt")
+  (prefix-in prop: "../data/property-type.rkt")
+  (prefix-in val: "../data/values.rkt"))
 
 ;; Each task has a status, which is one of active, inactive and done. Active
 ;; means that the task still needs to be completed and can be worked on now;
@@ -18,27 +20,10 @@
 ;; become active until the base status is changed. Likewise, a task marked as
 ;; "done" can never become active.
 
-(define base-status-key 'base-status)
+(define base-status-property-type
+  (prop:make-property-type #:key 'basestatus
+                           #:default (val:make-string "active")))
 
-(define base-status-active (val:make-string "active"))
-(define base-status-inactive (val:make-string "inactive"))
-(define base-status-done (val:make-string "done"))
-
-(define (register-property-base-status item-data)
-  (data:new-property item-data #:key base-status-key #:name "Base Status" #:default base-status-active))
-
-(define (finished? item-data item)
-  (eq? (data:get-property item-data item base-status-key) base-status-done))
-
-(define (unfinished? item-data item)
-  (not (finished? item-data item)))
-
-(define (active? item-data item)
-  (eq? (data:get-property item-data item base-status-key) base-status-active))
-
-(define (inactive? item-data item)
-  (not (active? item-data item)))
-
-
-
-
+;; TODO: Define 'status' property; setting this property should set the
+;; base-status; reading it should calculate the actual status based on the
+;; task's dependencies.
