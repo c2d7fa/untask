@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in data: "../data/item-data.rkt")
+ (prefix-in item: "../data/item-data.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
 
  "../data/filter-expressions.rkt"
@@ -16,21 +16,21 @@
 ;;
 ;; command-line-representation is a representation of the parsed user
 ;; input in the form (filter-expression command-name arguments...)
-(define ((execute command-line-representation) item-data)
+(define ((execute command-line-representation #:property-types property-types) item-data)
   (match command-line-representation
     (`(,filter-expression list) (values item-data (urgency:sort-items-by-urgency-descending
                                                    item-data
-                                                   (search item-data filter-expression))))
+                                                   (search item-data filter-expression #:property-types property-types))))
     (`(add ,modify-expression)
-     (let-values (((new-item-data-1 new-item) (data:new-item item-data)))
-       (values ((evaluate-modify-expression modify-expression) new-item-data-1 new-item)
+     (let-values (((new-item-data-1 new-item) (item:new-item item-data)))
+       (values ((evaluate-modify-expression modify-expression #:property-types property-types) new-item-data-1 new-item)
                (list new-item))))
     (`(,filter-expression modify ,modify-expression)
-     (values (modify-items item-data (search item-data filter-expression) modify-expression)
-             (set->list (search item-data filter-expression))))))
+     (values (modify-items item-data (search item-data filter-expression #:property-types property-types) modify-expression #:property-types property-types)
+             (set->list (search item-data filter-expression #:property-types property-types))))))
 
 ;; A version of execute with its parameter order and return values
 ;; modified to be better suited to constructing examples for testing.
-(define (execute* command-line-representation item-data)
-  (let-values (((new-item-data output) ((execute command-line-representation) item-data)))
+(define (execute* command-line-representation item-data #:property-types property-types)
+  (let-values (((new-item-data output) ((execute command-line-representation #:property-types property-types) item-data)))
     new-item-data))

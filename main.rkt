@@ -1,7 +1,7 @@
 #lang racket
 
 (require
- (prefix-in data: "src/data/item-data.rkt")
+ (prefix-in item: "src/data/item-data.rkt")
  (prefix-in prop: "src/data/property-type.rkt")
 
  (only-in "src/util.rkt" thread thread-first)
@@ -29,21 +29,19 @@
     ;(prop:add-property-type urgency:urgency-property-type)
     ))
 
-#;
 (define example-item-data
-  (thread item-data-empty-with-properties
-    (execute* (parse "add description:{this is a brand new item} tags+some-tag tags+another-tag"))
-    (execute* (parse "add description:{here is another item} tags+another-tag"))
-    (execute* (parse "add description:{third item} tags+some-tag tags+yet-another-tag"))
-    (execute* (parse "!description/third modify tags-some-tag tags+not-third"))
-    (execute* (parse "tags+not-third modify baseurgency+$2"))
-    (execute* (parse "1, 2 modify baseurgency-$1"))
+  (thread item:item-data-empty
+    (execute* (parse "add description:{this is a brand new item} tags+some-tag tags+another-tag") #:property-types property-types)
+    (execute* (parse "add description:{here is another item} tags+another-tag") #:property-types property-types)
+    (execute* (parse "add description:{third item} tags+some-tag tags+yet-another-tag") #:property-types property-types)
+    (execute* (parse "!description/third modify tags-some-tag tags+not-third") #:property-types property-types)
+    (execute* (parse "tags+not-third modify baseurgency+$2") #:property-types property-types)
+    (execute* (parse "1, 2 modify baseurgency-$1") #:property-types property-types)
     ))
 
-#;
 (define current-item-data-box (box example-item-data))
 
-(user-loop! data:item-data-empty
+(user-loop! current-item-data-box
             #:property-types property-types
             #:parse parse
             #:render-listing render-listing)
