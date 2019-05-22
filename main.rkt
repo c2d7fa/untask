@@ -2,7 +2,7 @@
 
 (require
  (prefix-in data: "src/data/item-data.rkt")
- (prefix-in prop: "src/data/property-types.rkt")
+ (prefix-in prop: "src/data/property-type.rkt")
 
  (only-in "src/util.rkt" thread thread-first)
 
