@@ -36,7 +36,7 @@
            (display (export:export-item-data-to-string item-data) out)))
        (values item-data (set->list (item:all-items item-data)))))
     (`(load ,filename)
-     (let ((new-item-data (export:read-item-data-from-string (port->string (open-input-file filename) #:close? #t))))
+     (let ((new-item-data (export:read-item-data-from-file filename)))
        (values new-item-data (set->list (item:all-items new-item-data)))))))
 
 ;; A version of execute with its parameter order and return values

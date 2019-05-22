@@ -30,19 +30,7 @@
     ;(prop:add-property-type urgency:urgency-property-type)
     ))
 
-(define example-item-data
-  (thread item:item-data-empty
-    (execute* (parse "add description:{this is a brand new item} tags+some-tag tags+another-tag") #:property-types property-types)
-    (execute* (parse "add description:{here is another item} tags+another-tag") #:property-types property-types)
-    (execute* (parse "add description:{third item} tags+some-tag tags+yet-another-tag") #:property-types property-types)
-    (execute* (parse "!description/third modify tags-some-tag tags+not-third") #:property-types property-types)
-    (execute* (parse "tags+not-third modify baseurgency+$2") #:property-types property-types)
-    (execute* (parse "1, 2 modify baseurgency-$1") #:property-types property-types)
-    ))
-
-(define current-item-data-box (box example-item-data))
-
-(user-loop! current-item-data-box
+(user-loop! (box (read-item-data-from-file "./example.twd"))
             #:property-types property-types
             #:parse parse
             #:render-listing render-listing)

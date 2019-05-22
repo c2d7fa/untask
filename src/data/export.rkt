@@ -17,3 +17,6 @@
           (namespace-attach-module (current-namespace) 'racket ns)
           (namespace-require 'racket ns)
           ns)))
+
+(define (read-item-data-from-file path)
+  (read-item-data-from-string (port->string (open-input-file path) #:close? #t)))
