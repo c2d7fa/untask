@@ -21,3 +21,11 @@
     ((thread-first x) #' x)
     ((thread-first x (f args ...) tail ...)
      #'(thread-first (f x args ...) tail ...))))
+
+(define (hash-filter-keys hash pred)
+  (make-hash
+   (map (λ (k) (cons k (hash-ref hash k)))
+        (filter identity
+                (hash-map hash
+                          (λ (k v)
+                            (if (pred k) k #f)))))))

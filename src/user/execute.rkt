@@ -4,6 +4,7 @@
 
 (require
  (prefix-in item: "../data/item-data.rkt")
+ (prefix-in export: "../data/export.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
 
  "../data/filter-expressions.rkt"
@@ -27,7 +28,16 @@
                (list new-item))))
     (`(,filter-expression modify ,modify-expression)
      (values (modify-items item-data (search item-data filter-expression #:property-types property-types) modify-expression #:property-types property-types)
-             (set->list (search item-data filter-expression #:property-types property-types))))))
+             (set->list (search item-data filter-expression #:property-types property-types))))
+    (`(save ,filename)
+     (begin
+       (call-with-output-file filename #:exists 'replace
+         (λ (out)
+           (display (export:export-item-data-to-string item-data) out)))
+       (values item-data (set->list (item:all-items item-data)))))
+    (`(load ,filename)
+     (let ((new-item-data (export:read-item-data-from-string (port->string (open-input-file filename) #:close? #t))))
+       (values new-item-data (set->list (item:all-items new-item-data)))))))
 
 ;; A version of execute with its parameter order and return values
 ;; modified to be better suited to constructing examples for testing.

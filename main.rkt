@@ -9,6 +9,7 @@
  "src/user/execute.rkt"
  "src/user/loop.rkt"
  "src/user/listing.rkt"
+ "src/data/export.rkt"
 
  (prefix-in status: "src/properties/status.rkt")
  (prefix-in description: "src/properties/description.rkt")

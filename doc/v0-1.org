@@ -107,15 +107,9 @@ expression according to the given modify expression. The =add= command
 creates a new item with properties given by the modify expression.
 
 The =save= and =load= commands are used to export and import items
-respectively. They are invoked as such:
-#+BEGIN_EXAMPLE
-[filter] save [file]
-[filter] load [file]
-#+END_EXAMPLE
-In each case, the filter is optional The =save= commands saves all of
-the items matching =[filter]= (or, if no filter is given, all items)
-to the given file. The =load= command loads all items matching the
-given filter from the given file.
+respectively. They each take a filename as argument. The =save= command
+saves the current item database to that file, while the =load= command
+loads items from the file.
 * Properties
 The following table lists all valid properties. Properties that are marked as
 /read-only/ cannot be modified directly.
@@ -157,5 +151,4 @@ Tasks that we need to finish before version 0.1:
   - Allow user to show only active tasks
   - Calculate active status from dependencies
 - Implement "read-only" properties /status/ and /urgency/
-- Implement =save= and =load= commands
 - Implement special property /blocks/

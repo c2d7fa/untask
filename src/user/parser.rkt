@@ -101,10 +101,17 @@
                      (f:pure (list))))
         (f:pure (append fe (list command-name) args))))
 
+(define filename/p
+  ;; TODO: Actually parse a correct filename
+  (f:map (λ (cs) (apply string cs))
+         (many/p any-char/p)))
+
 (define command-line-input/p
   (or/p (try/p (command/p 'modify #:arguments (list/p modify-expression/p)))
         (try/p (command/p 'list))
         (try/p (command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p)))
+        (try/p (command/p 'save #:takes-filter? #f #:arguments (list/p filename/p)))
+        (try/p (command/p 'load #:takes-filter? #f #:arguments (list/p filename/p)))
         (f:map (λ (fe) `(,fe list)) filter-expression/p)))
 
 (define (parse command-line-input)
