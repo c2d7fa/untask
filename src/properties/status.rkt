@@ -27,3 +27,6 @@
 ;; TODO: Define 'status' property; setting this property should set the
 ;; base-status; reading it should calculate the actual status based on the
 ;; task's dependencies.
+
+(define (calculate-status item-data item)
+  (data:get-property item-data item base-status-property-type))

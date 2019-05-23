@@ -4,18 +4,17 @@
  (prefix-in item: "src/data/item-data.rkt")
  (prefix-in prop: "src/data/property-type.rkt")
 
- (only-in "src/util.rkt" thread thread-first)
-
- "src/user/execute.rkt"
- "src/user/loop.rkt"
- "src/user/listing.rkt"
- "src/data/export.rkt"
+ (only-in "src/util.rkt" thread-first)
+ (only-in "src/user/loop.rkt" user-loop!)
+ (only-in "src/user/listing.rkt" render-listing)
+ (only-in "src/data/export.rkt" read-item-data-from-file)
+ (only-in "src/user/parser.rkt" parse)
 
  (prefix-in status: "src/properties/status.rkt")
  (prefix-in description: "src/properties/description.rkt")
  (prefix-in tags: "src/properties/tags.rkt")
  (prefix-in urgency: "src/properties/urgency.rkt")
- (only-in "src/user/parser.rkt" parse)
+ (prefix-in depends: "src/properties/dependencies.rkt")
  )
 
 ;;; EXAMPLE
@@ -28,6 +27,7 @@
     (prop:add-property-type tags:tags-property-type)
     (prop:add-property-type urgency:base-urgency-property-type)
     ;(prop:add-property-type urgency:urgency-property-type)
+    (prop:add-property-type depends:depends-property-type)
     ))
 
 (user-loop! (box (read-item-data-from-file "./example.twd"))
