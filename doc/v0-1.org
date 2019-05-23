@@ -142,9 +142,3 @@ values include the following:
 - /numbers/, represented as =`(number . -2.5)=;
 - /items/, represented as =`(item . 62)=;
 - /sets/, represented as =`(set . ,(set '(item . 1) '(item . 2) '(item . 3)))=.
-
-* List of unimplemented features
-Tasks that we need to finish before version 0.1:
-
-- Implement special property /urgency/
-  - Use urgency of blocked items in calculation
