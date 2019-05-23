@@ -18,7 +18,7 @@
     (define description (item:get-property item-data item description:description-property-type))
     (define tags (item:get-property item-data item tags:tags-property-type))
     (define urgency (urgency:calculate-urgency item-data item))
-    (define status (status:calculate-status item-data item))
+    (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
     (format "~a. ~a [~a] <~a> (st:~a, dp:[~a])"
             (item:item-id item-data item)

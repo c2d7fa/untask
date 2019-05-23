@@ -23,8 +23,13 @@
 
 ;;; Property type
 
-(define (make-property-type #:key key #:default default)
-  (list key default))
+(define (make-property-type #:key key
+                            #:default (default #f)
+                            #:calculate (calculate #f)
+                            #:translate (translate #f))
+  (list key default calculate translate))
 
 (define (property-type-key t) (list-ref t 0))
 (define (property-type-default t) (list-ref t 1))
+(define (property-type-calculate t) (list-ref t 2))
+(define (property-type-translate t) (list-ref t 3))

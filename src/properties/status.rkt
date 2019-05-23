@@ -30,3 +30,11 @@
 
 (define (calculate-status item-data item)
   (data:get-property item-data item base-status-property-type))
+
+(define (translate-status item-data item value)
+  (data:set-property item-data item base-status-property-type value))
+
+(define status-property-type
+  (prop:make-property-type #:key 'status
+                           #:calculate calculate-status
+                           #:translate translate-status))
