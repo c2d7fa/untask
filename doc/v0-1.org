@@ -146,9 +146,6 @@ values include the following:
 * List of unimplemented features
 Tasks that we need to finish before version 0.1:
 
-- Use active and inactive status
-  - Add a way of marking tasks as finished or unfinished
-  - Allow user to show only active tasks
-  - Calculate active status from dependencies
-- Implement "read-only" properties /status/ and /urgency/
 - Implement special property /blocks/
+- Implement special property /urgency/
+  - Use urgency of blocked items in calculation
