@@ -146,6 +146,5 @@ values include the following:
 * List of unimplemented features
 Tasks that we need to finish before version 0.1:
 
-- Implement special property /blocks/
 - Implement special property /urgency/
   - Use urgency of blocked items in calculation

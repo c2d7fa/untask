@@ -20,7 +20,8 @@
     (define urgency (urgency:calculate-urgency item-data item))
     (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
-    (format "~a. ~a [~a] <~a> (st:~a, dp:[~a])"
+    (define blocks (item:get-property item-data item depends:blocks-property-type))
+    (format "~a. ~a [~a] <~a> (st:~a, dp:[~a], bl:[~a])"
             (item:item-id item-data item)
             (val:unwrap-string description)
             (string-join (map val:unwrap-string (set->list (val:unwrap-set tags))) " ")
@@ -30,6 +31,9 @@
                                 (format "~a" (val:unwrap-item im)))
                               (set->list (val:unwrap-set depends)))
                          " ")
+            (string-join (map (λ (im)
+                                (format "~a" (val:unwrap-item im)))
+                              (set->list (val:unwrap-set blocks))))
             ))
   (string-join
    (map (λ (item) (render-item item-data item)) items)
