@@ -21,11 +21,9 @@
 
 (define property-types
   (thread-first prop:empty-property-type-collection
-    (prop:add-property-type status:base-status-property-type)
     (prop:add-property-type status:status-property-type)
     (prop:add-property-type description:description-property-type)
     (prop:add-property-type tags:tags-property-type)
-    (prop:add-property-type urgency:base-urgency-property-type)
     (prop:add-property-type urgency:urgency-property-type)
     (prop:add-property-type depends:depends-property-type)
     ))

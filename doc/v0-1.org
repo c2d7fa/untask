@@ -111,19 +111,16 @@ respectively. They each take a filename as argument. The =save= command
 saves the current item database to that file, while the =load= command
 loads items from the file.
 * Properties
-The following table lists all valid properties. Properties that are marked as
-/read-only/ cannot be modified directly.
-| Key           | Modifable  | Type       | Description                                |
-|---------------+------------+------------+--------------------------------------------|
-| =id=          | Modifiable | string     | Unique global ID                           |
-| =description= | Modifiable | string     | Description of item                        |
-| =tags=        | Modifiable | string set | List of tags                               |
-| =depends=     | Modifiable | item set   | Items that the item depends on             |
-| =blocks=      | Modifabile | item set   | Items that depend on the item              |
-| =basestatus=  | Modifiable | string     | Manually set status (active/inactive/done) |
-| =status=      | Read-only  | string     | Calculated status (active/inactive/done)   |
-| =baseurgency= | Modifiable | number     | Manually set urgency                       |
-| =urgency=     | Read-only  | number     | Calculated urgency                         |
+The following table lists all valid properties.
+| Key           | Type       | Description                    |
+|---------------+------------+--------------------------------|
+| =id=          | string     | Unique global ID               |
+| =description= | string     | Description of item            |
+| =tags=        | string set | List of tags                   |
+| =depends=     | item set   | Items that the item depends on |
+| =blocks=      | item set   | Items that depend on the item  |
+| =status=      | string     | Status (active/inactive/done)  |
+| =urgency=     | number     | Urgency                        |
 * Implementation
 TWD stores the current program state in a boxed variable, which is
 updated based on the user's input. The program state contains a

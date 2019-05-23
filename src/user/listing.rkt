@@ -18,7 +18,7 @@
     (define description (item:get-property item-data item description:description-property-type))
     (define tags (item:get-property item-data item tags:tags-property-type))
     (define urgency (item:get-property item-data item urgency:urgency-property-type))
-    (define base-urgency (item:get-property item-data item urgency:base-urgency-property-type))
+    (define base-urgency (item:get-raw-property item-data item urgency:urgency-property-type))
     (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
