@@ -122,14 +122,14 @@ The following table lists all valid properties.
 | =status=      | string     | Status (active/inactive/done)  |
 | =urgency=     | number     | Urgency                        |
 * Implementation
-TWD stores the current program state in a boxed variable, which is
+Untask stores the current program state in a boxed variable, which is
 updated based on the user's input. The program state contains a
 mapping /(item, property key) \rightarrow value/, where:
 - /item/ is represented as a number, which is the ID of the item;
 - /property key/ is a symbol; and
 - /value/ is a value, represented in the manner described below.
 ** Expressions and values
-When TWD parses a command line, it generates an
+When Untask parses a command line, it generates an
 *expression*. Expressions are simple types whose representation does
 not depend on any context (state).
 
