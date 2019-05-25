@@ -29,3 +29,17 @@
                 (hash-map hash
                           (λ (k v)
                             (if (pred k) k #f)))))))
+
+;; Returns (values removed added), where removed is a set containing
+;; all values in old-set but not new-set and added is a set containing
+;; all values in new-set but not old-set.
+(define (set-diff old-set new-set)
+  (define removed
+    (set-filter (λ (x)
+                  (and (set-member? old-set x) (not (set-member? new-set x))))
+                old-set))
+  (define added
+    (set-filter (λ (x)
+                  (and (set-member? new-set x) (not (set-member? old-set x))))
+                new-set))
+  (values removed added))
