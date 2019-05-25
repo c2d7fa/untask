@@ -29,7 +29,7 @@
     (prop:add-property-type depends:blocks-property-type)
     ))
 
-(user-loop! (box (read-item-data-from-file "./example.twd"))
+(user-loop! (box item:item-data-empty)
             #:property-types property-types
             #:parse parse
             #:render-listing render-listing)
