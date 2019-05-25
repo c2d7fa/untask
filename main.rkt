@@ -26,6 +26,7 @@
     (prop:add-property-type tags:tags-property-type)
     (prop:add-property-type urgency:urgency-property-type)
     (prop:add-property-type depends:depends-property-type)
+    (prop:add-property-type depends:blocks-property-type)
     ))
 
 (user-loop! (box (read-item-data-from-file "./example.twd"))
