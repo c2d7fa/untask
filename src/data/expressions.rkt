@@ -8,3 +8,5 @@
   `(number . ,x))
 (define (make-string str)
   `(string . ,str))
+(define (make-set element-expressions)
+  `(set . ,element-expressions))

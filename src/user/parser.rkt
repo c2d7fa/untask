@@ -27,10 +27,12 @@
 
 (define literal-item-expression/p
   (f:map expr:make-item int/p))
+
 (define literal-number-expression/p
   (f:map expr:make-number
          (f:do (char/p #\$)
                int/p)))  ; TODO: Parse non-integer numbers
+
 (define literal-string-expression/p
   (f:map expr:make-string
          (or/p bare-word/p
@@ -39,8 +41,16 @@
                      (char/p #\})
                      (f:pure (apply string cs))))))
 
+(define literal-set-expression/p
+  (f:map expr:make-set
+         (f:do (string/p "[")
+               (element-exprs <- (many/p literal-expression/p #:sep whitespace/p))
+               (string/p "]")
+               (f:pure element-exprs))))
+
 (define literal-expression/p
-  (or/p literal-item-expression/p
+  (or/p literal-set-expression/p
+        literal-item-expression/p
         literal-number-expression/p
         literal-string-expression/p))
 
