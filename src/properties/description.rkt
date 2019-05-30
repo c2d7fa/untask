@@ -9,4 +9,4 @@
 
 (define description-property-type
   (prop:make-property-type #:key 'description
-                           #:default (val:make-string "(Missing description)")))
+                           #:default (val:make-string "")))
