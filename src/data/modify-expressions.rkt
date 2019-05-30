@@ -5,7 +5,8 @@
 (require
  (prefix-in operators: "operators.rkt")
  (prefix-in data: "item-data.rkt")
- (prefix-in val: "values.rkt"))
+ (prefix-in val: "values.rkt")
+ (only-in "../user/builtin-operators.rkt" builtin-operators))
 
 ;; Take a modify expression and return a function that will update the
 ;; given item in the given item-data according to the
@@ -18,7 +19,7 @@
                                    item-data item property (val:evaluate-literal literal-expr))
          (data:set-property-by-key #:property-types property-types
                                    item-data item property (operators:evaluate-operator-expression
-                                                            operators:common-operators
+                                                            builtin-operators
                                                             (list (data:get-property-by-key item-data item property #:property-types property-types)
                                                                   operator
                                                                   (val:evaluate-literal literal-expr))))))

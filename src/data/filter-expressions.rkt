@@ -8,6 +8,7 @@
  (prefix-in operators: "operators.rkt")
  (prefix-in data: "item-data.rkt")
  (prefix-in val: "values.rkt")
+ (only-in "../user/builtin-operators.rkt" builtin-operators)
  )
 
 ;; Take a filter expression and return a function that returns whether
@@ -28,7 +29,7 @@
      (if (eq? operator ':)
          (equal? (data:get-property-by-key item-data item property #:property-types property-types)
                  (val:evaluate-literal literal-expr))
-         (operators:evaluate-operator-expression operators:common-operators
+         (operators:evaluate-operator-expression builtin-operators
                                                  (list (data:get-property-by-key item-data item property #:property-types property-types)
                                                        operator
                                                        (val:evaluate-literal literal-expr))
