@@ -17,7 +17,7 @@
                    #:object 'string
                    #:arguments '(string)
                    #:return 'string
-                   #:body (λ (str pfx) (val:make-string (string-append (val:unwrap-string pfx) (val:unwrap-string pfx))))))
+                   #:body (λ (str pfx) (val:make-string (string-append (val:unwrap-string pfx) (val:unwrap-string str))))))
 
 (define op-number-add
   (create-operator #:name '+
