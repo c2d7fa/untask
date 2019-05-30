@@ -61,11 +61,12 @@
         literal-number-expression/p
         literal-string-expression/p))
 
+(define valid-operator-names ":<>+-/")
+
 (define filter-or-modify-pair/p
   (let ((filter-or-modify-operator/p
-         ;; TODO: Allow any valid operator.
          (f:map (λ (c) (string->symbol (string c)))
-                (char-in/p ":<>+-/"))))  ; TODO: How to avoid hardcoding these?
+                (char-in/p valid-operator-names))))
     (f:do (key <- property-key/p)
           (op <- filter-or-modify-operator/p)
           (val <- literal-expression/p)
