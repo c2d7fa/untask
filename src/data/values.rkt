@@ -16,6 +16,9 @@
 (define (make-boolean v)
   `(boolean . ,v))
 
+(define (get-type v)
+  (car v))
+
 (define unwrap-string cdr)
 (define unwrap-set cdr)
 (define unwrap-number cdr)

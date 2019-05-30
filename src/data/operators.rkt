@@ -37,16 +37,13 @@
 (define (operator-definitions-find opdefs name object-type (filter-context? #f))
   (hash-ref opdefs (list* name object-type filter-context?)))
 
-(define (type-of value)
-  (car value))  ;; TODO: Temporary hack. Should probably be handled by values module.
-
 ;; TODO: This should be allowed to access item-data (for resolving
 ;; properties on items mentioned.)
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
     (`(,object ,operator ,argument-literal-exprs ...)
      (let ((result (apply operator-eval
-                          (operator-definitions-find opdefs operator (type-of object) filter-context?)
+                          (operator-definitions-find opdefs operator (val:get-type object) filter-context?)
                           object
                           (map val:evaluate-literal argument-literal-exprs))))
        (if filter-context? (val:unwrap-boolean result) result)))))
