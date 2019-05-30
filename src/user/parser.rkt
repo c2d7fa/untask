@@ -12,6 +12,13 @@
 
 (define digit/p (char-between/p #\0 #\9))
 (define int/p (f:map (λ (ds) (string->number (apply string ds))) (many+/p digit/p)))
+(define number/p
+  (let ((float/p (f:do (a <- int/p)
+                       (string/p ".")
+                       (b <- int/p)
+                       (f:pure (string->number (format "~a.~a" a b))))))
+    (or/p (try/p float/p)
+          int/p)))
 
 (define bare-word/p
   (let* ((valid-init/p (char-between/p #\a #\z))
@@ -31,7 +38,7 @@
 (define literal-number-expression/p
   (f:map expr:make-number
          (f:do (char/p #\$)
-               int/p)))  ; TODO: Parse non-integer numbers
+               number/p)))
 
 (define literal-string-expression/p
   (f:map expr:make-string
