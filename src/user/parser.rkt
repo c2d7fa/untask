@@ -112,7 +112,6 @@
         (f:pure (append fe (list command-name) args))))
 
 (define filename/p
-  ;; TODO: Actually parse a correct filename
   (f:map (λ (cs) (apply string cs))
          (many/p any-char/p)))
 

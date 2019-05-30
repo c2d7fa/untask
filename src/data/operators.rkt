@@ -37,8 +37,6 @@
 (define (operator-definitions-find opdefs name object-type (filter-context? #f))
   (hash-ref opdefs (list* name object-type filter-context?)))
 
-;; TODO: This should be allowed to access item-data (for resolving
-;; properties on items mentioned.)
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
     (`(,object ,operator ,argument-literal-exprs ...)
