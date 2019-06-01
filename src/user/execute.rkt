@@ -7,6 +7,7 @@
  (prefix-in export: "../data/export.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
  (prefix-in state: "../data/state.rkt")
+ (prefix-in context: "../data/context.rkt")
 
  "../data/filter-expressions.rkt"
  "../data/modify-expressions.rkt")
@@ -49,15 +50,37 @@
                                 filter-expression  ; TODO: Use context
                                 #:property-types property-types))))
     (`(context show)
-     (writeln `(context list)))
+     ;; TODO: Improve output; mark active context.
+     ;; TODO: Return context list as output instead of printing directly.
+     (writeln (context:context-definitions-available (state:state-defined-contexts state)))
+     (values state (list)))
     (`(context add ,name ,filter-expression ,modify-expression)
-     (writeln `(context add ,name ,filter-expression ,modify-expression)))
+     ;; TODO: Maybe return all items in new context.
+     (values (state:state-set-defined-contexts
+              state
+              (context:context-definitions-define
+               (state:state-defined-contexts state)
+               name
+               filter-expression
+               modify-expression))
+             (list)))
     (`(context remove ,name)
-     (writeln `(context remove ,name)))
+     (values (state:state-set-defined-contexts
+              state
+              (context:context-definitions-remove
+               (state:state-defined-contexts state)
+               name))
+             (list)))
+    ;; TODO: Support toggling multiple contexts at the same time.
     (`(context active (on ,name))
-     (displayln "activate"))
+     ;; TODO: Maybe return all visible items.
+     (values (state:state-set-current-context state name)
+             (list)))
     (`(context active (off ,name))
-     (displayln "deactivate"))
+     ;; TODO: This command only makes sense when there are multiple active contexts.
+     ;; TODO: Maybe return all visible items.
+     (values (state:state-set-current-context state #f)
+             (list)))
     (`(save ,filename)
      (begin
        (call-with-output-file filename #:exists 'replace
