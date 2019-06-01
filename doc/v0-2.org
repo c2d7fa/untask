@@ -4,3 +4,51 @@
 This file contains notes about what has changed in version 0.2 of Untask as
 compared to version 0.1.
 
+* Contexts
+When working on a particular project or at a particular location, you may find
+yourself often typing the same command arguments again and again. For example,
+if you are stranded somewhere without an internet connection and are working on
+your novel, you probably only want to show tasks having to do with that novel --
+and you don't want to see tasks that need an internet connection. That may look
+something like this:
+#+BEGIN_EXAMPLE
+> tags+novel tags-internet tags-research list
+#+END_EXAMPLE
+Having to type that filter expression over and over again is annoying, so you
+can create a /context/ called, say, =novel=:
+#+BEGIN_EXAMPLE
+> context add novel filter tags+novel tags-internet tags-research
+#+END_EXAMPLE
+Then, use the context, by prefixing the context name with =@=:
+#+BEGIN_EXAMPLE
+> @novel
+@novel>
+#+END_EXAMPLE
+Now, any command you type will automatically use that filter expression. You can
+also set a modify expression:
+#+BEGIN_EXAMPLE
+> context add novel filter tags+novel tags-internet tags-research modify tags+novel
+> @novel
+@novel> add tags+research description:{Figure out how long it would take to travel from Germany to Italy in 1750}
+#+END_EXAMPLE
+To deactivate a this context, use the command =-@novel=. It is possible to
+activate or deactivate a particular context for just a single command by simply
+starting that command with =@context= or =-@context=:
+#+BEGIN_EXAMPLE
+@novel> -@novel add tags+groceries description:{Buy milk}
+@novel>
+#+END_EXAMPLE
+** The =context= command
+The context command takes x different subcommands:
+#+BEGIN_EXAMPLE
+context list
+context add <name> [filter <filter expression>] [modify <modify expression>]
+context remove <name>
+#+END_EXAMPLE
+
+The =list= subcommand simply lists all available contexts.
+
+To add a new context or redefine an existing context, use =add=. A context must
+have a name and may take a filter expression and a modify expression.
+
+To remove a context, use =remove=.
