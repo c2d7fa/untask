@@ -152,12 +152,15 @@
                 (name <- context-name/p)
                 (f:pure `(context remove ,name))))
          (context-set-active-command/p
-          (or/p (f:do (string/p "@")
-                      (name <- context-name/p)
-                      (f:pure `(context active (on ,name))))
-                (f:do (string/p "-@")
-                      (name <- context-name/p)
-                      (f:pure `(context active (off ,name)))))))
+          (f:do (toggles <- (many+/p #:sep whitespace/p
+                                     (or/p
+                                      (f:do (string/p "@")
+                                            (name <- context-name/p)
+                                            (f:pure `(on ,name)))
+                                      (f:do (string/p "-@")
+                                            (name <- context-name/p)
+                                            (f:pure `(off ,name))))))
+                (f:pure `(context active ,toggles)))))
     (or/p (try/p context-list-command/p)
           (try/p context-add-command/p)
           (try/p context-remove-command/p)

@@ -72,14 +72,17 @@
                name))
              (list)))
     ;; TODO: Support toggling multiple contexts at the same time.
-    (`(context active (on ,name))
+    (`(context active ,toggles)
      ;; TODO: Maybe return all visible items.
-     (values (state:state-set-current-context state name)
-             (list)))
-    (`(context active (off ,name))
-     ;; TODO: This command only makes sense when there are multiple active contexts.
-     ;; TODO: Maybe return all visible items.
-     (values (state:state-set-current-context state #f)
+     (values (state:state-set-current-contexts
+              state
+              (foldl
+               (λ (expr active)
+                 (match expr
+                   (`(on ,name) (set-add active name))
+                   (`(off ,name) (set-remove active name))))
+               (state:state-current-contexts state)
+               toggles))
              (list)))
     (`(save ,filename)
      (begin

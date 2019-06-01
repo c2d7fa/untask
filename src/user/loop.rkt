@@ -37,11 +37,10 @@
                            state)))
               (list 'success output new-state))))))
 
-(define (format-prompt-line current-context)
-  (format "~a> "
-          (if current-context
-              (format "@~a" current-context)
-              "")))
+(define (format-prompt-line current-contexts)
+  (format "~a> " (string-join (map (λ (c) (format "@~a" c))
+                                   (set->list current-contexts))
+                              " ")))
 
 (define (user-loop! state-box
                     #:parse parse
@@ -61,7 +60,7 @@
     (displayln (render-listing (state:state-item-data new-state) output))
     (set-box! state-box new-state)
     (recur))
-  (let* ((input (prompt-line (format-prompt-line (state:state-current-context (unbox state-box)))))
+  (let* ((input (prompt-line (format-prompt-line (state:state-current-contexts (unbox state-box)))))
          (result (try-evaluate input
                                (unbox state-box)
                                #:property-types property-types
