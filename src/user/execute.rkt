@@ -48,6 +48,16 @@
              (set->list (search (state:state-item-data state)  ; FIXME: Use new state
                                 filter-expression  ; TODO: Use context
                                 #:property-types property-types))))
+    (`(context show)
+     (writeln `(context list)))
+    (`(context add ,name ,filter-expression ,modify-expression)
+     (writeln `(context add ,name ,filter-expression ,modify-expression)))
+    (`(context remove ,name)
+     (writeln `(context remove ,name)))
+    (`(context active (on ,name))
+     (displayln "activate"))
+    (`(context active (off ,name))
+     (displayln "deactivate"))
     (`(save ,filename)
      (begin
        (call-with-output-file filename #:exists 'replace
