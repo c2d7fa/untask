@@ -1,0 +1,6 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Untask 0.2
+
+This file contains notes about what has changed in version 0.2 of Untask as
+compared to version 0.1.
+
