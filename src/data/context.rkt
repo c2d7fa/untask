@@ -19,10 +19,8 @@
             name
             '((and) (and))))
 
-;; TODO
 (define (apply-context-to-filter-expression context filter-expression)
-  filter-expression)
+  `(and ,(car context) ,filter-expression))
 
-;; TODO
 (define (apply-context-to-modify-expression context modify-expression)
-  modify-expression)
+  `(and ,(cadr context) ,modify-expression))

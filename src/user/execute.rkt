@@ -12,6 +12,26 @@
  "../data/filter-expressions.rkt"
  "../data/modify-expressions.rkt")
 
+(define (filter-expression-with-contexts filter-expression state)
+  (foldl (λ (context filter-expression)
+           (context:apply-context-to-filter-expression
+            (context:context-definitions-get
+             (state:state-defined-contexts state)
+             context)
+            filter-expression))
+         filter-expression
+         (set->list (state:state-current-contexts state))))
+
+(define (modify-expression-with-contexts modify-expression state)
+  (foldl (λ (context filter-expression)
+           (context:apply-context-to-modify-expression
+            (context:context-definitions-get
+             (state:state-defined-contexts state)
+             context)
+            modify-expression))
+         modify-expression
+         (set->list (state:state-current-contexts state))))
+
 ;; Convert a representation of a user-inputted command-line into a function that
 ;; takes the current state and returns new-state and an output description
 ;; (currently just a list of items to print on the screen).
@@ -25,14 +45,14 @@
              (urgency:sort-items-by-urgency-descending
               (state:state-item-data state)
               (search (state:state-item-data state)
-                      filter-expression  ; TODO: Use context
+                      (filter-expression-with-contexts filter-expression state)
                       #:property-types property-types))))
     (`(add ,modify-expression)
      (let-values (((item-data-with-new-item new-item)
                    (item:new-item (state:state-item-data state))))
        (values (state:state-set-item-data
                 state
-                ((evaluate-modify-expression modify-expression  ; TODO: Use context
+                ((evaluate-modify-expression (modify-expression-with-contexts modify-expression state)
                                              #:property-types property-types)
                  item-data-with-new-item
                  new-item))
@@ -42,12 +62,12 @@
               state
               (modify-items (state:state-item-data state)
                             (search (state:state-item-data state)
-                                    filter-expression  ; TODO: Use context
+                                    (filter-expression-with-contexts filter-expression state)
                                     #:property-types property-types)
-                            modify-expression  ; TODO: Use context
+                            (modify-expression-with-contexts modify-expression state)
                             #:property-types property-types))
              (set->list (search (state:state-item-data state)  ; FIXME: Use new state
-                                filter-expression  ; TODO: Use context
+                                (filter-expression-with-contexts filter-expression state)
                                 #:property-types property-types))))
     (`(context show)
      (writeln (context:context-definitions-available (state:state-defined-contexts state)))
