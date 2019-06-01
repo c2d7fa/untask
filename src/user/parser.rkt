@@ -7,8 +7,7 @@
 
  (combine-in megaparsack megaparsack/text)
  (prefix-in f: (combine-in data/functor data/applicative data/monad data/either))
- (only-in data/monad <-)
- )
+ (only-in data/monad <-))
 
 (define digit/p (char-between/p #\0 #\9))
 (define int/p (f:map (λ (ds) (string->number (apply string ds))) (many+/p digit/p)))
@@ -104,7 +103,7 @@
   (or/p (try/p parser)
         (f:pure default)))
 
-(define (command/p command-name #:takes-filter? (takes-filter? #t) #:arguments (arguments/p #f))
+(define (normal-command/p command-name #:takes-filter? (takes-filter? #t) #:arguments (arguments/p #f))
   (f:do (fe <- (if takes-filter?
                    (opt/p (f:do (e <- filter-expression/p)
                                 whitespace/p
@@ -119,17 +118,68 @@
                      (f:pure (list))))
         (f:pure (append fe (list command-name) args))))
 
+(define context-command/p
+  (let* ((context-name/p bare-word/p)
+         (context-list-command/p
+          (f:do (string/p "context")
+                whitespace/p
+                (string/p "list")
+                (f:pure '(context show))))
+         (context-add-command/p
+          (f:do (string/p "context")
+                whitespace/p
+                (string/p "add")
+                whitespace/p
+                (name <- context-name/p)
+                (fe <- (opt/p #:default '(and)
+                              (f:do whitespace/p
+                                    (string/p "filter")
+                                    whitespace/p
+                                    (fe <- filter-expression/p)
+                                    (f:pure fe))))
+                (me <- (opt/p #:default '()
+                              (f:do whitespace/p
+                                    (string/p "modify")
+                                    whitespace/p
+                                    (me <- modify-expression/p)
+                                    (f:pure me))))
+                (f:pure `(context add ,name ,fe ,me))))
+         (context-remove-command/p
+          (f:do (string/p "context")
+                whitespace/p
+                (string/p "remove")
+                whitespace/p
+                (name <- context-name/p)
+                (f:pure `(context remove ,name))))
+         (context-set-active-command/p
+          (f:do (toggles <- (many+/p #:sep whitespace/p
+                                     (or/p
+                                      (f:do (string/p "@")
+                                            (name <- context-name/p)
+                                            (f:pure `(on ,name)))
+                                      (f:do (string/p "-@")
+                                            (name <- context-name/p)
+                                            (f:pure `(off ,name))))))
+                (f:pure `(context active ,toggles)))))
+    (or/p (try/p context-list-command/p)
+          (try/p context-add-command/p)
+          (try/p context-remove-command/p)
+          (try/p context-set-active-command/p)
+          )))
+
 (define filename/p
   (f:map (λ (cs) (apply string cs))
          (many/p any-char/p)))
 
 (define command-line-input/p
-  (or/p (try/p (command/p 'modify #:arguments (list/p modify-expression/p)))
-        (try/p (command/p 'list))
-        (try/p (command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p)))
-        (try/p (command/p 'save #:takes-filter? #f #:arguments (list/p filename/p)))
-        (try/p (command/p 'load #:takes-filter? #f #:arguments (list/p filename/p)))
-        (f:map (λ (fe) `(,fe list)) filter-expression/p)))
+  (or/p
+   (try/p context-command/p)
+   (try/p (normal-command/p 'modify #:arguments (list/p modify-expression/p)))
+   (try/p (normal-command/p 'list))
+   (try/p (normal-command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p)))
+   (try/p (normal-command/p 'save #:takes-filter? #f #:arguments (list/p filename/p)))
+   (try/p (normal-command/p 'load #:takes-filter? #f #:arguments (list/p filename/p)))
+   (f:map (λ (fe) `(,fe list)) filter-expression/p)))
 
 (define (parse command-line-input)
   (parse-result! (parse-string command-line-input/p command-line-input)))

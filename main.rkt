@@ -3,6 +3,7 @@
 (require
  (prefix-in item: "src/data/item-data.rkt")
  (prefix-in prop: "src/data/property-type.rkt")
+ (prefix-in state: "src/data/state.rkt")
 
  (only-in "src/util.rkt" thread-first)
  (only-in "src/user/loop.rkt" user-loop!)
@@ -29,7 +30,7 @@
     (prop:add-property-type depends:blocks-property-type)
     ))
 
-(user-loop! (box item:item-data-empty)
+(user-loop! (box state:state-empty)
             #:property-types property-types
             #:parse parse
             #:render-listing render-listing)
