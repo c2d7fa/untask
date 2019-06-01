@@ -50,12 +50,9 @@
                                 filter-expression  ; TODO: Use context
                                 #:property-types property-types))))
     (`(context show)
-     ;; TODO: Improve output; mark active context.
-     ;; TODO: Return context list as output instead of printing directly.
      (writeln (context:context-definitions-available (state:state-defined-contexts state)))
      (values state (list)))
     (`(context add ,name ,filter-expression ,modify-expression)
-     ;; TODO: Maybe return all items in new context.
      (values (state:state-set-defined-contexts
               state
               (context:context-definitions-define
@@ -71,9 +68,7 @@
                (state:state-defined-contexts state)
                name))
              (list)))
-    ;; TODO: Support toggling multiple contexts at the same time.
     (`(context active ,toggles)
-     ;; TODO: Maybe return all visible items.
      (values (state:state-set-current-contexts
               state
               (foldl
