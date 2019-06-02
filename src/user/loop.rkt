@@ -4,7 +4,8 @@
 
 (require
  "execute.rkt"
- (prefix-in state: "../data/state.rkt"))
+ (prefix-in state: "../data/state.rkt")
+ (prefix-in a: "../util/attributes.rkt"))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
@@ -57,10 +58,10 @@
     (displayln "Error: Could not parse input.")
     (recur))
   (define (success output new-state)
-    (displayln (render-listing (state:state-item-data new-state) output))
+    (displayln (render-listing (a:get (new-state state:state.item-data)) output))
     (set-box! state-box new-state)
     (recur))
-  (let* ((input (prompt-line (format-prompt-line (state:state-current-contexts (unbox state-box)))))
+  (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
          (result (try-evaluate input
                                (unbox state-box)
                                #:property-types property-types

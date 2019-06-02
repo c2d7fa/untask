@@ -9,41 +9,36 @@
 (provide (all-defined-out))
 
 (require
-  (prefix-in prop: "./property-type.rkt"))
+ (prefix-in prop: "./property-type.rkt")
+ (prefix-in a: "../util/attributes.rkt"))
+
+(a:define-record item-data (next properties))
 
 (define item-data-empty
-  (list*
-   0       ;; Next item
-   (hash)  ;; Item properties
-   ))
+  (item-data #:next 0
+             #:properties (hash)))
 
 ;; Returns (values new-item-data new-item).
 (define (new-item item-data)
-  (define next-item (car item-data))
-  (define item-properties (cdr item-data))
-  (values
-   (list* (add1 next-item) item-properties)
-   next-item))
+  (let ((next (add1 (a:get (item-data item-data.next)))))
+    (values (a:set (item-data item-data.next) next)
+            next)))
 
 ;; Returns new-item-data.
 (define (set-raw-property item-data item property-type value)
-  (define next-item (car item-data))
-  (define items-properties (cdr item-data))
-  (define item-properties (hash-ref items-properties item (hash)))
-  (list* next-item
-         (hash-set items-properties
-                   item
-                   (hash-set item-properties
-                             (prop:property-type-key property-type)
-                             value))))
-
+  (a:set (item-data
+          item-data.properties
+          (a:hash.key item #:default (hash))
+          (a:hash.key (prop:property-type-key property-type)))
+         value))
 
 ;; Returns value.
 (define (get-raw-property item-data item property-type)
-  (define item-properties (cdr item-data))
-  (hash-ref (hash-ref item-properties item (hash))
-            (prop:property-type-key property-type)
-            (prop:property-type-default property-type)))
+  (a:get (item-data
+          item-data.properties
+          (a:hash.key item #:default (hash))
+          (a:hash.key (prop:property-type-key property-type)
+                      #:default (prop:property-type-default property-type)))))
 
 (define (get-property item-data item property-type)
   (if (prop:property-type-calculate property-type)
@@ -63,8 +58,7 @@
 
 ;; Returns set of all items.
 (define (all-items item-data)
-  (define item-properties (cdr item-data))
-  (list->set (hash-keys item-properties)))
+  (list->set (hash-keys (a:get (item-data item-data.properties)))))
 
 ;; Returns the ID (an integer uniquely representing a reference to an
 ;; item) of an item in item-data.
