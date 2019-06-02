@@ -14,8 +14,8 @@
 
 (define (filter-expression-with-contexts filter-expression state)
   (foldl (λ (context filter-expression)
-           (context:apply-context-to-filter-expression
-            (context:context-definitions-get
+           (context:apply-context-filter
+            (context:get-context
              (state:state-defined-contexts state)
              context)
             filter-expression))
@@ -24,8 +24,8 @@
 
 (define (modify-expression-with-contexts modify-expression state)
   (foldl (λ (context filter-expression)
-           (context:apply-context-to-modify-expression
-            (context:context-definitions-get
+           (context:apply-context-modify
+            (context:get-context
              (state:state-defined-contexts state)
              context)
             modify-expression))
@@ -70,21 +70,21 @@
                                 (filter-expression-with-contexts filter-expression state)
                                 #:property-types property-types))))
     (`(context show)
-     (writeln (context:context-definitions-available (state:state-defined-contexts state)))
+     (writeln (context:available-contexts (state:state-defined-contexts state)))
      (values state (list)))
     (`(context add ,name ,filter-expression ,modify-expression)
      (values (state:state-set-defined-contexts
               state
-              (context:context-definitions-define
+              (context:add-context
                (state:state-defined-contexts state)
                name
-               filter-expression
-               modify-expression))
+               #:filter filter-expression
+               #:modify modify-expression))
              (list)))
     (`(context remove ,name)
      (values (state:state-set-defined-contexts
               state
-              (context:context-definitions-remove
+              (context:remove-context
                (state:state-defined-contexts state)
                name))
              (list)))

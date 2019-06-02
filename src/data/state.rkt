@@ -4,13 +4,14 @@
 
 (require
  (prefix-in item: "item-data.rkt")
- (prefix-in context: "context.rkt"))
+ (prefix-in context: "context.rkt")
+ (prefix-in a: "../util/attributes.rkt"))
 
 (define state-empty
   (list*
-   context:context-definitions-empty ; Defined contexts
-   (set)                             ; Current contexts
-   item:item-data-empty))            ; Item data
+   context:empty-contexts ; Defined contexts
+   (set)                  ; Current contexts
+   item:item-data-empty)) ; Item data
 
 (define (state-defined-contexts st) (car st))
 (define (state-current-contexts st) (cadr st))

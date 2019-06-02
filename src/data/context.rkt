@@ -2,25 +2,36 @@
 
 (provide (all-defined-out))
 
-(define context-definitions-empty
-  (hash))
+(require (prefix-in a: "../util/attributes.rkt"))
 
-(define (context-definitions-available definitions)
-  (hash-keys definitions))
+(a:define-record context (filter modify))
+(a:define-record contexts (definitions))
 
-(define (context-definitions-define definitions name filter-expression modify-expression)
-  (hash-set definitions name (list filter-expression modify-expression)))
+(define empty-contexts
+  (contexts #:definitions (hash)))
 
-(define (context-definitions-remove definitions name)
-  (hash-remove definitions name))
+(define (available-contexts contexts)
+  (hash-keys (a:get (contexts contexts.definitions))))
 
-(define (context-definitions-get definitions name)
-  (hash-ref definitions
-            name
-            '((and) (and))))
+(define (add-context contexts name #:filter filter-expression #:modify modify-expression)
+  (a:set (contexts contexts.definitions (a:hash.key name))
+         (context #:filter filter-expression #:modify modify-expression)))
 
-(define (apply-context-to-filter-expression context filter-expression)
-  `(and ,(car context) ,filter-expression))
+(define (remove-context contexts name)
+  (a:update (contexts contexts.definitions)
+            (λ (x) (hash-remove x name))))
 
-(define (apply-context-to-modify-expression context modify-expression)
-  `(and ,(cadr context) ,modify-expression))
+(define (get-context definitions name)
+  (a:get (contexts
+          contexts.definitions
+          (a:hash.key name #:default (context #:filter '() #:modify '())))))
+
+(define (apply-context-filter context filter-expression)
+  (list 'and
+        (a:get (context context.filter))
+        filter-expression))
+
+(define (apply-context-modify context modify-expression)
+  (list 'and
+        (a:get (context context.modify))
+        modify-expression))
