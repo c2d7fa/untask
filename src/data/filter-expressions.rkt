@@ -35,7 +35,9 @@
                                                        (val:evaluate-literal literal-expr))
                                                  #t)))
     (`(item . ,id)
-     (= (data:item-id item-data item) id))))
+     (= (data:item-id item-data item) id))
+    ((list)
+     #t)))
 
 ;; Returns a set of all items with values in item-data matching
 ;; filter-expression.
