@@ -46,3 +46,29 @@
 (define-syntax-rule (get (head path ...))      (get* head (list path ...)))
 (define-syntax-rule (set (head path ...) v)    (set* head (list path ...) v))
 (define-syntax-rule (update (head path ...) f) (update* head (list path ...) f))
+
+;;
+
+(require (for-syntax racket/syntax
+                     racket/list))
+
+(define-syntax (define-record stx)
+  (syntax-case stx ()
+    ((_ name (attrs ...))
+     (with-syntax ((make-name (format-id #'name "~a" #'name))
+                   ((make-name-args ...) (apply append (map (λ (x)
+                                                        (list (string->keyword (symbol->string (syntax->datum x)))
+                                                              x))
+                                                      (syntax-e #'(attrs ...)))))
+                   (make-name-body #'(list attrs ...))
+                   ((define-attrs ...) (map (λ (n)
+                                              (with-syntax ((n (datum->syntax #'name n))
+                                                            (attr-name (format-id #'name "~a.~a" #'name (list-ref (syntax-e #'(attrs ...)) n))))
+                                                #'(define attr-name
+                                                    (.nth n))))
+                                            (range (length (syntax-e #'(attrs ...))))))
+                   )
+       #'(begin
+           (define (make-name make-name-args ...)
+             make-name-body)
+           define-attrs ...)))))
