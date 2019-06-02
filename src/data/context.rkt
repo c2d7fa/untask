@@ -22,9 +22,12 @@
             (λ (x) (hash-remove x name))))
 
 (define (get-context definitions name)
-  (a:get (contexts
-          contexts.definitions
+  (a:get (definitions
           (a:hash.key name #:default (context #:filter '() #:modify '())))))
+
+(define (contexts.named name)
+  (a:make-attribute #:get (λ (x) (get-context (a:get (x contexts.definitions)) name))
+                    #:set (λ (x v) (a:set (x contexts.definitions (a:hash.key name)) v))))
 
 (define (apply-context-filter context filter-expression)
   (list 'and
