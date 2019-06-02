@@ -32,10 +32,7 @@
       (let ((parsed (try-parse input #:parse parse)))
         (if (eq? parsed #f)
             'parse-error
-            (let-values (((new-state output)
-                          ((execute parsed
-                                    #:property-types property-types)
-                           state)))
+            (let-values (((new-state output) (execute parsed state #:property-types property-types)))
               (list 'success output new-state))))))
 
 (define (format-prompt-line current-contexts)

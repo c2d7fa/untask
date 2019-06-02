@@ -49,11 +49,11 @@
                 (item:new-item (a:get (state state.item-data)))))
     (values
      (a:set (state state.item-data)
-            ((evaluate-modify-expression #:property-types property-types
-              (modify-expression-with-contexts modify-expression
-                                               state))
-             item-data-with-new-item
-             new-item))
+            (evaluate-modify-expression #:property-types property-types
+                                        (modify-expression-with-contexts modify-expression
+                                                                         state)
+                                        item-data-with-new-item
+                                        new-item))
      (list new-item))))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
@@ -75,7 +75,7 @@
 ;;
 ;; command-line-representation is a representation of the parsed user input in
 ;; the form (filter-expression command-name arguments...)
-(define ((execute command-line-representation #:property-types property-types) state)
+(define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
     (`(,filter-expression list) (execute-list state filter-expression #:property-types property-types))
     (`(add ,modify-expression) (execute-add state modify-expression #:property-types property-types))
