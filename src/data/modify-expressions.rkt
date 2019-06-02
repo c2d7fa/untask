@@ -27,7 +27,9 @@
      (foldl (λ (subexpression item-data)
               ((evaluate-modify-expression subexpression #:property-types property-types) item-data item))
             item-data
-            subexpressions))))
+            subexpressions))
+    ((list)
+     item-data)))
 
 ;; Returns new-item-data after modifying all items in item-data
 ;; according to modify-expression.
