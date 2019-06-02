@@ -72,3 +72,6 @@
            (define (make-name make-name-args ...)
              make-name-body)
            define-attrs ...)))))
+
+(define-syntax-rule (define-attribute name #:get getter #:set setter)
+  (define name (make-attribute #:get getter #:set setter)))
