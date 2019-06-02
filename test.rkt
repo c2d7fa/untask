@@ -1,7 +1,7 @@
 #lang racket
 
 (require
- rackunit/gui
+ rackunit/text-ui
  "./test/user/parser.rkt")
 
-(test/gui parser-tests #:wait? #t)
+(run-tests parser-tests)
