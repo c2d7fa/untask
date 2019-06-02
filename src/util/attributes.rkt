@@ -1,5 +1,9 @@
 #lang racket
 
+(provide (all-defined-out))
+
+;;
+
 (define (make-attribute #:get getter #:set setter)
   (list* getter setter))
 
@@ -16,6 +20,10 @@
 
 (define (.nth n)
   (apply path (append (make-list n .cdr) (list .car))))
+
+(define (hash.key k #:default (default #f))
+  (make-attribute #:get (λ (x) (hash-ref x k default))
+                  #:set (λ (x v) (hash-set x k v))))
 
 ;;
 
