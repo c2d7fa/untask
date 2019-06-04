@@ -37,24 +37,25 @@
 
 (define (execute-list state filter-expression #:property-types property-types)
   (let ((item-data (a:get (state state.item-data))))
-    (values state
-            (urgency:sort-items-by-urgency-descending
-             item-data
-             (search item-data
-                     (filter-expression-with-contexts filter-expression state)
-                     #:property-types property-types)))))
+    `((list-items ,item-data
+                  (urgency:sort-items-by-urgency-descending
+                   item-data
+                   (search item-data
+                           (filter-expression-with-contexts filter-expression state)
+                           #:property-types property-types))))))
 
 (define (execute-add state modify-expression #:property-types property-types)
   (let-values (((item-data-with-new-item new-item)
                 (item:new-item (a:get (state state.item-data)))))
-    (values
-     (a:set (state state.item-data)
-            (evaluate-modify-expression #:property-types property-types
-                                        (modify-expression-with-contexts modify-expression
-                                                                         state)
-                                        item-data-with-new-item
-                                        new-item))
-     (list new-item))))
+    (let ((new-state
+           (a:set (state state.item-data)
+                  (evaluate-modify-expression #:property-types property-types
+                                              (modify-expression-with-contexts modify-expression
+                                                                               state)
+                                              item-data-with-new-item
+                                              new-item))))
+      `((update-state ,new-state)
+        (list-items ,(a:get (state state.item-data)) (,new-item))))))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
   (let ((new-state
@@ -65,45 +66,38 @@
                                            (filter-expression-with-contexts filter-expression state))
                                    (modify-expression-with-contexts modify-expression state)
                                    #:property-types property-types)))))
-    (values new-state
-            (set->list (search (a:get (new-state state.item-data)) #:property-types property-types
-                               (filter-expression-with-contexts filter-expression state))))))
+    `((update-state ,new-state)
+      (list-items ,(a:get (state state.item-data))
+                  ,(set->list (search (a:get (new-state state.item-data)) #:property-types property-types
+                                      (filter-expression-with-contexts filter-expression state)))))))
 
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
-    (`(,filter-expression list) (execute-list state filter-expression #:property-types property-types))
-    (`(add ,modify-expression) (execute-add state modify-expression #:property-types property-types))
-    (`(,filter-expression modify ,modify-expression) (execute-modify state filter-expression modify-expression #:property-types property-types))
+    (`(,filter-expression list)
+     (execute-list state filter-expression #:property-types property-types))
+    (`(add ,modify-expression)
+     (execute-add state modify-expression #:property-types property-types))
+    (`(,filter-expression modify ,modify-expression)
+     (execute-modify state filter-expression modify-expression #:property-types property-types))
     (`(context show)
-     (writeln (available-contexts (a:get (state state.defined-contexts))))
-     (values state (list)))
+     `((print-raw ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))))))
     (`(context add ,name ,filter-expression ,modify-expression)
-     (values (a:set (state state.defined-contexts (contexts.named name))
-                    (context #:filter filter-expression
-                             #:modify modify-expression))
-             (list)))
+     `((set-state ,(a:set (state state.defined-contexts (contexts.named name))
+                          (context #:filter filter-expression
+                                   #:modify modify-expression)))))
     (`(context remove ,name)
-     (values (a:update (state state.defined-contexts)
-                       (λ (x) (remove-context x name)))
-             (list)))
+     `((set-state ,(a:update (state state.defined-contexts)
+                             (λ (x) (remove-context x name))))))
     (`(context active ,toggles)
-     (values (a:update (state state.active-contexts)
-                       (λ (active-contexts)
-                         (foldl (λ (expr active-contexts)
-                                  (match expr
-                                    (`(on ,name)  (set-add active-contexts name))
-                                    (`(off ,name) (set-remove active-contexts name))))
-                                active-contexts
-                                toggles)))
-             (list)))
+     `((set-state ,(a:update (state state.active-contexts)
+                             (λ (active-contexts)
+                               (foldl (λ (expr active-contexts)
+                                        (match expr
+                                          (`(on ,name)  (set-add active-contexts name))
+                                          (`(off ,name) (set-remove active-contexts name))))
+                                      active-contexts
+                                      toggles))))))
     (`(save ,filename)
-     (begin
-       (call-with-output-file filename #:exists 'replace
-         (λ (out)
-           (display (export:export-item-data-to-string (a:get (state state.item-data))) out)))
-       (values state
-               (set->list (item:all-items (a:get (state state.item-data)))))))
+     `((write-file ,filename ,(export:export-item-data-to-string (a:get (state state.item-data))))))
     (`(load ,filename)
-     (let ((new-item-data (export:read-item-data-from-file filename)))
-       (values (a:set (state state.item-data) new-item-data)
-               (set->list (item:all-items new-item-data)))))))
+     `((load-item-data-from-file ,filename)))))
