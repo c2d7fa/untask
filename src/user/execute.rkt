@@ -69,12 +69,6 @@
             (set->list (search (a:get (new-state state.item-data)) #:property-types property-types
                                (filter-expression-with-contexts filter-expression state))))))
 
-;; Convert a representation of a user-inputted command-line into a function that
-;; takes the current state and returns new-state and an output description
-;; (currently just a list of items to print on the screen).
-;;
-;; command-line-representation is a representation of the parsed user input in
-;; the form (filter-expression command-name arguments...)
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
     (`(,filter-expression list) (execute-list state filter-expression #:property-types property-types))
