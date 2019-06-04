@@ -4,6 +4,8 @@
 
 (require
  "execute.rkt"
+ "listing.rkt"
+ (only-in "parser.rkt" parse)
  (prefix-in state: "../data/state.rkt")
  (prefix-in a: "../util/attributes.rkt"))
 
@@ -14,7 +16,7 @@
   (with-handlers ((exn:break? (λ (e) #f)))
     (read-line)))
 
-(define (try-parse input #:parse parse)
+(define (try-parse input)
   (with-handlers ((exn? (λ (e) #f)))
     (parse input)))
 
@@ -24,12 +26,11 @@
 ;;  - `(success ,output ,new-state)
 (define (try-evaluate input
                       state
-                      #:parse parse
                       #:property-types property-types)
   (if (or (eq? input #f)
           (equal? input "exit"))
       'exit
-      (let ((parsed (try-parse input #:parse parse)))
+      (let ((parsed (try-parse input)))
         (if (eq? parsed #f)
             'parse-error
             (let-values (((new-state output) (execute parsed state #:property-types property-types)))
@@ -41,13 +42,9 @@
                               " ")))
 
 (define (user-loop! state-box
-                    #:parse parse
-                    #:render-listing render-listing
                     #:property-types property-types)
   (define (recur)
     (user-loop! state-box
-                #:parse parse
-                #:render-listing render-listing
                 #:property-types property-types))
   (define (goodbye)
     (displayln "Goodbye!"))
@@ -61,8 +58,7 @@
   (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
          (result (try-evaluate input
                                (unbox state-box)
-                               #:property-types property-types
-                               #:parse parse)))
+                               #:property-types property-types)))
     (match result
       ('exit (goodbye))
       ('parse-error (parse-error))

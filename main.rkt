@@ -7,7 +7,6 @@
 
  (only-in "src/util.rkt" thread-first)
  (only-in "src/user/loop.rkt" user-loop!)
- (only-in "src/user/listing.rkt" render-listing)
  (only-in "src/data/export.rkt" read-item-data-from-file)
  (only-in "src/user/parser.rkt" parse)
 
@@ -31,6 +30,4 @@
     ))
 
 (user-loop! (box state:state-empty)
-            #:property-types property-types
-            #:parse parse
-            #:render-listing render-listing)
+            #:property-types property-types)
