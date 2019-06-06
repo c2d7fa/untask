@@ -54,7 +54,7 @@
                                                                                state)
                                               item-data-with-new-item
                                               new-item))))
-      `((update-state ,new-state)
+      `((set-state ,new-state)
         (list-items ,(a:get (new-state state.item-data)) (,new-item))))))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
@@ -66,7 +66,7 @@
                                            (filter-expression-with-contexts filter-expression state))
                                    (modify-expression-with-contexts modify-expression state)
                                    #:property-types property-types)))))
-    `((update-state ,new-state)
+    `((set-state ,new-state)
       (list-items ,(a:get (state state.item-data))
                   ,(set->list (search (a:get (new-state state.item-data)) #:property-types property-types
                                       (filter-expression-with-contexts filter-expression state)))))))

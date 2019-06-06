@@ -54,7 +54,7 @@
     (recur))
   (define (handle! action)
     (match action
-      (`(update-state ,new-state)
+      (`(set-state ,new-state)
        (set-box! state-box new-state))
       (`(list-items ,item-data ,item)
        (displayln (render-listing item-data item)))
@@ -66,7 +66,7 @@
            (display string-data out))))
       (`(load-item-data-from-file ,filename)
        (let ((new-item-data (export:read-item-data-from-file filename)))
-         (handle! (list 'update-state (a:set ((unbox state-box) state:state.item-data) new-item-data)))))))
+         (handle! (list 'set-state (a:set ((unbox state-box) state:state.item-data) new-item-data)))))))
   (define (success output)
     (map handle! output)
     (recur))
