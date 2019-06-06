@@ -1,11 +1,14 @@
 #lang racket
 
 (require
+ rackunit
  rackunit/text-ui
 
  "./test/unit/user/parser.rkt"
  "./test/integration.rkt"
  )
 
-(run-tests parser-tests
-           integration-tests)
+(run-tests
+ (test-suite "untask"
+             parser-tests
+             integration-tests))
