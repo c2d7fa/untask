@@ -5,11 +5,10 @@
          )
 
 (define/provide-test-suite integration-tests
-  (let-values (((state output) (run "add description:{New item}"
-                                    "add description:{Other item}"
-                                    "list")))
-    (check-equal? output '(listing 0 1))
-    (check-equal? (a:get (state state.item-data (item-data.property-of 0 description-property-type)))
-                  "New item")
-    (check-equal? (a:get (state state.item-data (item-data.property-of 1 description-property-type)))
-                  "Other item")))
+  (test-case "filtering based on tags"
+    (let* ((state (build-state "add description:{item 1} tags+tag1 tags+tag2"
+                               "add description:{item 2} tags+tag1"
+                               "add description:{item 3} tags+tag2"))
+           (items (run-list-command "tags+tag2" state)))
+      (check-equal? (get-descriptions items)
+                    (set "item 1" "item 3")))))
