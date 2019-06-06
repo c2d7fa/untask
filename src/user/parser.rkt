@@ -131,7 +131,7 @@
                 (string/p "add")
                 whitespace/p
                 (name <- context-name/p)
-                (fe <- (opt/p #:default '(and)
+                (fe <- (opt/p #:default '()
                               (f:do whitespace/p
                                     (string/p "filter")
                                     whitespace/p
@@ -182,4 +182,8 @@
    (f:map (λ (fe) `(,fe list)) filter-expression/p)))
 
 (define (parse command-line-input)
-  (parse-result! (parse-string command-line-input/p command-line-input)))
+  (parse-result! (parse-string (f:do (result <- command-line-input/p)
+                                     (opt/p whitespace/p)
+                                     eof/p
+                                     (f:pure result))
+                               command-line-input)))

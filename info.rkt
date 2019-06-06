@@ -1,3 +1,3 @@
 #lang info
 
-(define deps '("megaparsack"))
+(define deps '("megaparsack" "rackunit"))
