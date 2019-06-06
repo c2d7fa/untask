@@ -38,11 +38,11 @@
 (define (execute-list state filter-expression #:property-types property-types)
   (let ((item-data (a:get (state state.item-data))))
     `((list-items ,item-data
-                  (urgency:sort-items-by-urgency-descending
-                   item-data
-                   (search item-data
-                           (filter-expression-with-contexts filter-expression state)
-                           #:property-types property-types))))))
+                  ,(urgency:sort-items-by-urgency-descending
+                    item-data
+                    (search item-data
+                            (filter-expression-with-contexts filter-expression state)
+                            #:property-types property-types))))))
 
 (define (execute-add state modify-expression #:property-types property-types)
   (let-values (((item-data-with-new-item new-item)
@@ -55,7 +55,7 @@
                                               item-data-with-new-item
                                               new-item))))
       `((update-state ,new-state)
-        (list-items ,(a:get (state state.item-data)) (,new-item))))))
+        (list-items ,(a:get (new-state state.item-data)) (,new-item))))))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
   (let ((new-state
