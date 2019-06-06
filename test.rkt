@@ -3,7 +3,7 @@
 (require
  rackunit/text-ui
 
- "./test/user/parser.rkt"
+ "./test/unit/user/parser.rkt"
  "./test/integration.rkt"
  )
 
