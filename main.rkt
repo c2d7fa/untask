@@ -17,8 +17,6 @@
  (prefix-in depends: "src/properties/dependencies.rkt")
  )
 
-;;; EXAMPLE
-
 (define property-types
   (thread-first prop:empty-property-type-collection
     (prop:add-property-type status:status-property-type)
