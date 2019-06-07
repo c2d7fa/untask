@@ -5,7 +5,7 @@
 ;; Takes an output description and returns a string that can be printed to
 ;; terminal to display the output.
 (define (render output)
-  "todo")
+  (translate-tree output))
 
 (define (butlast l)
   (reverse (cdr (reverse l))))
@@ -56,5 +56,3 @@
                            segments))
       (reset) ,@post))
   (if (string? tree) (list tree) (untree-tree tree)))
-
-(display (translate-tree '((bright black background) (italic) (blue) ("hello, this is a " ((magenta) (underline) (strikethrough) (bold) ("test")) ".\n"))))
