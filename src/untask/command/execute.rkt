@@ -98,6 +98,6 @@
                                       active-contexts
                                       toggles))))))
     (`(save ,filename)
-     `((write-file ,filename ,(export:export-item-data-to-string (a:get (state state.item-data))))))
+     `((write-file ,filename ,(export:export-state-to-string state))))
     (`(load ,filename)
      `((load-item-data-from-file ,filename)))))
