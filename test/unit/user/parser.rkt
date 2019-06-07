@@ -1,7 +1,7 @@
 #lang racket
 
 (require rackunit
-         "../../../src/user/parser.rkt")
+         "../../../src/untask/user/parser.rkt")
 
 (define/provide-test-suite parser-tests
   (test-equal? "add"

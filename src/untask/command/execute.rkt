@@ -3,18 +3,18 @@
 (provide execute)
 
 (require
- (prefix-in item: "../data/item-data.rkt")
- (prefix-in export: "../data/export.rkt")
+ (prefix-in item: "../core/item.rkt")
+ (prefix-in export: "../core/export.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
 
- "../data/context.rkt"
- "../data/state.rkt"
+ "../core/context.rkt"
+ "../core/state.rkt"
 
- "../data/filter-expressions.rkt"
- "../data/modify-expressions.rkt"
+ "filter.rkt"
+ "modify.rkt"
 
- (prefix-in a: "../util/attributes.rkt")
- (only-in "../util.rkt" thread))
+ (prefix-in a: "../../attribute.rkt")
+ (only-in "../../misc.rkt" thread))
 
 
 (define (filter-expression-with-contexts filter-expression state)

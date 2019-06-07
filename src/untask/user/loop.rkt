@@ -3,13 +3,13 @@
 (provide user-loop!)
 
 (require
- "execute.rkt"
- "listing.rkt"
- (only-in "parser.rkt" parse)
+ "../command/execute.rkt"
+ "./render-list.rkt"
+ "./parser.rkt"
 
- (prefix-in export: "../data/export.rkt")
- (prefix-in state: "../data/state.rkt")
- (prefix-in a: "../util/attributes.rkt"))
+ (prefix-in export: "../core/export.rkt")
+ (prefix-in state: "../core/state.rkt")
+ (prefix-in a: "../../attribute.rkt"))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.

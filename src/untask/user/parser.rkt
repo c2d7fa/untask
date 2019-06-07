@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in expr: "../data/expressions.rkt")
+ (prefix-in expr: "../command/expression.rkt")
 
  (combine-in megaparsack megaparsack/text)
  (prefix-in f: (combine-in data/functor data/applicative data/monad data/either))

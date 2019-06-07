@@ -9,8 +9,8 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in prop: "./property-type.rkt")
- (prefix-in a: "../util/attributes.rkt"))
+ (prefix-in prop: "./property.rkt")
+ (prefix-in a: "../../attribute.rkt"))
 
 (a:define-record item-data (next properties))
 

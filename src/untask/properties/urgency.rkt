@@ -3,9 +3,9 @@
 (provide (all-defined-out))
 
 (require
-  (prefix-in item: "../data/item-data.rkt")
-  (prefix-in prop: "../data/property-type.rkt")
-  (prefix-in val: "../data/values.rkt")
+  (prefix-in item: "../core/item.rkt")
+  (prefix-in prop: "../core/property.rkt")
+  (prefix-in val: "../core/value.rkt")
   (prefix-in depends: "./dependencies.rkt"))
 
 (define (calculate-urgency item-data item)

@@ -5,11 +5,11 @@
  blocks-property-type)
 
 (require
-  (prefix-in item: "../data/item-data.rkt")
-  (prefix-in prop: "../data/property-type.rkt")
-  (prefix-in val: "../data/values.rkt")
+  (prefix-in item: "../core/item.rkt")
+  (prefix-in prop: "../core/property.rkt")
+  (prefix-in val: "../core/value.rkt")
 
-  (only-in "../util.rkt" set-diff))
+  (only-in "../../misc.rkt" set-diff))
 
 (define depends-property-type
   (prop:make-property-type #:key 'depends

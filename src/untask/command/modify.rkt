@@ -3,9 +3,10 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in operators: "operators.rkt")
- (prefix-in data: "item-data.rkt")
- (prefix-in val: "values.rkt")
+ (prefix-in operators: "../core/operator.rkt")
+ (prefix-in item: "../core/item.rkt")
+ (prefix-in val: "../core/value.rkt")
+
  (only-in "../user/builtin-operators.rkt" builtin-operators))
 
 ;; Take a modify expression and return a function that will update the
@@ -15,12 +16,12 @@
   (match modify-expression
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (if (eq? operator ':)
-         (data:set-property-by-key #:property-types property-types
+         (item:set-property-by-key #:property-types property-types
                                    item-data item property (val:evaluate-literal literal-expr))
-         (data:set-property-by-key #:property-types property-types
+         (item:set-property-by-key #:property-types property-types
                                    item-data item property (operators:evaluate-operator-expression
                                                             builtin-operators
-                                                            (list (data:get-property-by-key item-data item property #:property-types property-types)
+                                                            (list (item:get-property-by-key item-data item property #:property-types property-types)
                                                                   operator
                                                                   (val:evaluate-literal literal-expr))))))
     (`(and ,subexpressions ...)

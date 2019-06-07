@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in expr: "expressions.rkt"))
+ (prefix-in expr: "../command/expression.rkt"))
 
 (define (make-string string-content)
   `(string . ,string-content))

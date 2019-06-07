@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in a: "../util/attributes.rkt"))
+(require (prefix-in a: "../../attribute.rkt"))
 
 (a:define-record context (filter modify))
 (a:define-record contexts (definitions))

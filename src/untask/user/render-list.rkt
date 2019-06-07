@@ -3,8 +3,8 @@
 (provide render-listing)
 
 (require
- (prefix-in item: "../data/item-data.rkt")
- (prefix-in val: "../data/values.rkt")
+ (prefix-in item: "../core/item.rkt")
+ (prefix-in val: "../core/value.rkt")
 
  (prefix-in status: "../properties/status.rkt")
  (prefix-in description: "../properties/description.rkt")

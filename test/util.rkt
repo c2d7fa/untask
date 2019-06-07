@@ -6,21 +6,21 @@
          )
 
 (require
- "../src/data/state.rkt"
- "../src/data/property-type.rkt"
- "../src/user/execute.rkt"
- "../src/user/parser.rkt"
- "../src/util.rkt"
+ "../src/untask/core/state.rkt"
+ "../src/untask/core/property.rkt"
+ "../src/untask/command/execute.rkt"
+ "../src/untask/user/parser.rkt"
+ "../src/misc.rkt"
 
- "../src/properties/status.rkt"
- "../src/properties/description.rkt"
- "../src/properties/tags.rkt"
- "../src/properties/urgency.rkt"
- "../src/properties/dependencies.rkt"
+ "../src/untask/properties/status.rkt"
+ "../src/untask/properties/description.rkt"
+ "../src/untask/properties/tags.rkt"
+ "../src/untask/properties/urgency.rkt"
+ "../src/untask/properties/dependencies.rkt"
 
- (prefix-in a: "../src/util/attributes.rkt")
- (prefix-in i: "../src/data/item-data.rkt")
- (prefix-in v: "../src/data/values.rkt")
+ (prefix-in a: "../src/attribute.rkt")
+ (prefix-in i: "../src/untask/core/item.rkt")
+ (prefix-in v: "../src/untask/core/value.rkt")
  )
 
 (define standard-property-types

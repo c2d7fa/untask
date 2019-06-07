@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require
-  (prefix-in item: "./item-data.rkt"))
+  (prefix-in item: "./item.rkt"))
 
 (define (export-item-data-to-string item-data)
   (format "~v" item-data))

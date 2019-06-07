@@ -2,9 +2,9 @@
 
 (provide builtin-operators)
 
-(require "../data/operators.rkt"
-         (prefix-in val: "../data/values.rkt")
-         (only-in "../util.rkt" thread-first))
+(require "../core/operator.rkt"
+         (prefix-in val: "../core/value.rkt")
+         (only-in "../../misc.rkt" thread-first))
 
 (define op-string-suffix
   (create-operator #:name '>

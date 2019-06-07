@@ -2,8 +2,8 @@
 
 (provide (all-defined-out))
 
-(require (only-in "../util.rkt" thread-first)
-         (prefix-in val: "values.rkt"))
+(require (only-in "../../misc.rkt" thread-first)
+         (prefix-in val: "value.rkt"))
 
 (define (create-operator #:name name
                          #:object object-type

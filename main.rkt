@@ -1,21 +1,18 @@
 #lang racket
 
 (require
- (prefix-in item: "src/data/item-data.rkt")
- (prefix-in prop: "src/data/property-type.rkt")
- (prefix-in state: "src/data/state.rkt")
+ (prefix-in prop: "./src/untask/core/property.rkt")
+ (prefix-in state: "./src/untask/core/state.rkt")
 
- (only-in "src/util.rkt" thread-first)
- (only-in "src/user/loop.rkt" user-loop!)
- (only-in "src/data/export.rkt" read-item-data-from-file)
- (only-in "src/user/parser.rkt" parse)
+ (only-in "./src/untask/user/loop.rkt" user-loop!)
 
- (prefix-in status: "src/properties/status.rkt")
- (prefix-in description: "src/properties/description.rkt")
- (prefix-in tags: "src/properties/tags.rkt")
- (prefix-in urgency: "src/properties/urgency.rkt")
- (prefix-in depends: "src/properties/dependencies.rkt")
- )
+ (prefix-in status: "./src/untask/properties/status.rkt")
+ (prefix-in description: "./src/untask/properties/description.rkt")
+ (prefix-in tags: "./src/untask/properties/tags.rkt")
+ (prefix-in urgency: "./src/untask/properties/urgency.rkt")
+ (prefix-in depends: "./src/untask/properties/dependencies.rkt")
+
+ (only-in "./src/misc.rkt" thread-first))
 
 (define property-types
   (thread-first prop:empty-property-type-collection

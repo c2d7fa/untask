@@ -3,9 +3,9 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in item: "item-data.rkt")
- (prefix-in context: "context.rkt")
- (prefix-in a: "../util/attributes.rkt"))
+ (prefix-in item: "./item.rkt")
+ (prefix-in context: "./context.rkt")
+ (prefix-in a: "../../attribute.rkt"))
 
 (a:define-record state (defined-contexts active-contexts item-data))
 
