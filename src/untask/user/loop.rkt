@@ -9,7 +9,8 @@
 
  (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
- (prefix-in a: "../../attribute.rkt"))
+ (prefix-in a: "../../attribute.rkt")
+ (prefix-in term: "../../terminal.rkt"))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
@@ -38,9 +39,16 @@
             (list 'success (execute parsed state #:property-types property-types))))))
 
 (define (format-prompt-line current-contexts)
-  (format "~a> " (string-join (map (λ (c) (format "@~a" c))
-                                   (set->list current-contexts))
-                              " ")))
+  (let ((contexts (string-join
+                   (map (λ (c)
+                          (term:render
+                           `(() (((black) ("@"))
+                                 ((cyan) (,c))))))
+                        (set->list current-contexts))
+                   " ")))
+        (term:render `(()
+                       (,contexts
+                        ((black) ("> ")))))))
 
 (define (user-loop! state-box
                     #:property-types property-types)

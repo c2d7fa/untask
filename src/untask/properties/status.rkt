@@ -34,3 +34,9 @@
                            #:default (val:make-string "active")
                            #:calculate calculate-status
                            #:translate translate-status))
+
+(define (active? item-data item)
+  (equal? (val:make-string "active") (item:get-property item-data item status-property-type)))
+
+(define (done? item-data item)
+  (equal? (val:make-string "done") (item:get-property item-data item status-property-type)))
