@@ -24,6 +24,8 @@
        (sgr))
       (`(bold)
        (sgr 1))
+      (`(faint)
+       (sgr 2))
       (`(italic)
        (sgr 3))
       (`(underline)
@@ -38,6 +40,7 @@
        (sgr (+ 40 (color-index color))))
       (`(bright ,color background) #:when (color? color)
        (sgr (+ 100 (color-index color))))
+      ('() "")
       ))
   (if (string? item)
       item
