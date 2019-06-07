@@ -67,8 +67,8 @@
                                    (modify-expression-with-contexts modify-expression state)
                                    #:property-types property-types)))))
     `((set-state ,new-state)
-      (list-items ,(a:get (state state.item-data))
-                  ,(set->list (search (a:get (new-state state.item-data)) #:property-types property-types
+      (list-items ,(a:get (new-state state.item-data))
+                  ,(set->list (search (a:get (state state.item-data)) #:property-types property-types
                                       (filter-expression-with-contexts filter-expression state)))))))
 
 (define (execute command-line-representation state #:property-types property-types)
