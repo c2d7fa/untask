@@ -50,21 +50,19 @@
                     " "
                     ((bold) (yellow)
                       (,(~a (val:unwrap-number urgency))))
+                    ;; Blocks
+                    ,(if (set-empty? (val:unwrap-set blocks))
+                         ""
+                         `((red)
+                           ((() (" B:"))
+                            ((bold) (,(~a (set-count (val:unwrap-set blocks))))))))
+                    ;; Depends
+                    ,(if (set-empty? (val:unwrap-set depends))
+                         ""
+                         `((blue)
+                           ((() (" D:"))
+                            ((bold) (,(~a (set-count (val:unwrap-set depends))))))))
                     ))))
-    #;(format "~a. ~a [~a] <~a/~a> (st:~a, dp:[~a], bl:[~a])"
-            (item:item-id item-data item)
-            (val:unwrap-string description)
-            (string-join (map val:unwrap-string (set->list (val:unwrap-set tags))) " ")
-            (val:unwrap-number urgency)
-            (val:unwrap-number base-urgency)
-            (val:unwrap-string status)
-            (string-join (map (λ (im)
-                                (format "~a" (val:unwrap-item im)))
-                              (set->list (val:unwrap-set depends)))
-                         " ")
-            (string-join (map (λ (im)
-                                (format "~a" (val:unwrap-item im)))
-                              (set->list (val:unwrap-set blocks)))))
   (string-join
    (map (λ (item) (render-item item-data item)) items)
    "\n"))
