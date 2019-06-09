@@ -3,6 +3,7 @@
 (require
  (prefix-in prop: "./src/untask/core/property.rkt")
  (prefix-in state: "./src/untask/core/state.rkt")
+ (prefix-in export: "./src/untask/core/export.rkt")
 
  (only-in "./src/untask/user/loop.rkt" user-loop!)
 
@@ -24,5 +25,7 @@
     (prop:add-property-type depends:blocks-property-type)
     ))
 
-(user-loop! (box state:state-empty)
+(user-loop! (box (if (zero? (vector-length (current-command-line-arguments)))
+                     state:state-empty
+                     (export:read-state-from-file (vector-ref (current-command-line-arguments) 0))))
             #:property-types property-types)
