@@ -72,9 +72,10 @@
        (call-with-output-file filename #:exists 'replace
          (λ (out)
            (display string-data out))))
-      (`(load-item-data-from-file ,filename)
+      (`(load-state-from-file-and-then ,filename ,and-then)
        (let ((new-state (export:read-state-from-file filename)))
-         (handle! (list 'set-state new-state))))))
+         #;(handle! (list 'set-state new-state))
+         (handle! (and-then new-state))))))
   (define (success output)
     (map handle! output)
     (recur))
