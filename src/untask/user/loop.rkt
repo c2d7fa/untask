@@ -50,13 +50,26 @@
                        (,contexts
                         ((black) ("> ")))))))
 
+(define (prompt-proceed-unsaved state)
+  (if (or (not (a:get (state state:state.open-file)))
+          (equal? (export:read-state-from-file (a:get (state state:state.open-file)))
+                  state))
+      #t
+      (begin
+        (display "You have unsaved work. Proceed?  ")
+        (let ((input (read-line)))
+          (or (string-prefix? input "y")
+              (string-prefix? input "Y"))))))
+
 (define (user-loop! state-box
                     #:property-types property-types)
   (define (recur)
     (user-loop! state-box
                 #:property-types property-types))
   (define (goodbye)
-    (displayln "Goodbye!"))
+    (if (prompt-proceed-unsaved (unbox state-box))
+        (displayln "Goodbye!")
+        (recur)))
   (define (parse-error)
     (displayln "Error: Could not parse input.")
     (recur))
@@ -74,8 +87,9 @@
            (display string-data out))))
       (`(load-state-from-file-and-then ,filename ,and-then)
        (let ((new-state (export:read-state-from-file filename)))
-         #;(handle! (list 'set-state new-state))
-         (handle! (and-then new-state))))))
+         (when (prompt-proceed-unsaved (unbox state-box))
+           (handle! (list 'set-state new-state))
+           (handle! (and-then new-state)))))))
   (define (success output)
     (map handle! output)
     (recur))
