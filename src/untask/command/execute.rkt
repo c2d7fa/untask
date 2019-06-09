@@ -27,7 +27,7 @@
          (set->list (a:get (state state.active-contexts)))))
 
 (define (modify-expression-with-contexts modify-expression state)
-  (foldl (λ (context-name filter-expression)
+  (foldl (λ (context-name modify-expression)
            (apply-context-modify (a:get (state
                                          state.defined-contexts
                                          (contexts.named context-name)))
