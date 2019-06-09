@@ -97,7 +97,16 @@
                                           (`(off ,name) (set-remove active-contexts name))))
                                       active-contexts
                                       toggles))))))
-    (`(save ,filename)
-     `((write-file ,filename ,(export:export-state-to-string state))))
-    (`(load ,filename)
-     `((load-item-data-from-file ,filename)))))
+    (`(save)
+     `((write-file ,(a:get (state state.open-file)) ,(export:export-state-to-string state))))
+    (`(open ,filename)
+     `((load-state-from-file-and-then ,filename
+                                      ,(λ (loaded-state)
+                                         `(set-state ,(thread state
+                                                              ((λ (state) (a:set (state state.open-file) filename)))
+                                                              ((λ (state) (a:set (state state.item-data)
+                                                                                 (a:get (loaded-state state.item-data)))))
+                                                              ((λ (state) (a:set (state state.defined-contexts)
+                                                                                 (a:get (loaded-state state.defined-contexts)))))
+                                                              ((λ (state) (a:set (state state.active-contexts)
+                                                                                 (a:get (loaded-state state.active-contexts)))))))))))))
