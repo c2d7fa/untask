@@ -36,13 +36,15 @@
          (set->list (a:get (state state.active-contexts)))))
 
 (define (execute-list state filter-expression #:property-types property-types)
-  (let ((item-data (a:get (state state.item-data))))
-    `((list-items ,item-data
-                  ,(urgency:sort-items-by-urgency-descending
-                    item-data
-                    (search item-data
-                            (filter-expression-with-contexts filter-expression state)
-                            #:property-types property-types))))))
+  (if (eq? #t (check-filter-expression filter-expression #:property-types property-types))
+      (let ((item-data (a:get (state state.item-data))))
+        `((list-items ,item-data
+                      ,(urgency:sort-items-by-urgency-descending
+                        item-data
+                        (search item-data
+                                (filter-expression-with-contexts filter-expression state)
+                                #:property-types property-types)))))
+      `((error ,(check-filter-expression filter-expression #:property-types property-types)))))
 
 (define (execute-add state modify-expression #:property-types property-types)
   (let-values (((item-data-with-new-item new-item)

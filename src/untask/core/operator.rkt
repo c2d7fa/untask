@@ -16,6 +16,7 @@
 
 (define (operator-name op) (car op))
 (define (operator-object-type op) (car (cdr op)))
+(define (operator-argument-types op) (caddr op))
 (define (operator-eval op object . args)
   (apply (cdr (cdr (cdr (cdr (cdr op))))) object args))
 (define (operator-return-type op)
@@ -35,7 +36,7 @@
             operator))
 
 (define (operator-definitions-find opdefs name object-type (filter-context? #f))
-  (hash-ref opdefs (list* name object-type filter-context?)))
+  (hash-ref opdefs (list* name object-type filter-context?) #f))
 
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression

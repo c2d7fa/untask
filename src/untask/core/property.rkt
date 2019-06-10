@@ -7,6 +7,8 @@
 
 (provide (all-defined-out))
 
+(require (prefix-in val: "value.rkt"))
+
 ;;; Property type collection
 
 ;; Property type collections are used to access information about all the
@@ -19,7 +21,7 @@
   (hash-set collection (property-type-key property-type) property-type))
 
 (define (get-property-type collection key)
-  (hash-ref collection key))
+  (hash-ref collection key #f))
 
 ;;; Property type
 
@@ -33,3 +35,4 @@
 (define (property-type-default t) (list-ref t 1))
 (define (property-type-calculate t) (list-ref t 2))
 (define (property-type-translate t) (list-ref t 3))
+(define (property-type-type t) (val:get-type (property-type-default t)))  ; TODO: Should probably declare this explicitly in the record.
