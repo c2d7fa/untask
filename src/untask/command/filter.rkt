@@ -32,23 +32,30 @@
     (`(not ,subexpr)
      (check subexpr))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     ;; TODO: Special handling of ":" operator
      (let ((pr (prop:get-property-type property-types property)))
        (if (eq? pr #f)
            (format "Unknown property '~a'." property)
-           (let ((op (operators:operator-definitions-find builtin-operators
-                                                          operator
-                                                          (prop:property-type-type pr)
-                                                          #t)))
-             (if (eq? op #f)
-                 (format "Unknown operator '~a' on property '~a'." operator property)
-                 (if (val:type<=? (val:get-type (val:evaluate-literal literal-expr))
-                                  (car (operators:operator-argument-types op)))
-                     #t
-                     (format "Incorrect argument type for operator '~a' on property '~a'; expected type ~a."
-                             operator
-                             property
-                             (car (operators:operator-argument-types op)))))))))
+           (if (eq? ': operator)
+               (if (val:type<=? (val:get-type (val:evaluate-literal literal-expr))
+                                (prop:property-type-type pr))
+                   #t
+                   (format "Incorrect argument type for operator '~a' on property '~a'; expected type ~a"
+                           operator
+                           property
+                           (prop:property-type-type pr)))
+               (let ((op (operators:operator-definitions-find builtin-operators
+                                                              operator
+                                                              (prop:property-type-type pr)
+                                                              #t)))
+                 (if (eq? op #f)
+                     (format "Unknown operator '~a' on property '~a'." operator property)
+                     (if (val:type<=? (val:get-type (val:evaluate-literal literal-expr))
+                                      (car (operators:operator-argument-types op)))
+                         #t
+                         (format "Incorrect argument type for operator '~a' on property '~a'; expected type ~a."
+                                 operator
+                                 property
+                                 (car (operators:operator-argument-types op))))))))))
     (`(item . ,id) #t)
     ('() #t)))
 
