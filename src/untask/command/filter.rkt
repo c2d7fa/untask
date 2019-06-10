@@ -19,7 +19,6 @@
     (check-filter-expression subexpr #:property-types property-types))
   (define (collect subexprs)
     (foldl (λ (subexpr total)
-             (writeln subexpr)
              (if (eq? total #t)
                  (check subexpr)
                  total))
@@ -43,8 +42,8 @@
                                                           #t)))
              (if (eq? op #f)
                  (format "Unknown operator '~a' on property '~a'." operator property)
-                 (if (eq? (car (operators:operator-argument-types op))
-                          (val:get-type (val:evaluate-literal literal-expr)))
+                 (if (val:type<=? (val:get-type (val:evaluate-literal literal-expr))
+                                  (car (operators:operator-argument-types op)))
                      #t
                      (format "Incorrect argument type for operator '~a' on property '~a'; expected type ~a."
                              operator

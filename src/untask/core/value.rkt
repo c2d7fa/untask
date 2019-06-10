@@ -16,8 +16,8 @@
 (define (make-boolean v)
   `(boolean . ,v))
 
-(define (get-type v)
-  (car v))
+(define (get-type v) (car v))
+(define (type<=? t1 t2) (or (equal? t1 t2) (eq? 'any t1) (eq? 'any t2)))
 
 (define unwrap-string cdr)
 (define unwrap-set cdr)
