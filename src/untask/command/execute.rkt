@@ -47,31 +47,37 @@
       `((error ,(check-filter-expression filter-expression #:property-types property-types)))))
 
 (define (execute-add state modify-expression #:property-types property-types)
-  (let-values (((item-data-with-new-item new-item)
-                (item:new-item (a:get (state state.item-data)))))
-    (let ((new-state
-           (a:set (state state.item-data)
-                  (evaluate-modify-expression #:property-types property-types
-                                              (modify-expression-with-contexts modify-expression
-                                                                               state)
-                                              item-data-with-new-item
-                                              new-item))))
-      `((set-state ,new-state)
-        (list-items ,(a:get (new-state state.item-data)) (,new-item))))))
+  (if (eq? #t (check-modify-expression modify-expression #:property-types property-types))
+      (let-values (((item-data-with-new-item new-item)
+                    (item:new-item (a:get (state state.item-data)))))
+        (let ((new-state
+               (a:set (state state.item-data)
+                      (evaluate-modify-expression #:property-types property-types
+                                                  (modify-expression-with-contexts modify-expression
+                                                                                   state)
+                                                  item-data-with-new-item
+                                                  new-item))))
+          `((set-state ,new-state)
+            (list-items ,(a:get (new-state state.item-data)) (,new-item)))))
+      `((error ,(check-modify-expression modify-expression #:property-types property-types)))))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
-  (let ((new-state
-         (a:update (state state.item-data)
-                   (λ (item-data)
-                     (modify-items item-data
-                                   (search item-data #:property-types property-types
-                                           (filter-expression-with-contexts filter-expression state))
-                                   (modify-expression-with-contexts modify-expression state)
-                                   #:property-types property-types)))))
-    `((set-state ,new-state)
-      (list-items ,(a:get (new-state state.item-data))
-                  ,(set->list (search (a:get (state state.item-data)) #:property-types property-types
-                                      (filter-expression-with-contexts filter-expression state)))))))
+  (if (eq? #t (check-filter-expression filter-expression #:property-types property-types))
+      (if (eq? #t (check-modify-expression modify-expression #:property-types property-types))
+          (let ((new-state
+                 (a:update (state state.item-data)
+                           (λ (item-data)
+                             (modify-items item-data
+                                           (search item-data #:property-types property-types
+                                                   (filter-expression-with-contexts filter-expression state))
+                                           (modify-expression-with-contexts modify-expression state)
+                                           #:property-types property-types)))))
+            `((set-state ,new-state)
+              (list-items ,(a:get (new-state state.item-data))
+                          ,(set->list (search (a:get (state state.item-data)) #:property-types property-types
+                                              (filter-expression-with-contexts filter-expression state))))))
+          `((error ,(check-modify-expression modify-expression #:property-types property-types))))
+      `((error ,(check-filter-expression filter-expression #:property-types property-types)))))
 
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
