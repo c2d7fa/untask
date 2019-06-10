@@ -18,12 +18,13 @@
   (define (check subexpr)
     (check-filter-expression subexpr #:property-types property-types))
   (define (collect subexprs)
-    (foldl (λ (x total)
+    (foldl (λ (subexpr total)
+             (writeln subexpr)
              (if (eq? total #t)
-                 x
+                 (check subexpr)
                  total))
            #t
-           (map check subexprs)))
+           subexprs))
   (match filter-expression
     (`(and ,subexprs ...)
      (collect subexprs))
