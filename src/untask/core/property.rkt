@@ -26,13 +26,14 @@
 ;;; Property type
 
 (define (make-property-type #:key key
+                            #:type type
                             #:default (default #f)
                             #:calculate (calculate #f)
                             #:translate (translate #f))
-  (list key default calculate translate))
+  (list key type default calculate translate))
 
 (define (property-type-key t) (list-ref t 0))
-(define (property-type-default t) (list-ref t 1))
-(define (property-type-calculate t) (list-ref t 2))
-(define (property-type-translate t) (list-ref t 3))
-(define (property-type-type t) (val:get-type (property-type-default t)))  ; TODO: Should probably declare this explicitly in the record.
+(define (property-type-type t) (list-ref t 1))
+(define (property-type-default t) (list-ref t 2))
+(define (property-type-calculate t) (list-ref t 3))
+(define (property-type-translate t) (list-ref t 4))

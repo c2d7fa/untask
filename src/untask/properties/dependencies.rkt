@@ -13,6 +13,7 @@
 
 (define depends-property-type
   (prop:make-property-type #:key 'depends
+                           #:type 'set
                            #:default (val:make-set)))
 
 (define (calculate-blocks item-data item)
@@ -52,5 +53,6 @@
 
 (define blocks-property-type
   (prop:make-property-type #:key 'blocks
+                           #:type 'set
                            #:calculate calculate-blocks
                            #:translate translate-blocks))

@@ -31,6 +31,7 @@
 
 (define status-property-type
   (prop:make-property-type #:key 'status
+                           #:type 'string
                            #:default (val:make-string "active")
                            #:calculate calculate-status
                            #:translate translate-status))

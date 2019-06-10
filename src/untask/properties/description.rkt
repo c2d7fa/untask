@@ -8,4 +8,5 @@
 
 (define description-property-type
   (prop:make-property-type #:key 'description
+                           #:type 'string
                            #:default (val:make-string "")))
