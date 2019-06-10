@@ -7,22 +7,16 @@
 
 (define (create-operator #:name name
                          #:object object-type
-                         #:arguments (argument-types '())
-                         #:return return-type
                          #:filter? (filter-context #f)
                          #:body body-procedure
                          )
-  (list* name object-type argument-types return-type filter-context body-procedure))
+  (list name object-type filter-context body-procedure))
 
-(define (operator-name op) (car op))
-(define (operator-object-type op) (car (cdr op)))
-(define (operator-argument-types op) (caddr op))
+(define (operator-name op) (list-ref op 0))
+(define (operator-object-type op) (list-ref op 1))
+(define (operator-filter-context? op) (list-ref op 2))
 (define (operator-eval op object . args)
-  (apply (cdr (cdr (cdr (cdr (cdr op))))) object args))
-(define (operator-return-type op)
-  (car (cdr (cdr (cdr op)))))
-(define (operator-filter-context? op)
-  (car (cdr (cdr (cdr (cdr op))))))
+  (apply (list-ref op 3) object args))
 
 ;;
 
