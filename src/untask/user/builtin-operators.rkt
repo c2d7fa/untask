@@ -6,22 +6,31 @@
          (prefix-in val: "../core/value.rkt")
          (only-in "../../misc.rkt" thread-first))
 
+(define ((check-argument expected-argument-type) object-type argument-types)
+  (if (val:type<=? (car argument-types) expected-argument-type)
+      #t
+      (format "Invalid argument type: Expected type ~a but got ~a." expected-argument-type (car argument-types))))
+
 (define op-string-suffix
   (create-operator #:name '>
                    #:object 'string
+                   #:check-types (check-argument 'string)
                    #:body (λ (str sfx) (val:make-string (string-append (val:unwrap-string str) (val:unwrap-string sfx))))))
 (define op-string-prefix
   (create-operator #:name '<
                    #:object 'string
+                   #:check-types (check-argument 'string)
                    #:body (λ (str pfx) (val:make-string (string-append (val:unwrap-string pfx) (val:unwrap-string str))))))
 
 (define op-number-add
   (create-operator #:name '+
                    #:object 'number
+                   #:check-types (check-argument 'number)
                    #:body (λ (x y) (val:make-number (+ (val:unwrap-number x) (val:unwrap-number y))))))
 (define op-number-subtract
   (create-operator #:name '-
                    #:object 'number
+                   #:check-types (check-argument 'number)
                    #:body (λ (x y) (val:make-number (- (val:unwrap-number x) (val:unwrap-number y))))))
 
 (define op-set-add
@@ -37,16 +46,19 @@
   (create-operator #:name '/
                    #:object 'string
                    #:filter? #t
+                   #:check-types (check-argument 'string)
                    #:body (λ (str sst) (val:make-boolean (string-contains? (val:unwrap-string str) (val:unwrap-string sst))))))
 (define op-string-prefix?
   (create-operator #:name '<
                    #:object 'string
                    #:filter? #t
+                   #:check-types (check-argument 'string)
                    #:body (λ (str prf) (val:make-boolean (string-prefix? (val:unwrap-string str) (val:unwrap-string prf))))))
 (define op-string-suffix?
   (create-operator #:name '>
                    #:object 'string
                    #:filter? #t
+                   #:check-types (check-argument 'string)
                    #:body (λ (str sfx) (val:make-boolean (string-suffix? (val:unwrap-string str) (val:unwrap-string sfx))))))
 
 (define op-set-contains?
@@ -64,11 +76,13 @@
   (create-operator #:name '>
                    #:object 'number
                    #:filter? #t
+                   #:check-types (check-argument 'number)
                    #:body (λ (x y) (val:make-boolean (> (val:unwrap-number x) (val:unwrap-number y))))))
 (define op-number-less-than?
   (create-operator #:name '<
                    #:object 'number
                    #:filter? #t
+                   #:check-types (check-argument 'number)
                    #:body (λ (x y) (val:make-boolean (< (val:unwrap-number x) (val:unwrap-number y))))))
 
 ;;

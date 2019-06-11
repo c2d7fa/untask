@@ -9,14 +9,17 @@
                          #:object object-type
                          #:filter? (filter-context #f)
                          #:body body-procedure
+                         #:check-types (check-types (λ (object-type argument-types) #t))
                          )
-  (list name object-type filter-context body-procedure))
+  (list name object-type filter-context body-procedure check-types))
 
 (define (operator-name op) (list-ref op 0))
 (define (operator-object-type op) (list-ref op 1))
 (define (operator-filter-context? op) (list-ref op 2))
 (define (operator-eval op object . args)
   (apply (list-ref op 3) object args))
+(define (operator-check-types op)
+  (list-ref op 4))
 
 ;;
 
@@ -46,4 +49,4 @@
 ;; describing the reason why this is not a valid cominations of object and
 ;; argument types.
 (define (check-types operator #:object-type object-type #:argument-types argument-types)
-  #t)
+  ((operator-check-types operator) object-type argument-types))
