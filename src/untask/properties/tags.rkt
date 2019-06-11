@@ -8,5 +8,5 @@
 
 (define tags-property-type
   (prop:make-property-type #:key 'tags
-                           #:type 'set
+                           #:type '(set string)
                            #:default (val:make-set)))

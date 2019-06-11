@@ -11,6 +11,15 @@
       #t
       (format "Invalid argument type: Expected type ~a but got ~a." expected-argument-type (car argument-types))))
 
+(define (check-set object-type argument-types)
+  ;; object-type has format `(set ,type).
+  (if (val:type<=? (car argument-types) (cadr object-type))
+      #t
+      (format "Invalid argument type for set of type ~a: Expected type ~a but got ~a."
+              (cadr object-type)
+              (cadr object-type)
+              (car argument-types))))
+
 (define op-string-suffix
   (create-operator #:name '>
                    #:object 'string
@@ -36,10 +45,12 @@
 (define op-set-add
   (create-operator #:name '+
                    #:object 'set
+                   #:check-types check-set
                    #:body (λ (xs x) (val:make-set (set-add (val:unwrap-set xs) x)))))
 (define op-set-remove
   (create-operator #:name '-
                    #:object 'set
+                   #:check-types check-set
                    #:body (λ (xs x) (val:make-set (set-remove (val:unwrap-set xs) x)))))
 
 (define op-string-match?
@@ -65,11 +76,13 @@
   (create-operator #:name '+
                    #:object 'set
                    #:filter? #t
+                   #:check-types check-set
                    #:body (λ (xs x) (val:make-boolean (set-member? (val:unwrap-set xs) x)))))
 (define op-set-doesnt-contain?
   (create-operator #:name '-
                    #:object 'set
                    #:filter? #t
+                   #:check-types check-set
                    #:body (λ (xs x) (val:make-boolean (not (set-member? (val:unwrap-set xs) x))))))
 
 (define op-number-greater-than?

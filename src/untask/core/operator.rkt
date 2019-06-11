@@ -33,7 +33,8 @@
             operator))
 
 (define (operator-definitions-find opdefs name object-type (filter-context? #f))
-  (hash-ref opdefs (list* name object-type filter-context?) #f))
+  (let ((object-type* (if (list? object-type) (car object-type) object-type)))
+    (hash-ref opdefs (list* name object-type* filter-context?) #f)))
 
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
