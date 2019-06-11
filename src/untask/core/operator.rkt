@@ -40,3 +40,10 @@
                           object
                           (map val:evaluate-literal argument-literal-exprs))))
        (if filter-context? (val:unwrap-boolean result) result)))))
+
+;; Returns #t if operator can be used with an object of type object-type and
+;; argument-types as arguments. Otherwise, returns a human-readable string
+;; describing the reason why this is not a valid cominations of object and
+;; argument types.
+(define (check-types operator #:object-type object-type #:argument-types argument-types)
+  #t)

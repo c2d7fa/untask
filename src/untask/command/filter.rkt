@@ -49,13 +49,9 @@
                                                               #t)))
                  (if (eq? op #f)
                      (format "Unknown operator '~a' on property '~a'." operator property)
-                     (if (val:type<=? (val:get-type (val:evaluate-literal literal-expr))
-                                      (car (operators:operator-argument-types op)))
-                         #t
-                         (format "Incorrect argument type for operator '~a' on property '~a'; expected type ~a."
-                                 operator
-                                 property
-                                 (car (operators:operator-argument-types op))))))))))
+                     (operators:check-types op
+                                            #:object-type (prop:property-type-type pr)
+                                            #:argument-types (list (val:get-type (val:evaluate-literal literal-expr))))))))))
     (`(item . ,id) #t)
     ('() #t)))
 
