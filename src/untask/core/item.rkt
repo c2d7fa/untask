@@ -25,6 +25,12 @@
             next)))
 
 ;; Returns new-item-data.
+(define (remove-item item-data item)
+  (a:update (item-data item-data.properties)
+            (λ (property-values)
+              (hash-remove property-values item))))
+
+;; Returns new-item-data.
 (define (set-raw-property item-data item property-type value)
   (a:set (item-data
           item-data.properties

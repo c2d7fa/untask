@@ -79,6 +79,17 @@
         (λ (modify-expression)
           (execute-modify* filter-expression modify-expression))))))
 
+(define (execute-remove state filter-expression #:property-types property-types)
+  (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
+    (λ (filter-expression)
+      `((set-state ,(a:update (state state.item-data)
+                              (λ (item-data)
+                                (foldl (λ (item item-data)
+                                         (item:remove-item item-data item))
+                                       item-data
+                                       (set->list (search (a:get (state state.item-data)) #:property-types property-types
+                                                          filter-expression))))))))))
+
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
     (`(,filter-expression list)
@@ -87,6 +98,8 @@
      (execute-add state modify-expression #:property-types property-types))
     (`(,filter-expression modify ,modify-expression)
      (execute-modify state filter-expression modify-expression #:property-types property-types))
+    (`(,filter-expression remove)
+     (execute-remove state filter-expression #:property-types property-types))
     (`(context show)
      `((print-raw ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))))))
     (`(context add ,name ,filter-expression ,modify-expression)

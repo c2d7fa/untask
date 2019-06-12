@@ -179,6 +179,7 @@
    (try/p (normal-command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p)))
    (try/p (normal-command/p 'save #:takes-filter? #f))
    (try/p (normal-command/p 'open #:takes-filter? #f #:arguments (list/p filename/p)))
+   (try/p (normal-command/p 'remove #:takes-filter? #t))
    (f:map (λ (fe) `(,fe list)) filter-expression/p)))
 
 (define (parse command-line-input)
