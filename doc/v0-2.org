@@ -52,3 +52,35 @@ To add a new context or redefine an existing context, use =add=. A context must
 have a name and may take a filter expression and a modify expression.
 
 To remove a context, use =remove=.
+* Type checking
+Version 0.2 no longer crashes when the user passes a value of an incorrect type
+to a command. For example,
+#+BEGIN_EXAMPLE
+> add depends+1
+Error: Invalid argument type for set of type string: Expected type string but got item.
+#+END_EXAMPLE
+
+** Implementation
+To implement this, we associate types to properties, operators and values. We
+use a somewhat messy system, with different representations of types in
+different places. The basic types are:
+
+- =any=, which matches any type;
+- =string=, =number= and =item=, representing atomic values;
+- =(set x)= where /x/ is a type, which represents a set containing values of
+  type /x/.
+
+These types are used in properties, which contain an attribute that holds the
+type expected by that property. Any value will have a non-=any= type, which can
+be found with =get-type=.
+
+Operators have two attributes having to do with types: When looking up which
+operator to pick for an expression, =operator-object-type= is used; this field
+contains either the type of an atomic value or the symbol =set=, which indicates
+that the operator should be picked when the object is a set, no matter what type
+the contents of the set have.
+
+When type checking is done, =operator-object-type= is not involved; rather, the
+operator contains a function that can be evaluated to determine whether a
+particular set of argument types are valid.
+
