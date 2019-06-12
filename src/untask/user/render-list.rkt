@@ -17,6 +17,11 @@
  )
 
 (define (render-listing item-data items)
+  (if (= 1 (length items))
+      (render-listing-info item-data items)
+      (render-listing* item-data items)))
+
+(define (render-listing* item-data items)
   (define (render-item item-data item)
     (define description (item:get-property item-data item description:description-property-type))
     (define tags (item:get-property item-data item tags:tags-property-type))
@@ -118,7 +123,7 @@
                          `(()
                            ("\n\n"
                             ((black) (bold) ("Depends on:\n"))
-                            ,(string-indent (render-listing item-data (map val:unwrap-item (set->list (val:unwrap-set depends))))
+                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set depends))))
                                             4))))
                     ;; Blocked
                     ,(if (set-empty? (val:unwrap-set blocks))
@@ -126,7 +131,7 @@
                          `(()
                            ("\n\n"
                             ((black) (bold) ("Blocks:\n"))
-                            ,(string-indent (render-listing item-data (map val:unwrap-item (set->list (val:unwrap-set blocks))))
+                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set blocks))))
                                             4))))
                     ))))
   (string-join
