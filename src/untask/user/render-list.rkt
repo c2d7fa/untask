@@ -95,12 +95,12 @@
                     "\n\n"
                     ;; Id
                     (()
-                     (((black) ("ID:     "))
+                     (((black) ("ID:      "))
                       ,(~a (item:item-id item-data item))))
                     "\n"
                     ;; Status
                     (()
-                     (((black) ("Status: "))
+                     (((black) ("Status:  "))
                       ,(cond
                          ((status:active? item-data item) '((bold) ("active")))
                          ((status:done? item-data item) '((strikethrough) (white) ("done")))
@@ -113,7 +113,7 @@
                     "\n"
                     ;; Tags
                     (()
-                     (((black) ("Tags:   "))
+                     (((black) ("Tags:    "))
                       ,(string-join
                         (map (λ (t)
                                (term:render
@@ -127,7 +127,7 @@
                          ""
                          `(()
                            ("\n\n"
-                            ((black) (bold) ("Depends on:\n"))
+                            ((black) ("Depends on:\n"))
                             ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set depends))))
                                             4))))
                     ;; Blocked
@@ -135,7 +135,7 @@
                          ""
                          `(()
                            ("\n\n"
-                            ((black) (bold) ("Blocks:\n"))
+                            ((black) ("Blocks:\n"))
                             ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set blocks))))
                                             4))))
                     ))))
