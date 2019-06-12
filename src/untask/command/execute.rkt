@@ -92,6 +92,12 @@
                                        item-data
                                        (set->list items)))))))))
 
+(define (execute-info state filter-expression #:property-types property-types)
+  (execute-with-search filter-expression state #:property-types property-types
+    (λ (items)
+      `((info-items ,(a:get (state state.item-data))
+                    ,(set->list items))))))
+
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
     (`(,filter-expression list)
@@ -102,6 +108,8 @@
      (execute-modify state filter-expression modify-expression #:property-types property-types))
     (`(,filter-expression remove)
      (execute-remove state filter-expression #:property-types property-types))
+    (`(,filter-expression info)
+     (execute-info state filter-expression #:property-types property-types))
     (`(context show)
      `((print-raw ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))))))
     (`(context add ,name ,filter-expression ,modify-expression)

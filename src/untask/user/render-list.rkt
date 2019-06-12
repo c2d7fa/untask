@@ -1,6 +1,7 @@
 #lang racket
 
-(provide render-listing)
+(provide render-listing
+         render-listing-info)
 
 (require
  (prefix-in item: "../core/item.rkt")
@@ -66,3 +67,68 @@
   (string-join
    (map (λ (item) (render-item item-data item)) items)
    "\n"))
+
+(define (string-indent s n)
+  (string-join (map (λ (s) (string-append (make-string n #\space) s))
+                    (string-split s "\n"))
+               "\n"))
+
+(define (render-listing-info item-data items)
+  (define (render-item item)
+    (define description (item:get-property item-data item description:description-property-type))
+    (define tags (item:get-property item-data item tags:tags-property-type))
+    (define urgency (item:get-property item-data item urgency:urgency-property-type))
+    (define base-urgency (item:get-raw-property item-data item urgency:urgency-property-type))
+    (define status (item:get-property item-data item status:status-property-type))
+    (define depends (item:get-property item-data item depends:depends-property-type))
+    (define blocks (item:get-property item-data item depends:blocks-property-type))
+    (term:render `(()
+                   (
+                    ;; Description
+                    ((bold)
+                     (,(val:unwrap-string description)))
+                    "\n\n"
+                    ;; Id
+                    (()
+                     (((black) ("ID:     "))
+                      ,(~a (item:item-id item-data item))))
+                    "\n"
+                    ;; Status
+                    (()
+                     (((black) ("Status: "))
+                      ,(cond
+                         ((status:active? item-data item) '((bold) ("active")))
+                         ((status:done? item-data item) '((strikethrough) (white) ("done")))
+                         (else `((white) (,(val:unwrap-string status)))))))
+                    "\n"
+                    ;; Tags
+                    (()
+                     (((black) ("Tags:   "))
+                      ,(string-join
+                        (map (λ (t)
+                               (term:render
+                                `(()
+                                  (((black) ("#"))
+                                   ((blue) (,(val:unwrap-string t)))))))
+                             (set->list (val:unwrap-set tags)))
+                        " ")))
+                    ;; Dependencies
+                    ,(if (set-empty? (val:unwrap-set depends))
+                         ""
+                         `(()
+                           ("\n\n"
+                            ((black) (bold) ("Depends on:\n"))
+                            ,(string-indent (render-listing item-data (map val:unwrap-item (set->list (val:unwrap-set depends))))
+                                            4))))
+                    ;; Blocked
+                    ,(if (set-empty? (val:unwrap-set blocks))
+                         ""
+                         `(()
+                           ("\n\n"
+                            ((black) (bold) ("Blocks:\n"))
+                            ,(string-indent (render-listing item-data (map val:unwrap-item (set->list (val:unwrap-set blocks))))
+                                            4))))
+                    ))))
+  (string-join
+   (map (λ (item) (render-item item)) items)
+   "\n\n\n"))

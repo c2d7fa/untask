@@ -79,6 +79,8 @@
        (set-box! state-box new-state))
       (`(list-items ,item-data ,item)
        (displayln (render-listing item-data item)))
+      (`(info-items ,item-data ,items)
+       (displayln (render-listing-info item-data items)))
       (`(print-raw ,str)
        (displayln str))
       (`(error ,str)
