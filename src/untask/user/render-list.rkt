@@ -106,6 +106,11 @@
                          ((status:done? item-data item) '((strikethrough) (white) ("done")))
                          (else `((white) (,(val:unwrap-string status)))))))
                     "\n"
+                    ;; Urgency
+                    (()
+                     (((black) ("Urgency: "))
+                      ((bold) (yellow) (,(~a (val:unwrap-number urgency))))))
+                    "\n"
                     ;; Tags
                     (()
                      (((black) ("Tags:   "))
