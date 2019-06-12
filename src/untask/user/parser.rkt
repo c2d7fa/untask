@@ -39,13 +39,15 @@
          (f:do (char/p #\$)
                number/p)))
 
+(define bracketed-string/p
+  (f:do (char/p #\{)
+        (cs <- (many/p (char-not/p #\})))
+        (char/p #\})
+        (f:pure (apply string cs))))
+
 (define literal-string-expression/p
   (f:map expr:make-string
-         (or/p bare-word/p
-               (f:do (char/p #\{)
-                     (cs <- (many/p (char-not/p #\})))
-                     (char/p #\})
-                     (f:pure (apply string cs))))))
+         (or/p bare-word/p bracketed-string/p)))
 
 (define literal-set-expression/p
   (f:map expr:make-set
@@ -60,16 +62,32 @@
         literal-number-expression/p
         literal-string-expression/p))
 
+(define filter-or-modify-pair-abbreviation/p
+  (let ((description-pair/p (f:map (λ (v)
+                                     `(description : (string . ,v)))
+                                   bracketed-string/p))
+        (tags+-pair/p (f:do (string/p "#")
+                            (t <- bare-word/p)
+                            (f:pure `(tags + (string . ,t)))))
+        (tags--pair/p (f:do (string/p "-#")
+                            (t <- bare-word/p)
+                            (f:pure `(tags - (string . ,t))))))
+    (or/p (try/p description-pair/p)
+          (try/p tags+-pair/p)
+          (try/p tags--pair/p))))
+
+
 (define valid-operator-names ":<>+-/")
 
 (define filter-or-modify-pair/p
-  (let ((filter-or-modify-operator/p
-         (f:map (λ (c) (string->symbol (string c)))
-                (char-in/p valid-operator-names))))
-    (f:do (key <- property-key/p)
-          (op <- filter-or-modify-operator/p)
-          (val <- literal-expression/p)
-          (f:pure (list key op val)))))
+  (or/p filter-or-modify-pair-abbreviation/p
+        (let ((filter-or-modify-operator/p
+               (f:map (λ (c) (string->symbol (string c)))
+                      (char-in/p valid-operator-names))))
+          (f:do (key <- property-key/p)
+                (op <- filter-or-modify-operator/p)
+                (val <- literal-expression/p)
+                (f:pure (list key op val))))))
 
 (define whitespace/p (many+/p (char/p #\space)))
 (define comma-whitespace/p (list/p (char/p #\,) whitespace/p))
