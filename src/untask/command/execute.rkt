@@ -75,7 +75,9 @@
                                         filter-expression))))))
   (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
     (λ (filter-expression)
-      (execute-with (enrich-with-contexts modify-expression #f state) #f execute-modify* #:property-types property-types))))
+      (execute-with (enrich-with-contexts modify-expression #f state) #f #:property-types property-types
+        (λ (modify-expression)
+          (execute-modify* filter-expression modify-expression))))))
 
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
