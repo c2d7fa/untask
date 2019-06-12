@@ -26,9 +26,10 @@
            (set->list (a:get (state state.active-contexts)))))
 
 ;; Enrich filter-expression with contexts and report errors. If no errors are
-;; found, call continue with filter expression.
+;; found, call continue with filter expression. If state is #f, then contexts
+;; are not used.
 (define (execute-with-filter-expression filter-expression state continue #:property-types property-types)
-  (let* ((filter-expression (enrich-with-contexts apply-context-filter filter-expression state))
+  (let* ((filter-expression (if state (enrich-with-contexts apply-context-filter filter-expression state) filter-expression))
          (check-value (check-filter-expression filter-expression #:property-types property-types)))
     (if (eq? #t check-value)
         (continue filter-expression)
@@ -36,7 +37,7 @@
 
 ;; Same as execute-with-filter-expression, but for modify expressions.
 (define (execute-with-modify-expression modify-expression state continue #:property-types property-types)
-  (let* ((modify-expression (enrich-with-contexts apply-context-modify modify-expression state))
+  (let* ((modify-expression (if state (enrich-with-contexts apply-context-modify modify-expression state) modify-expression))
          (check-value (check-modify-expression modify-expression #:property-types property-types)))
     (if (eq? #t check-value)
         (continue modify-expression)
@@ -105,9 +106,11 @@
     (`(context show)
      `((print-raw ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))))))
     (`(context add ,name ,filter-expression ,modify-expression)
-     `((set-state ,(a:set (state state.defined-contexts (contexts.named name))
+     (execute-with-filter-and-modify-expressions filter-expression modify-expression #f #:property-types property-types
+       (λ (filter-expression modify-expression)
+         `((set-state ,(a:set (state state.defined-contexts (contexts.named name))
                           (context #:filter filter-expression
-                                   #:modify modify-expression)))))
+                                   #:modify modify-expression)))))))
     (`(context remove ,name)
      `((set-state ,(a:update (state state.defined-contexts)
                              (λ (x) (remove-context x name))))))
