@@ -12,46 +12,26 @@
 
  "filter.rkt"
  "modify.rkt"
+ "check-expression.rkt"
 
  (prefix-in a: "../../attribute.rkt")
  (only-in "../../misc.rkt" thread))
 
-(define (enrich-with-contexts apply-context expression state)
-  (foldl (λ (context-name expression)
+(define (enrich-with-contexts expression filter? state)
+  (let ((apply-context (if filter? apply-context-filter apply-context-modify)))
+    (foldl (λ (context-name expression)
              (apply-context (a:get (state
                                     state.defined-contexts
                                     (contexts.named context-name)))
                             expression))
            expression
-           (set->list (a:get (state state.active-contexts)))))
+           (set->list (a:get (state state.active-contexts))))))
 
-;; Enrich filter-expression with contexts and report errors. If no errors are
-;; found, call continue with filter expression. If state is #f, then contexts
-;; are not used.
-(define (execute-with-filter-expression filter-expression state continue #:property-types property-types)
-  (let* ((filter-expression (if state (enrich-with-contexts apply-context-filter filter-expression state) filter-expression))
-         (check-value (check-filter-expression filter-expression #:property-types property-types)))
+(define (execute-with fm-expression filter? continue #:property-types property-types)
+  (let ((check-value (check-filter/modify-expression fm-expression filter? #:property-types property-types)))
     (if (eq? #t check-value)
-        (continue filter-expression)
+        (continue fm-expression)
         `((error ,check-value)))))
-
-;; Same as execute-with-filter-expression, but for modify expressions.
-(define (execute-with-modify-expression modify-expression state continue #:property-types property-types)
-  (let* ((modify-expression (if state (enrich-with-contexts apply-context-modify modify-expression state) modify-expression))
-         (check-value (check-modify-expression modify-expression #:property-types property-types)))
-    (if (eq? #t check-value)
-        (continue modify-expression)
-        `((error ,check-value)))))
-
-(define (execute-with-filter-and-modify-expressions filter-expression modify-expression state continue #:property-types property-types)
-  (execute-with-filter-expression filter-expression #:property-types property-types
-                                  state
-                                  (λ (filter-expression)
-                                    (execute-with-modify-expression #:property-types property-types
-                                     modify-expression
-                                     state
-                                     (λ (modify-expression)
-                                       (continue filter-expression modify-expression))))))
 
 (define (execute-list state filter-expression #:property-types property-types)
   (define (execute-list* filter-expression)
@@ -62,7 +42,7 @@
                         (search item-data
                                 filter-expression
                                 #:property-types property-types))))))
-  (execute-with-filter-expression filter-expression state execute-list* #:property-types property-types))
+  (execute-with (enrich-with-contexts filter-expression #t state) #t execute-list* #:property-types property-types))
 
 (define (execute-add state modify-expression #:property-types property-types)
   (define (execute-add* modify-expression)
@@ -76,7 +56,7 @@
                                                   new-item))))
           `((set-state ,new-state)
             (list-items ,(a:get (new-state state.item-data)) (,new-item))))))
-  (execute-with-modify-expression modify-expression state execute-add* #:property-types property-types))
+  (execute-with (enrich-with-contexts modify-expression #f state) #f execute-add* #:property-types property-types))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
   (define (execute-modify* filter-expression modify-expression)
@@ -93,7 +73,9 @@
         (list-items ,(a:get (new-state state.item-data))
                     ,(set->list (search (a:get (state state.item-data)) #:property-types property-types
                                         filter-expression))))))
-  (execute-with-filter-and-modify-expressions filter-expression modify-expression state execute-modify* #:property-types property-types))
+  (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
+    (λ (filter-expression)
+      (execute-with (enrich-with-contexts modify-expression #f state) #f execute-modify* #:property-types property-types))))
 
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
@@ -106,11 +88,13 @@
     (`(context show)
      `((print-raw ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))))))
     (`(context add ,name ,filter-expression ,modify-expression)
-     (execute-with-filter-and-modify-expressions filter-expression modify-expression #f #:property-types property-types
-       (λ (filter-expression modify-expression)
-         `((set-state ,(a:set (state state.defined-contexts (contexts.named name))
-                          (context #:filter filter-expression
-                                   #:modify modify-expression)))))))
+     (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
+       (λ (filter-expression)
+         (execute-with (enrich-with-contexts modify-expression #f state) #f #:property-types property-types
+           (λ (modify-expression)
+             `((set-state ,(a:set (state state.defined-contexts (contexts.named name))
+                                  (context #:filter filter-expression
+                                           #:modify modify-expression)))))))))
     (`(context remove ,name)
      `((set-state ,(a:update (state state.defined-contexts)
                              (λ (x) (remove-context x name))))))

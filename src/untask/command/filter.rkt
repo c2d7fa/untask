@@ -6,54 +6,11 @@
  (prefix-in operators: "../core/operator.rkt")
  (prefix-in item: "../core/item.rkt")
  (prefix-in val: "../core/value.rkt")
- (prefix-in prop: "../core/property.rkt")
 
  (only-in "../user/builtin-operators.rkt" builtin-operators)
 
  (only-in "../../misc.rkt" set-filter)
  )
-
-;; Returns #t if valid filter expression, otherwise returns error string.
-(define (check-filter-expression filter-expression #:property-types property-types)
-  (define (check subexpr)
-    (check-filter-expression subexpr #:property-types property-types))
-  (define (collect subexprs)
-    (foldl (λ (subexpr total)
-             (if (eq? total #t)
-                 (check subexpr)
-                 total))
-           #t
-           subexprs))
-  (match filter-expression
-    (`(and ,subexprs ...)
-     (collect subexprs))
-    (`(or ,subexprs ...)
-     (collect subexprs))
-    (`(not ,subexpr)
-     (check subexpr))
-    (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (let ((pr (prop:get-property-type property-types property)))
-       (if (eq? pr #f)
-           (format "Unknown property '~a'." property)
-           (if (eq? ': operator)
-               (if (val:type<=? (val:get-type (val:evaluate-literal literal-expr))
-                                (prop:property-type-type pr))
-                   #t
-                   (format "Incorrect argument type for operator '~a' on property '~a'; expected type ~a"
-                           operator
-                           property
-                           (prop:property-type-type pr)))
-               (let ((op (operators:operator-definitions-find builtin-operators
-                                                              operator
-                                                              (prop:property-type-type pr)
-                                                              #t)))
-                 (if (eq? op #f)
-                     (format "Unknown operator '~a' on property '~a'." operator property)
-                     (operators:check-types op
-                                            #:object-type (prop:property-type-type pr)
-                                            #:argument-types (list (val:get-type (val:evaluate-literal literal-expr))))))))))
-    (`(item . ,id) #t)
-    ('() #t)))
 
 ;; Take a filter expression and return a function that returns whether
 ;; an item matches the filter.

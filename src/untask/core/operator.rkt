@@ -16,10 +16,8 @@
 (define (operator-name op) (list-ref op 0))
 (define (operator-object-type op) (list-ref op 1))
 (define (operator-filter-context? op) (list-ref op 2))
-(define (operator-eval op object . args)
-  (apply (list-ref op 3) object args))
-(define (operator-check-types op)
-  (list-ref op 4))
+(define (operator-eval op object . args) (apply (list-ref op 3) object args))
+(define (operator-check-types op) (list-ref op 4))
 
 ;;
 

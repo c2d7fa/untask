@@ -7,8 +7,6 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in val: "value.rkt"))
-
 ;;; Property type collection
 
 ;; Property type collections are used to access information about all the
