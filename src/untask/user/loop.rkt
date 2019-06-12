@@ -81,6 +81,8 @@
        (displayln (render-listing item-data item)))
       (`(print-raw ,str)
        (displayln str))
+      (`(error ,str)
+       (displayln (term:render `((bold) (red) ("Error: " ,str)))))
       (`(write-file ,filename ,string-data)
        (call-with-output-file filename #:exists 'replace
          (λ (out)

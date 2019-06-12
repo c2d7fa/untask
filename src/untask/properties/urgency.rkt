@@ -20,6 +20,7 @@
 
 (define urgency-property-type
   (prop:make-property-type #:key 'urgency
+                           #:type 'number
                            #:default (val:make-number 0)
                            #:calculate calculate-urgency
                            #:translate translate-urgency))
