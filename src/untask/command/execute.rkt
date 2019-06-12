@@ -17,6 +17,8 @@
  (prefix-in a: "../../attribute.rkt")
  (only-in "../../misc.rkt" thread))
 
+;; Helper functions
+
 (define (enrich-with-contexts expression filter? state)
   (let ((apply-context (if filter? apply-context-filter apply-context-modify)))
     (foldl (λ (context-name expression)
@@ -33,20 +35,29 @@
         (continue fm-expression)
         `((error ,check-value)))))
 
+(define (execute-with-enriched fm-expression filter? state continue #:property-types property-types)
+  (execute-with (enrich-with-contexts fm-expression filter? state) filter? #:property-types property-types
+    continue))
+
+(define (execute-with-search filter-expression state continue #:property-types property-types)
+  (execute-with-enriched filter-expression #t state #:property-types property-types
+    (λ (filter-expression)
+      (continue (search (a:get (state state.item-data)) filter-expression #:property-types property-types)))))
+
+;; --
+
 (define (execute-list state filter-expression #:property-types property-types)
-  (define (execute-list* filter-expression)
-    (let ((item-data (a:get (state state.item-data))))
-        `((list-items ,item-data
-                      ,(urgency:sort-items-by-urgency-descending
-                        item-data
-                        (search item-data
-                                filter-expression
-                                #:property-types property-types))))))
-  (execute-with (enrich-with-contexts filter-expression #t state) #t execute-list* #:property-types property-types))
+  (execute-with-search filter-expression state #:property-types property-types
+    (λ (items)
+      `((list-items ,(a:get (state state.item-data))
+                    ,(urgency:sort-items-by-urgency-descending
+                      (a:get (state state.item-data))
+                      items))))))
 
 (define (execute-add state modify-expression #:property-types property-types)
-  (define (execute-add* modify-expression)
-    (let-values (((item-data-with-new-item new-item)
+  (execute-with-enriched modify-expression #f state #:property-types property-types
+    (λ (modify-expression)
+      (let-values (((item-data-with-new-item new-item)
                     (item:new-item (a:get (state state.item-data)))))
         (let ((new-state
                (a:set (state state.item-data)
@@ -55,40 +66,31 @@
                                                   item-data-with-new-item
                                                   new-item))))
           `((set-state ,new-state)
-            (list-items ,(a:get (new-state state.item-data)) (,new-item))))))
-  (execute-with (enrich-with-contexts modify-expression #f state) #f execute-add* #:property-types property-types))
+            (list-items ,(a:get (new-state state.item-data)) (,new-item))))))))
 
 (define (execute-modify state filter-expression modify-expression #:property-types property-types)
-  (define (execute-modify* filter-expression modify-expression)
-    (let ((new-state
-           (a:update (state state.item-data)
-                     (λ (item-data)
-                       (modify-items item-data
-                                     (search item-data
-                                             filter-expression
-                                             #:property-types property-types)
-                                     modify-expression
-                                     #:property-types property-types)))))
-      `((set-state ,new-state)
-        (list-items ,(a:get (new-state state.item-data))
-                    ,(set->list (search (a:get (state state.item-data)) #:property-types property-types
-                                        filter-expression))))))
-  (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
-    (λ (filter-expression)
-      (execute-with (enrich-with-contexts modify-expression #f state) #f #:property-types property-types
+  (execute-with-search filter-expression state #:property-types property-types
+    (λ (items)
+      (execute-with-enriched modify-expression #f state #:property-types property-types
         (λ (modify-expression)
-          (execute-modify* filter-expression modify-expression))))))
+        (let ((new-state (a:update (state state.item-data)
+                                   (λ (item-data)
+                                     (modify-items item-data #:property-types property-types
+                                                   items
+                                                   modify-expression)))))
+          `((set-state ,new-state)
+            (list-items ,(a:get (new-state state.item-data))
+                        ,(set->list items)))))))))
 
 (define (execute-remove state filter-expression #:property-types property-types)
-  (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
-    (λ (filter-expression)
+  (execute-with-search filter-expression state #:property-types property-types
+    (λ (items)
       `((set-state ,(a:update (state state.item-data)
                               (λ (item-data)
                                 (foldl (λ (item item-data)
                                          (item:remove-item item-data item))
                                        item-data
-                                       (set->list (search (a:get (state state.item-data)) #:property-types property-types
-                                                          filter-expression))))))))))
+                                       (set->list items)))))))))
 
 (define (execute command-line-representation state #:property-types property-types)
   (match command-line-representation
