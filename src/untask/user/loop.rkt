@@ -38,8 +38,9 @@
 
 (define (prompt-proceed-unsaved state)
   (if (or (not (a:get (state state:state.open-file)))
-          (equal? (export:read-state-from-file (a:get (state state:state.open-file)))
-                  state))
+          (and (file-exists? (a:get (state state:state.open-file)))
+               (equal? (export:read-state-from-file (a:get (state state:state.open-file)))
+                       state)))
       #t
       (begin
         (display "You have unsaved work. Proceed?  ")
@@ -65,10 +66,14 @@
          (λ (out)
            (display string-data out))))
       (`(load-state-from-file-and-then ,filename ,and-then)
-       (let ((new-state (export:read-state-from-file filename)))
-         (when (prompt-proceed-unsaved (unbox state-box))
-           (handle! (list 'set-state new-state))
-           (handle! (and-then new-state)))))))
+       ;; If file does not exist, use empty state.
+       (if (file-exists? filename)
+           (let ((new-state (export:read-state-from-file filename)))
+             (when (prompt-proceed-unsaved (unbox state-box))
+               (handle! (list 'set-state new-state))
+               (handle! (and-then new-state))))
+           (begin (handle! (list 'set-state state:state-empty))
+                  (handle! (and-then state:state-empty)))))))
   (map handle! (execute command-line-representation (unbox state-box) #:property-types property-types))
   (void))
 
