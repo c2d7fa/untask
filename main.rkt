@@ -5,7 +5,7 @@
  (prefix-in state: "./src/untask/core/state.rkt")
  (prefix-in export: "./src/untask/core/export.rkt")
 
- (only-in "./src/untask/user/loop.rkt" user-loop!)
+ "./src/untask/user/loop.rkt"
  (only-in "./src/untask/command/execute.rkt" execute)
 
  (prefix-in status: "./src/untask/properties/status.rkt")
@@ -27,8 +27,7 @@
     (prop:add-property-type depends:blocks-property-type)
     ))
 
-(user-loop! (box (if (zero? (vector-length (current-command-line-arguments)))
-                     state:state-empty
-                     (a:set ((export:read-state-from-file (vector-ref (current-command-line-arguments) 0)) state:state.open-file)
-                            (vector-ref (current-command-line-arguments) 0))))
-            #:property-types property-types)
+(define state-box (box state:state-empty))
+(when (not (zero? (vector-length (current-command-line-arguments))))
+  (run-execute! state-box `(open ,(vector-ref (current-command-line-arguments) 0)) #:property-types property-types))
+(user-loop! state-box #:property-types property-types)

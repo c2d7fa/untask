@@ -69,7 +69,8 @@
          (when (prompt-proceed-unsaved (unbox state-box))
            (handle! (list 'set-state new-state))
            (handle! (and-then new-state)))))))
-  (map handle! (execute command-line-representation (unbox state-box) #:property-types property-types)))
+  (map handle! (execute command-line-representation (unbox state-box) #:property-types property-types))
+  (void))
 
 (define (run-execute!/with-special state-box command-line-representation quit! proceed! #:property-types property-types)
   (match command-line-representation
