@@ -1,6 +1,7 @@
 #lang racket
 
-(provide user-loop!)
+(provide user-loop!
+         run-execute!)
 
 (require
  "../command/execute.rkt"
@@ -20,23 +21,8 @@
     (read-line)))
 
 (define (try-parse input)
-  (with-handlers ((exn? (λ (e) #f)))
-    (parse input)))
-
-;; Returns one of
-;;  - 'exit
-;;  - 'parse-error
-;;  - `(success ,output ,new-state)
-(define (try-evaluate input
-                      state
-                      #:property-types property-types)
-  (if (or (eq? input #f)
-          (equal? input "exit"))
-      'exit
-      (let ((parsed (try-parse input)))
-        (if (eq? parsed #f)
-            'parse-error
-            (list 'success (execute parsed state #:property-types property-types))))))
+  (with-handlers ((exn? (λ (e) '(parse-error))))
+    (if (not input) '(exit) (parse input))))
 
 (define (format-prompt-line current-contexts)
   (let ((contexts (string-join
@@ -61,18 +47,7 @@
           (or (string-prefix? input "y")
               (string-prefix? input "Y"))))))
 
-(define (user-loop! state-box
-                    #:property-types property-types)
-  (define (recur)
-    (user-loop! state-box
-                #:property-types property-types))
-  (define (goodbye)
-    (if (prompt-proceed-unsaved (unbox state-box))
-        (displayln "Goodbye!")
-        (recur)))
-  (define (parse-error)
-    (displayln "Error: Could not parse input.")
-    (recur))
+(define (run-execute! state-box command-line-representation #:property-types property-types)
   (define (handle! action)
     (match action
       (`(set-state ,new-state)
@@ -94,14 +69,28 @@
          (when (prompt-proceed-unsaved (unbox state-box))
            (handle! (list 'set-state new-state))
            (handle! (and-then new-state)))))))
-  (define (success output)
-    (map handle! output)
-    (recur))
+  (map handle! (execute command-line-representation (unbox state-box) #:property-types property-types)))
+
+(define (run-execute!/with-special state-box command-line-representation quit! proceed! #:property-types property-types)
+  (match command-line-representation
+    (`(parse-error)
+     (displayln (term:render `((bold) (red) ("Error: Unable to parse command.")))))
+    (`(exit)
+     (if (prompt-proceed-unsaved (unbox state-box))
+         (quit!)
+         (proceed!)))
+    (else (begin (run-execute! state-box command-line-representation #:property-types property-types)
+                 (proceed!)))))
+
+(define (user-loop! state-box
+                    #:property-types property-types)
+  (define (recur)
+    (user-loop! state-box
+                #:property-types property-types))
   (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
-         (result (try-evaluate input
-                               (unbox state-box)
+         (parsed (try-parse input)))
+    (run-execute!/with-special state-box
+                               parsed
+                               (lambda () (void))
+                               recur
                                #:property-types property-types)))
-    (match result
-      ('exit (goodbye))
-      ('parse-error (parse-error))
-      (`(success ,output) (success output)))))
