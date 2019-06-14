@@ -80,7 +80,8 @@
 (define (run-execute!/with-special state-box command-line-representation quit! proceed! #:property-types property-types)
   (match command-line-representation
     (`(parse-error)
-     (displayln (term:render `((bold) (red) ("Error: Unable to parse command.")))))
+     (displayln (term:render `((bold) (red) ("Error: Unable to parse command."))))
+     (proceed!))
     (`(exit)
      (if (prompt-proceed-unsaved (unbox state-box))
          (quit!)
