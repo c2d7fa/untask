@@ -32,13 +32,7 @@ also set a modify expression:
 > @novel
 @novel> add #research {Figure out how long it would take to travel from London to New York in 1920}
 #+END_EXAMPLE
-To deactivate a this context, use the command =-@novel=. It is possible to
-activate or deactivate a particular context for just a single command by simply
-starting that command with =@context= or =-@context=:
-#+BEGIN_EXAMPLE
-@novel> -@novel add #groceries {Buy milk}
-@novel>
-#+END_EXAMPLE
+To deactivate a this context, use the command =-@novel=.
 
 ** The =context= command
 
