@@ -87,6 +87,16 @@ argument types are valid. This allows us to place more complex constraints on
 the arguments of operators; for example, the =+= operator on sets checks that
 the argument is of the type that the object set contains.
 
+* Syntactic abbreviations
+
+In version 0.2, using a bracketed string without an explicit property in a
+filter or modify expression will be parsed as if the string was the argument to
+=description:=. In other words, ={Example}= is equivalent to
+=description:{Example}= in filter and modify expressions.
+
+In filter and modify expressions, the expressions =#tag= and =-#tag= expand to
+=tags+tag= and =tags-tag=, respectively.
+
 * Opening files
 
 Version 0.2 replaces =save= and =load= with a more traditional system for
