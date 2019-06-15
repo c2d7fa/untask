@@ -108,3 +108,14 @@ is:
 <filter> remove
 #+END_EXAMPLE
 which will remove the items matching /<filter>/.
+
+* Detailed item information
+
+Version 0.2 adds the =info= command, which is used to get detailed information
+about item. The command
+#+BEGIN_EXAMPLE
+<filter> info
+#+END_EXAMPLE
+will display information including dependencies and blocked items of each item
+matching /<filter>/. When =list= is called with a filter expression that matches
+exactly one item, it instead uses the output of =info=.
