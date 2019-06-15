@@ -80,7 +80,10 @@ contains either the type of an atomic value or the symbol =set=, which indicates
 that the operator should be picked when the object is a set, no matter what type
 the contents of the set have.
 
-When type checking is done, =operator-object-type= is not involved; rather, the
-operator contains a function that can be evaluated to determine whether a
-particular set of argument types are valid.
+A different method is used for checking the types of operator arguments: To each
+operator is associated a function that can be evaluated with the types of the
+operator object and arguments as values to determine whether a particular set of
+argument types are valid. This allows us to place more complex constraints on
+the arguments of operators; for example, the =+= operator on sets checks that
+the argument is of the type that the object set contains.
 
