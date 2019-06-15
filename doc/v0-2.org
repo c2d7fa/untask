@@ -87,3 +87,15 @@ argument types are valid. This allows us to place more complex constraints on
 the arguments of operators; for example, the =+= operator on sets checks that
 the argument is of the type that the object set contains.
 
+* Opening files
+
+Version 0.2 replaces =save= and =load= with a more traditional system for
+managing files. The new =open= command takes a filename as an argument, which is
+then set as the open file; future invocations of =save= will save data to that
+file. The new syntax is:
+#+BEGIN_EXAMPLE
+open <filename>
+save
+#+END_EXAMPLE
+It is no longer possible to =load= a file -- this functionality is replaced by
+=open=.
