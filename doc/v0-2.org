@@ -99,3 +99,12 @@ save
 #+END_EXAMPLE
 It is no longer possible to =load= a file -- this functionality is replaced by
 =open=.
+
+* Removing items
+
+Version 0.2 adds the =remove= command, which is used to remove items. The syntax
+is:
+#+BEGIN_EXAMPLE
+<filter> remove
+#+END_EXAMPLE
+which will remove the items matching /<filter>/.
