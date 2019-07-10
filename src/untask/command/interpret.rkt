@@ -72,6 +72,18 @@
                                      matching-items)
                                    ,continue))))
 
+(define (interpret-add modify-expression continue)
+  (interpret-check-contextify-expression
+   modify-expression #f
+   (λ (state modify-expression)
+     (let-values (((item-data-with-new-item new-item) (item:new-item (a:get (state state.item-data)))))
+       (let ((new-state (a:set (state state.item-data)
+                               (evaluate-modify-expression #:property-types builtin-property-types
+                                                           modify-expression
+                                                           item-data-with-new-item
+                                                           new-item))))
+         `(set-state ,new-state ,(λ () `(list-items ,new-state (,new-item) ,continue))))))))
+
 ;; Takes a command (the value returned by parse) and returns an interpretation
 ;; whose value is one of 'proceed and 'quit.
 ;;
@@ -93,6 +105,8 @@
   (match command
     (`(,filter-expression list)
      (interpret-list filter-expression (λ () '(value proceed))))
+    (`(add ,modify-expression)
+     (interpret-add modify-expression (λ () '(value proceed))))
     (`(open ,filename)
      `(get-state
        ,(λ (state)
