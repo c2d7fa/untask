@@ -1,6 +1,7 @@
 #lang racket
 
 (provide interpret
+         interpret-string
          run!
          run-state)
 
@@ -17,6 +18,7 @@
  "../core/context.rkt"
  "./check-expression.rkt"
 
+ (prefix-in parser: "../user/parser.rkt")
  (prefix-in term: "../../terminal.rkt")
  (only-in "../user/render-list.rkt" render-listing render-listing-info)
  (prefix-in a: "../../attribute.rkt")
@@ -124,6 +126,12 @@
        ,(λ (state)
           `(write-file ,(a:get (state state.open-file)) ,(export:export-state-to-string state) ,(λ () '(value proceed))))))
     ))
+
+;; Parse input string and interpret it like `interpret'. If input is #f, return
+;; 'exit value. If input cannot be parsed, print a human-readable error instead.
+(define (interpret-string input)
+  (with-handlers ((exn? (λ (e) `(error "Unable to parse command." ,(λ () '(value proceed))))))
+    (if input (interpret (parser:parse input) #:property-types builtin-property-types) `(value exit))))
 
 ;; Run an interpretation by writing and reading to actual files, asking the user
 ;; for confirmation and writing to standard output. Update the state by setting
