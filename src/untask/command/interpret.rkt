@@ -5,9 +5,75 @@
          run-state)
 
 (require
+ "../core/state.rkt"
+ (prefix-in item: "../core/item.rkt")
+ (prefix-in export: "../core/export.rkt")
+ (prefix-in urgency: "../properties/urgency.rkt")
+
+ "../properties/builtin.rkt"
+
+ "./filter.rkt"
+ "./modify.rkt"
+ "../core/context.rkt"
+ "./check-expression.rkt"
+
+ (prefix-in term: "../../terminal.rkt")
+ (only-in "../user/render-list.rkt" render-listing render-listing-info)
+ (prefix-in a: "../../attribute.rkt")
  )
 
-;; Takes a command (the value returned by parse) and returns an interpretation.
+(define (has-unsaved-state? state)
+  (or (not (a:get (state state.open-file)))
+      (and (file-exists? (a:get (state state.open-file)))
+           (equal? (export:read-state-from-file (a:get (state state.open-file)))
+                   state))))
+
+(define (write-file! path content)
+  (call-with-output-file path #:exists 'replace
+    (λ (out)
+      (display content out))))
+
+(define (interpret-check-expression fm-expression filter? continue)
+  (let ((check-value (check-filter/modify-expression fm-expression filter? #:property-types builtin-property-types)))
+    (if (eq? #t check-value)
+        (continue)
+        `(error ,check-value ,(λ () '(value proceed))))))
+
+(define (contextify-expression fm-expression filter? state)
+  (let ((apply-context (if filter? apply-context-filter apply-context-modify)))
+    (foldl (λ (context-name fm-expression)
+             (apply-context (a:get (state
+                                    state.defined-contexts
+                                    (contexts.named context-name)))
+                            fm-expression))
+           fm-expression
+           (set->list (a:get (state state.active-contexts))))))
+
+(define (interpret-check-contextify-expression fm-expression filter? continue)
+  (interpret-check-expression fm-expression filter?
+                              (λ ()
+                                `(get-state ,(λ (state)
+                                               (continue state (contextify-expression fm-expression filter? state)))))))
+
+
+(define (interpret-search filter-expression continue)
+  (interpret-check-contextify-expression filter-expression #t
+                                         (λ (state filter-expression)
+                                           (continue state (search (a:get (state state.item-data))
+                                                                   filter-expression
+                                                                   #:property-types builtin-property-types)))))
+
+(define (interpret-list filter-expression continue)
+  (interpret-search filter-expression
+                    (λ (state matching-items)
+                      `(list-items ,state
+                                   ,(urgency:sort-items-by-urgency-descending
+                                     (a:get (state state.item-data))
+                                     matching-items)
+                                   ,continue))))
+
+;; Takes a command (the value returned by parse) and returns an interpretation
+;; whose value is one of 'proceed and 'quit.
 ;;
 ;; An interpretation is a Racket expression which is one of the following:
 ;; - (value x)
@@ -16,6 +82,8 @@
 ;; - (read-file filename (λ (data) ...))
 ;; - (write-file filename data (λ () ...))
 ;; - (confirm prompt (λ (confirmed?) ...))
+;; - (list-items state items (λ () ...))
+;; - (info-items state items (λ () ...))
 ;;
 ;; The interpretation (value x) represents the simple value x. In each other
 ;; case, the interpretation represents some operation, whose behavior is defined
@@ -23,23 +91,73 @@
 ;; operation and returns the next operation.
 (define (interpret command #:property-types property-types)
   (match command
+    (`(,filter-expression list)
+     (interpret-list filter-expression (λ () '(value proceed))))
     (`(open ,filename)
-     `(get-state ,(λ (state)
-     `(read-file ,filename ,(λ (file-content)
-     (if (newer? file-content state)
-       `(confirm "You have unsaved data. Proceed?" ,(λ (answer)
-       (if answer
-         `(set-state (read-state file-content))
-         `())))
-       `(set-state (read-state file-content))))))))))
+     `(get-state
+       ,(λ (state)
+          `(read-file ,filename
+                      ,(λ (file-content)
+                         (if (has-unsaved-state? state)
+                             `(confirm "You have unsaved data. Proceed?"
+                                       ,(λ (answer)
+                                          (if answer
+                                              `(set-state ,(export:read-state-from-string file-content) ,(λ () '(value proceed)))
+                                              `(value proceed))))
+                             `(set-state ,(export:read-state-from-string file-content) ,(λ () '(value proceed)))))))))
+    (`(save)
+     `(get-state
+       ,(λ (state)
+          `(write-file ,(a:get (state state.open-file)) ,(export:export-state-to-string state) ,(λ () '(value proceed))))))
+    ))
 
 ;; Run an interpretation by writing and reading to actual files, asking the user
 ;; for confirmation and writing to standard output. Update the state by setting
 ;; the boxed state.
-(define (run! interpretation state-box #:property-types property-types)
-  'undefined)
+(define (run! interpretation state-box)
+  (match interpretation
+    (`(value ,x) x)
+    (`(list-items ,state ,items ,continue)
+     (begin (displayln (render-listing (a:get (state state.item-data)) items))
+            (run! (continue) state-box)))
+    (`(info-items ,state ,items ,continue)
+     (begin (displayln (render-listing-info (a:get (state state.item-data)) items))
+            (run! (continue) state-box)))
+    (`(get-state ,continue)
+     (run! (continue (unbox state-box)) state-box))
+    (`(read-file ,path ,continue)
+     (run! (continue (port->string (open-input-file path) #:close? #t)) state-box))
+    (`(write-file ,path ,content ,continue)
+     (begin (write-file! path content)
+            (run! (continue) state-box)))
+    (`(error ,message ,continue)
+     (begin (displayln (term:render `((bold) (red) ("Error: " ,message))))
+            (run! (continue) state-box)))
+    (`(confirm ,prompt ,continue)
+     (let ((answer (begin
+                     (display (format "~a " prompt))
+                     (let ((input (read-line)))
+                       (or (string-prefix? input "y")
+                           (string-prefix? input "Y"))))))
+       (run! (continue answer) state-box)))
+    (`(set-state ,state ,continue)
+     (begin (set-box! state-box state)
+            (run! (continue) state-box)))))
 
 ;; Run an interpretation given an initial state. Returns the state after
 ;; evaluating the interpretation. Does not allow any side-effects.
-(define (run interpretation init-state #:property-types property-types)
+(define (run-state interpretation init-state #:property-types property-types)
   'undefined)
+
+
+;;;;
+
+(define state-box (box state-empty))
+
+#;
+(run!
+ (interpret '(open "/untask/example.t") #:property-types #f)
+ state-box)
+
+#;
+(run! (interpret '(save) #:property-types #f) state-box)
