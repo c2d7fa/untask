@@ -103,7 +103,7 @@
 ;; case, the interpretation represents some operation, whose behavior is defined
 ;; elsewhere, associated with a function that consumes the result of that
 ;; operation and returns the next operation.
-(define (interpret command #:property-types property-types)
+(define (interpret command)
   (match command
     (`(,filter-expression list)
      (interpret-list filter-expression (λ () '(value proceed))))
@@ -131,7 +131,7 @@
 ;; 'exit value. If input cannot be parsed, print a human-readable error instead.
 (define (interpret-string input)
   (with-handlers ((exn? (λ (e) `(error "Unable to parse command." ,(λ () '(value proceed))))))
-    (if input (interpret (parser:parse input) #:property-types builtin-property-types) `(value exit))))
+    (if input (interpret (parser:parse input)) `(value exit))))
 
 ;; Run an interpretation by writing and reading to actual files, asking the user
 ;; for confirmation and writing to standard output. Update the state by setting
@@ -168,18 +168,5 @@
 
 ;; Run an interpretation given an initial state. Returns the state after
 ;; evaluating the interpretation. Does not allow any side-effects.
-(define (run-state interpretation init-state #:property-types property-types)
+(define (run-state interpretation init-state)
   'undefined)
-
-
-;;;;
-
-(define state-box (box state-empty))
-
-#;
-(run!
- (interpret '(open "/untask/example.t") #:property-types #f)
- state-box)
-
-#;
-(run! (interpret '(save) #:property-types #f) state-box)
