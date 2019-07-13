@@ -74,6 +74,15 @@
                                      matching-items)
                                    ,continue))))
 
+(define (interpret-info filter-expression continue)
+  (interpret-search filter-expression
+                    (λ (state matching-items)
+                      `(info-items ,state
+                                   ,(urgency:sort-items-by-urgency-descending
+                                     (a:get (state state.item-data))
+                                     matching-items)
+                                   ,continue))))
+
 (define (interpret-add modify-expression continue)
   (interpret-check-contextify-expression
    modify-expression #f
@@ -97,6 +106,17 @@
                                                                                                           matching-items
                                                                                                           modify-expression)))))
                                                                  `(set-state ,new-state ,(λ () `(list-items ,new-state ,(set->list matching-items) ,continue)))))))))
+
+(define (interpret-remove filter-expression continue)
+  (interpret-search filter-expression
+                    (λ (state matching-items)
+                      `(set-state ,(a:update (state state.item-data)
+                                             (λ (item-data)
+                                               (foldl (λ (item item-data)
+                                                        (item:remove-item item-data item))
+                                                      item-data
+                                                      (set->list matching-items))))
+                                  ,continue))))
 
 ;; Takes a command (the value returned by parse) and returns an interpretation
 ;; whose value is one of 'proceed and 'quit.
@@ -123,6 +143,10 @@
      (interpret-add modify-expression (λ () '(value proceed))))
     (`(,filter-expression modify ,modify-expression)
      (interpret-modify filter-expression modify-expression (λ () '(value proceed))))
+    (`(,filter-expression remove)
+     (interpret-remove filter-expression (λ () '(value proceed))))
+    (`(,filter-expression info)
+     (interpret-info filter-expression (λ () '(value proceed))))
     (`(open ,filename)
      `(get-state
        ,(λ (state)

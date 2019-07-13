@@ -23,9 +23,11 @@
               (interpret:run! (interpret:interpret-string input) state-box))
             inputs))
 
-(run-inputs! "add {This is a new item that I just added.} #sometag"
+(run-inputs! "add {This is a new item that I just added.} #sometag urgency+$6"
              "this is a parse error!"
              "add {Another new item} #sometag"
              "add {Item without tags}"
              "#sometag modify urgency-$5"
-             "list")
+             "list"
+             "urgency<$0 remove"
+             "info")
