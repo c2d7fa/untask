@@ -1,9 +1,13 @@
 #lang racket
 
-(provide builtin-property-types)
+(provide
+ get-property-by-key
+ set-property-by-key
+ builtin-property-types)
 
 (require
  (prefix-in prop: "../core/property.rkt")
+ (prefix-in item: "../core/item.rkt")
  (only-in "../../misc.rkt" thread-first)
 
  (prefix-in status: "./status.rkt")
@@ -12,6 +16,13 @@
  (prefix-in urgency: "./urgency.rkt")
  (prefix-in depends: "./dependencies.rkt")
  )
+
+
+(define (set-property-by-key item-data item key value)
+  (item:set-property item-data item (prop:get-property-type builtin-property-types key) value))
+
+(define (get-property-by-key item-data item key)
+  (item:get-property item-data item (prop:get-property-type builtin-property-types key)))
 
 (define builtin-property-types
   (thread-first prop:empty-property-type-collection

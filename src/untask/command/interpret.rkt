@@ -36,7 +36,7 @@
       (display content out))))
 
 (define (interpret-check-expression fm-expression filter? continue)
-  (let ((check-value (check-filter/modify-expression fm-expression filter? #:property-types builtin-property-types)))
+  (let ((check-value (check-filter/modify-expression fm-expression filter?)))
     (if (eq? #t check-value)
         (continue)
         `(error ,check-value ,(λ () '(value proceed))))))
@@ -62,8 +62,7 @@
   (interpret-check-contextify-expression filter-expression #t
                                          (λ (state filter-expression)
                                            (continue state (search (a:get (state state.item-data))
-                                                                   filter-expression
-                                                                   #:property-types builtin-property-types)))))
+                                                                   filter-expression)))))
 
 (define (interpret-list filter-expression continue)
   (interpret-search filter-expression
@@ -89,8 +88,7 @@
    (λ (state modify-expression)
      (let-values (((item-data-with-new-item new-item) (item:new-item (a:get (state state.item-data)))))
        (let ((new-state (a:set (state state.item-data)
-                               (evaluate-modify-expression #:property-types builtin-property-types
-                                                           modify-expression
+                               (evaluate-modify-expression modify-expression
                                                            item-data-with-new-item
                                                            new-item))))
          `(set-state ,new-state ,(λ () `(list-items ,new-state (,new-item) ,continue))))))))
@@ -102,7 +100,7 @@
                                                              (λ (state matching-items)
                                                                (let ((new-state (a:update (state state.item-data)
                                                                                           (λ (item-data)
-                                                                                            (modify-items item-data #:property-types builtin-property-types
+                                                                                            (modify-items item-data
                                                                                                           matching-items
                                                                                                           modify-expression)))))
                                                                  `(set-state ,new-state ,(λ () `(list-items ,new-state ,(set->list matching-items) ,continue)))))))))
