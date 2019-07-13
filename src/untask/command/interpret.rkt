@@ -148,6 +148,15 @@
     (`(,filter-expression info)
      (interpret-info filter-expression (λ () '(value proceed))))
     (`(open ,filename)
+     (let ((load-state (λ (old-state file-state)
+                         (thread state
+                                 ((λ (state) (a:set (state state.open-file) filename)))
+                                                              ((λ (state) (a:set (state state.item-data)
+                                                                                 (a:get (file-state state.item-data)))))
+                                                              ((λ (state) (a:set (state state.defined-contexts)
+                                                                                 (a:get (file-state state.defined-contexts)))))
+                                                              ((λ (state) (a:set (state state.active-contexts)
+                                                                                 (a:get (file-state state.active-contexts)))))))))
      `(get-state
        ,(λ (state)
           `(read-file ,filename
@@ -156,9 +165,9 @@
                              `(confirm "You have unsaved data. Proceed?"
                                        ,(λ (answer)
                                           (if answer
-                                              `(set-state ,(export:read-state-from-string file-content) ,(λ () '(value proceed)))
+                                              `(set-state ,(load-state state (export:read-state-from-string file-content)) ,(λ () '(value proceed)))
                                               `(value proceed))))
-                             `(set-state ,(export:read-state-from-string file-content) ,(λ () '(value proceed)))))))))
+                             `(set-state ,(load-state state (export:read-state-from-string file-content)) ,(λ () '(value proceed))))))))))
     (`(save)
      `(get-state
        ,(λ (state)
