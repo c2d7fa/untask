@@ -17,5 +17,15 @@
   (run-execute! state-box `(open ,(vector-ref (current-command-line-arguments) 0)) #:property-types builtin-property-types))
 #;(user-loop! state-box #:property-types builtin-property-types)
 
-(interpret:run! (interpret:interpret '((urgency < (number . 0)) list) #:property-types builtin-property-types) state-box)
+(define (run-inputs! . inputs)
+  (for-each (λ (input)
+              (printf "> ~a~n" input)
+              (interpret:run! (interpret:interpret-string input) state-box))
+            inputs))
 
+(run-inputs! "add {This is a new item that I just added.} #sometag"
+             "this is a parse error!"
+             "add {Another new item} #sometag"
+             "add {Item without tags}"
+             "#sometag modify urgency-$5"
+             "list")

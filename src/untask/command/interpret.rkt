@@ -86,6 +86,18 @@
                                                            new-item))))
          `(set-state ,new-state ,(λ () `(list-items ,new-state (,new-item) ,continue))))))))
 
+(define (interpret-modify filter-expression modify-expression continue)
+  (interpret-check-contextify-expression modify-expression #f
+                                         (λ (state modify-expression)
+                                           (interpret-search filter-expression
+                                                             (λ (state matching-items)
+                                                               (let ((new-state (a:update (state state.item-data)
+                                                                                          (λ (item-data)
+                                                                                            (modify-items item-data #:property-types builtin-property-types
+                                                                                                          matching-items
+                                                                                                          modify-expression)))))
+                                                                 `(set-state ,new-state ,(λ () `(list-items ,new-state ,(set->list matching-items) ,continue)))))))))
+
 ;; Takes a command (the value returned by parse) and returns an interpretation
 ;; whose value is one of 'proceed and 'quit.
 ;;
@@ -109,6 +121,8 @@
      (interpret-list filter-expression (λ () '(value proceed))))
     (`(add ,modify-expression)
      (interpret-add modify-expression (λ () '(value proceed))))
+    (`(,filter-expression modify ,modify-expression)
+     (interpret-modify filter-expression modify-expression (λ () '(value proceed))))
     (`(open ,filename)
      `(get-state
        ,(λ (state)
@@ -130,7 +144,7 @@
 ;; Parse input string and interpret it like `interpret'. If input is #f, return
 ;; 'exit value. If input cannot be parsed, print a human-readable error instead.
 (define (interpret-string input)
-  (with-handlers ((exn? (λ (e) `(error "Unable to parse command." ,(λ () '(value proceed))))))
+  (with-handlers ((exn:fail:read? (λ (e) `(error "Unable to parse command." ,(λ () '(value proceed))))))
     (if input (interpret (parser:parse input)) `(value exit))))
 
 ;; Run an interpretation by writing and reading to actual files, asking the user
