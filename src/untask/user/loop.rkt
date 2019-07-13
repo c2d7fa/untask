@@ -48,7 +48,7 @@
           (or (string-prefix? input "y")
               (string-prefix? input "Y"))))))
 
-(define (run-execute! state-box command-line-representation #:property-types property-types)
+(define (run-execute! state-box command-line-representation)
   (define (handle! action)
     (match action
       (`(set-state ,new-state)
@@ -74,10 +74,10 @@
                (handle! (and-then new-state))))
            (begin (handle! (list 'set-state state:state-empty))
                   (handle! (and-then state:state-empty)))))))
-  (map handle! (execute command-line-representation (unbox state-box) #:property-types property-types))
+  (map handle! (execute command-line-representation (unbox state-box)))
   (void))
 
-(define (run-execute!/with-special state-box command-line-representation quit! proceed! #:property-types property-types)
+(define (run-execute!/with-special state-box command-line-representation quit! proceed!)
   (match command-line-representation
     (`(parse-error)
      (displayln (term:render `((bold) (red) ("Error: Unable to parse command."))))
@@ -86,18 +86,15 @@
      (if (prompt-proceed-unsaved (unbox state-box))
          (quit!)
          (proceed!)))
-    (else (begin (run-execute! state-box command-line-representation #:property-types property-types)
+    (else (begin (run-execute! state-box command-line-representation)
                  (proceed!)))))
 
-(define (user-loop! state-box
-                    #:property-types property-types)
+(define (user-loop! state-box)
   (define (recur)
-    (user-loop! state-box
-                #:property-types property-types))
+    (user-loop! state-box))
   (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
          (parsed (try-parse input)))
     (run-execute!/with-special state-box
                                parsed
                                (lambda () (void))
-                               recur
-                               #:property-types property-types)))
+                               recur)))

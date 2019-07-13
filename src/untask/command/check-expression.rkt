@@ -6,14 +6,16 @@
  (prefix-in prop: "../core/property.rkt")
  (prefix-in val: "../core/value.rkt")
  (prefix-in op: "../core/operator.rkt")
- (only-in "../user/builtin-operators.rkt" builtin-operators))
+
+ "../user/builtin-operators.rkt"
+ "../properties/builtin.rkt")
 
 
 ;; Returns #t if expression is valid, otherwise returns human-readable string
 ;; representing error.
-(define (check-filter/modify-expression fm-expression filter? #:property-types property-types)
+(define (check-filter/modify-expression fm-expression filter?)
   (define (check subexpr)
-    (check-filter/modify-expression subexpr filter? #:property-types property-types))
+    (check-filter/modify-expression subexpr filter?))
   (define (collect subexprs)
     (foldl (λ (subexpr total)
              (if (eq? total #t)
@@ -29,7 +31,7 @@
     (`(not ,subexpr)
      (check subexpr))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (let ((pr (prop:get-property-type property-types property)))
+     (let ((pr (prop:get-property-type builtin-property-types property)))
        (if (eq? pr #f)
            (format "Unknown property '~a'." property)
            (if (eq? ': operator)
