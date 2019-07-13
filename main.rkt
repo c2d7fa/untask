@@ -13,5 +13,5 @@
 
 (define state-box (box state:state-empty))
 (when (not (zero? (vector-length (current-command-line-arguments))))
-  (run-execute! state-box `(open ,(vector-ref (current-command-line-arguments) 0)) #:property-types builtin-property-types))
-(user-loop! state-box #:property-types builtin-property-types)
+  (run-execute! state-box `(open ,(vector-ref (current-command-line-arguments) 0))))
+(user-loop! state-box)

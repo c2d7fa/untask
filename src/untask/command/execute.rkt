@@ -29,61 +29,60 @@
            expression
            (set->list (a:get (state state.active-contexts))))))
 
-(define (execute-with fm-expression filter? continue #:property-types property-types)
-  (let ((check-value (check-filter/modify-expression fm-expression filter? #:property-types property-types)))
+(define (execute-with fm-expression filter? continue)
+  (let ((check-value (check-filter/modify-expression fm-expression filter?)))
     (if (eq? #t check-value)
         (continue fm-expression)
         `((error ,check-value)))))
 
-(define (execute-with-enriched fm-expression filter? state continue #:property-types property-types)
-  (execute-with (enrich-with-contexts fm-expression filter? state) filter? #:property-types property-types
+(define (execute-with-enriched fm-expression filter? state continue)
+  (execute-with (enrich-with-contexts fm-expression filter? state) filter?
     continue))
 
-(define (execute-with-search filter-expression state continue #:property-types property-types)
-  (execute-with-enriched filter-expression #t state #:property-types property-types
+(define (execute-with-search filter-expression state continue)
+  (execute-with-enriched filter-expression #t state
     (λ (filter-expression)
-      (continue (search (a:get (state state.item-data)) filter-expression #:property-types property-types)))))
+      (continue (search (a:get (state state.item-data)) filter-expression)))))
 
 ;; --
 
-(define (execute-list state filter-expression #:property-types property-types)
-  (execute-with-search filter-expression state #:property-types property-types
+(define (execute-list state filter-expression)
+  (execute-with-search filter-expression state
     (λ (items)
       `((list-items ,(a:get (state state.item-data))
                     ,(urgency:sort-items-by-urgency-descending
                       (a:get (state state.item-data))
                       items))))))
 
-(define (execute-add state modify-expression #:property-types property-types)
-  (execute-with-enriched modify-expression #f state #:property-types property-types
+(define (execute-add state modify-expression)
+  (execute-with-enriched modify-expression #f state
     (λ (modify-expression)
       (let-values (((item-data-with-new-item new-item)
                     (item:new-item (a:get (state state.item-data)))))
         (let ((new-state
                (a:set (state state.item-data)
-                      (evaluate-modify-expression #:property-types property-types
-                                                  modify-expression
+                      (evaluate-modify-expression modify-expression
                                                   item-data-with-new-item
                                                   new-item))))
           `((set-state ,new-state)
             (list-items ,(a:get (new-state state.item-data)) (,new-item))))))))
 
-(define (execute-modify state filter-expression modify-expression #:property-types property-types)
-  (execute-with-search filter-expression state #:property-types property-types
+(define (execute-modify state filter-expression modify-expression)
+  (execute-with-search filter-expression state
     (λ (items)
-      (execute-with-enriched modify-expression #f state #:property-types property-types
+      (execute-with-enriched modify-expression #f state
         (λ (modify-expression)
         (let ((new-state (a:update (state state.item-data)
                                    (λ (item-data)
-                                     (modify-items item-data #:property-types property-types
+                                     (modify-items item-data
                                                    items
                                                    modify-expression)))))
           `((set-state ,new-state)
             (list-items ,(a:get (new-state state.item-data))
                         ,(set->list items)))))))))
 
-(define (execute-remove state filter-expression #:property-types property-types)
-  (execute-with-search filter-expression state #:property-types property-types
+(define (execute-remove state filter-expression)
+  (execute-with-search filter-expression state
     (λ (items)
       `((set-state ,(a:update (state state.item-data)
                               (λ (item-data)
@@ -92,30 +91,30 @@
                                        item-data
                                        (set->list items)))))))))
 
-(define (execute-info state filter-expression #:property-types property-types)
-  (execute-with-search filter-expression state #:property-types property-types
+(define (execute-info state filter-expression)
+  (execute-with-search filter-expression state
     (λ (items)
       `((info-items ,(a:get (state state.item-data))
                     ,(set->list items))))))
 
-(define (execute command-line-representation state #:property-types property-types)
+(define (execute command-line-representation state)
   (match command-line-representation
     (`(,filter-expression list)
-     (execute-list state filter-expression #:property-types property-types))
+     (execute-list state filter-expression))
     (`(add ,modify-expression)
-     (execute-add state modify-expression #:property-types property-types))
+     (execute-add state modify-expression))
     (`(,filter-expression modify ,modify-expression)
-     (execute-modify state filter-expression modify-expression #:property-types property-types))
+     (execute-modify state filter-expression modify-expression))
     (`(,filter-expression remove)
-     (execute-remove state filter-expression #:property-types property-types))
+     (execute-remove state filter-expression))
     (`(,filter-expression info)
-     (execute-info state filter-expression #:property-types property-types))
+     (execute-info state filter-expression))
     (`(context show)
      `((print-raw ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))))))
     (`(context add ,name ,filter-expression ,modify-expression)
-     (execute-with (enrich-with-contexts filter-expression #t state) #t #:property-types property-types
+     (execute-with (enrich-with-contexts filter-expression #t state) #t
        (λ (filter-expression)
-         (execute-with (enrich-with-contexts modify-expression #f state) #f #:property-types property-types
+         (execute-with (enrich-with-contexts modify-expression #f state) #f
            (λ (modify-expression)
              `((set-state ,(a:set (state state.defined-contexts (contexts.named name))
                                   (context #:filter filter-expression

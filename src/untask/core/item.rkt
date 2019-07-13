@@ -56,12 +56,6 @@
       ((prop:property-type-translate property-type) item-data item value)
       (set-raw-property item-data item property-type value)))
 
-(define (set-property-by-key item-data item key value #:property-types property-types)
-  (set-property item-data item (prop:get-property-type property-types key) value))
-
-(define (get-property-by-key item-data item key #:property-types property-types)
-  (get-property item-data item (prop:get-property-type property-types key)))
-
 ;; Returns set of all items.
 (define (all-items item-data)
   (list->set (hash-keys (a:get (item-data item-data.properties)))))
