@@ -26,10 +26,10 @@
  )
 
 (define (has-unsaved-state? state)
-  (or (not (a:get (state state.open-file)))
-      (and (file-exists? (a:get (state state.open-file)))
-           (equal? (export:read-state-from-file (a:get (state state.open-file)))
-                   state))))
+  (not (or (not (a:get (state state.open-file)))
+           (and (file-exists? (a:get (state state.open-file)))
+                (equal? (export:read-state-from-file (a:get (state state.open-file)))
+                        state)))))
 
 (define (write-file! path content)
   (call-with-output-file path #:exists 'replace
