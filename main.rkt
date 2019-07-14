@@ -7,7 +7,6 @@
  "./src/untask/properties/builtin.rkt"
 
  "./src/untask/user/loop.rkt"
- (only-in "./src/untask/command/execute.rkt" execute)
  (prefix-in interpret: "./src/untask/command/interpret.rkt")
 
  (prefix-in a: "./src/attribute.rkt"))
