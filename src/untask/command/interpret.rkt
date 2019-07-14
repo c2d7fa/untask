@@ -172,6 +172,14 @@
      `(get-state
        ,(λ (state)
           `(write-file ,(a:get (state state.open-file)) ,(export:export-state-to-string state) ,(λ () '(value proceed))))))
+    (`(exit)
+     `(get-state ,(λ (state) (if (has-unsaved-state? state)
+                                 `(confirm "You have unsaved data. Proceed?"
+                                           ,(λ (answer)
+                                              (if answer
+                                                  '(value exit)
+                                                  '(value proceed))))
+                                 '(value exit)))))
     (`(context add ,name ,filter-expression ,modify-expression)
      `(get-state ,(λ (state) `(set-state ,(a:set (state state.defined-contexts (contexts.named name))
                                                  (context #:filter filter-expression
