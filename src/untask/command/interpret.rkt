@@ -22,6 +22,7 @@
  (prefix-in term: "../../terminal.rkt")
  (only-in "../user/render-list.rkt" render-listing render-listing-info)
  (prefix-in a: "../../attribute.rkt")
+ (only-in "../../misc.rkt" thread)
  )
 
 (define (has-unsaved-state? state)
@@ -148,14 +149,14 @@
      (interpret-info filter-expression (λ () '(value proceed))))
     (`(open ,filename)
      (let ((load-state (λ (old-state file-state)
-                         (thread state
+                         (thread old-state
                                  ((λ (state) (a:set (state state.open-file) filename)))
-                                                              ((λ (state) (a:set (state state.item-data)
-                                                                                 (a:get (file-state state.item-data)))))
-                                                              ((λ (state) (a:set (state state.defined-contexts)
-                                                                                 (a:get (file-state state.defined-contexts)))))
-                                                              ((λ (state) (a:set (state state.active-contexts)
-                                                                                 (a:get (file-state state.active-contexts)))))))))
+                                 ((λ (state) (a:set (state state.item-data)
+                                                    (a:get (file-state state.item-data)))))
+                                 ((λ (state) (a:set (state state.defined-contexts)
+                                                    (a:get (file-state state.defined-contexts)))))
+                                 ((λ (state) (a:set (state state.active-contexts)
+                                                    (a:get (file-state state.active-contexts)))))))))
      `(get-state
        ,(λ (state)
           `(read-file ,filename
