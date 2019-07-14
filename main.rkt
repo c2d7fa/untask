@@ -23,11 +23,15 @@
               (interpret:run! (interpret:interpret-string input) state-box))
             inputs))
 
-(run-inputs! "add {This is a new item that I just added.} #sometag urgency+$6"
-             "this is a parse error!"
-             "add {Another new item} #sometag"
-             "add {Item without tags}"
-             "#sometag modify urgency-$5"
+(run-inputs! "add {Item 1}"
+             "context add context filter #context status:active modify #context"
+             "@context"
+             "add {Item 2}"
+             "add {Item 3}"
+             "add {Item 4} depends+2"
              "list"
-             "urgency<$0 remove"
-             "info")
+             "context list"
+             "-@context"
+             "list"
+             "context remove context"
+             "context list")

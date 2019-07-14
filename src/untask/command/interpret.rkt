@@ -128,6 +128,7 @@
 ;; - (confirm prompt (λ (confirmed?) ...))
 ;; - (list-items state items (λ () ...))
 ;; - (info-items state items (λ () ...))
+;; - (message string (λ () ...))
 ;;
 ;; The interpretation (value x) represents the simple value x. In each other
 ;; case, the interpretation represents some operation, whose behavior is defined
@@ -170,7 +171,30 @@
      `(get-state
        ,(λ (state)
           `(write-file ,(a:get (state state.open-file)) ,(export:export-state-to-string state) ,(λ () '(value proceed))))))
-    ))
+    (`(context add ,name ,filter-expression ,modify-expression)
+     `(get-state ,(λ (state) `(set-state ,(a:set (state state.defined-contexts (contexts.named name))
+                                                 (context #:filter filter-expression
+                                                          #:modify modify-expression))
+                                         ,(λ () '(value proceed))))))
+    (`(context active ,toggles)
+     `(get-state ,(λ (state)
+                    `(set-state ,(a:update (state state.active-contexts)
+                                           (λ (active-contexts)
+                                             (foldl (λ (expr active-contexts)
+                                                      (match expr
+                                                        (`(on ,name)  (set-add active-contexts name))
+                                                        (`(off ,name) (set-remove active-contexts name))))
+                                                    active-contexts
+                                                    toggles)))
+                                ,(λ () '(value proceed))))))
+    (`(context show)
+     `(get-state ,(λ (state)
+                    `(message ,(format "~a" (available-contexts (a:get (state state.defined-contexts)))) ,(λ () '(value proceed))))))
+    (`(context remove ,name)
+     `(get-state ,(λ (state)
+                    `(set-state ,(a:update (state state.defined-contexts)
+                                           (λ (x) (remove-context x name)))
+                                ,(λ () '(value proceed))))))))
 
 ;; Parse input string and interpret it like `interpret'. If input is #f, return
 ;; 'exit value. If input cannot be parsed, print a human-readable error instead.
@@ -199,6 +223,9 @@
             (run! (continue) state-box)))
     (`(error ,message ,continue)
      (begin (displayln (term:render `((bold) (red) ("Error: " ,message))))
+            (run! (continue) state-box)))
+    (`(message ,message ,continue)
+     (begin (displayln (term:render `((bold) (blue) (,message))))
             (run! (continue) state-box)))
     (`(confirm ,prompt ,continue)
      (let ((answer (begin
