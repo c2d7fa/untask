@@ -246,8 +246,3 @@
     (`(set-state ,state ,continue)
      (begin (set-box! state-box state)
             (run! (continue) state-box)))))
-
-;; Run an interpretation given an initial state. Returns the state after
-;; evaluating the interpretation. Does not allow any side-effects.
-(define (run-state interpretation init-state)
-  'undefined)
