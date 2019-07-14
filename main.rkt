@@ -13,25 +13,9 @@
  (prefix-in a: "./src/attribute.rkt"))
 
 (define state-box (box state:state-empty))
-(when (not (zero? (vector-length (current-command-line-arguments))))
-  (run-execute! state-box `(open ,(vector-ref (current-command-line-arguments) 0))))
-#;(user-loop! state-box)
 
-(define (run-inputs! . inputs)
-  (for-each (λ (input)
-              (printf "> ~a~n" input)
-              (interpret:run! (interpret:interpret-string input) state-box))
-            inputs))
+(void
+ (when (not (zero? (vector-length (current-command-line-arguments))))
+   (interpret:run! (interpret:interpret `(open ,(vector-ref (current-command-line-arguments) 0))) state-box)))
 
-(run-inputs! "add {Item 1}"
-             "context add context filter #context status:active modify #context"
-             "@context"
-             "add {Item 2}"
-             "add {Item 3}"
-             "add {Item 4} depends+2"
-             "list"
-             "context list"
-             "-@context"
-             "list"
-             "context remove context"
-             "context list")
+(user-loop! state-box)
