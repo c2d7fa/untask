@@ -41,11 +41,11 @@
      (begin (displayln (term:render `((bold) (red) ("Error: " ,message))))
             (run! (continue) state-box)))
     (`(message ,message ,continue)
-     (begin (displayln (term:render `((bold) (blue) (,message))))
+     (begin (displayln (term:render `((blue) (,message))))
             (run! (continue) state-box)))
     (`(confirm ,prompt ,continue)
      (let ((answer (begin
-                     (display (format "~a " prompt))
+                     (display (term:render `((bold) (blue) (,(format "~a " prompt)))))
                      (let ((input (read-line)))
                        (or (string-prefix? input "y")
                            (string-prefix? input "Y"))))))
