@@ -16,8 +16,6 @@
  "./check-expression.rkt"
 
  (prefix-in parser: "../user/parser.rkt")
- (prefix-in term: "../../terminal.rkt")
- (only-in "../user/render-list.rkt" render-listing render-listing-info)
  (prefix-in a: "../../attribute.rkt")
  (only-in "../../misc.rkt" thread)
  )
