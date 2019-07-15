@@ -3,10 +3,11 @@
 (provide user-loop!)
 
 (require
- "./render-list.rkt"
- "./parser.rkt"
+ "render-list.rkt"
+ "parser.rkt"
+ "run.rkt"
+ "../command/interpret.rkt"
 
- (prefix-in interpret: "./../command/interpret.rkt")
  (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
  (prefix-in a: "../../attribute.rkt")
@@ -41,7 +42,7 @@
   (let ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts))))))
     (let ((result
            (if (not input)
-               (interpret:run! `(exit) state-box)
-               (interpret:run! (interpret:interpret-string input) state-box))))
+               (run! `(exit) state-box)
+               (run! (interpret-string input) state-box))))
       (when (equal? 'proceed result)
         (user-loop! state-box)))))

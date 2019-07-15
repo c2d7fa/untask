@@ -1,9 +1,6 @@
 #lang racket
 
-(provide interpret
-         interpret-string
-         run!
-         run-state)
+(provide interpret interpret-string)
 
 (require
  "../core/state.rkt"
@@ -25,16 +22,12 @@
  (only-in "../../misc.rkt" thread)
  )
 
+;; TODO: This should probably not be allowed to read file directly.
 (define (has-unsaved-state? state)
   (not (or (not (a:get (state state.open-file)))
            (and (file-exists? (a:get (state state.open-file)))
                 (equal? (export:read-state-from-file (a:get (state state.open-file)))
                         state)))))
-
-(define (write-file! path content)
-  (call-with-output-file path #:exists 'replace
-    (λ (out)
-      (display content out))))
 
 (define (interpret-check-expression fm-expression filter? continue)
   (let ((check-value (check-filter/modify-expression fm-expression filter?)))
@@ -210,39 +203,3 @@
 (define (interpret-string input)
   (with-handlers ((exn:fail:read? (λ (e) `(error "Unable to parse command." ,(λ () '(value proceed))))))
     (if input (interpret (parser:parse input)) `(value exit))))
-
-;; Run an interpretation by writing and reading to actual files, asking the user
-;; for confirmation and writing to standard output. Update the state by setting
-;; the boxed state.
-(define (run! interpretation state-box)
-  (match interpretation
-    (`(value ,x) x)
-    (`(list-items ,state ,items ,continue)
-     (begin (displayln (render-listing (a:get (state state.item-data)) items))
-            (run! (continue) state-box)))
-    (`(info-items ,state ,items ,continue)
-     (begin (displayln (render-listing-info (a:get (state state.item-data)) items))
-            (run! (continue) state-box)))
-    (`(get-state ,continue)
-     (run! (continue (unbox state-box)) state-box))
-    (`(read-file ,path ,continue)
-     (run! (continue (port->string (open-input-file path) #:close? #t)) state-box))
-    (`(write-file ,path ,content ,continue)
-     (begin (write-file! path content)
-            (run! (continue) state-box)))
-    (`(error ,message ,continue)
-     (begin (displayln (term:render `((bold) (red) ("Error: " ,message))))
-            (run! (continue) state-box)))
-    (`(message ,message ,continue)
-     (begin (displayln (term:render `((bold) (blue) (,message))))
-            (run! (continue) state-box)))
-    (`(confirm ,prompt ,continue)
-     (let ((answer (begin
-                     (display (format "~a " prompt))
-                     (let ((input (read-line)))
-                       (or (string-prefix? input "y")
-                           (string-prefix? input "Y"))))))
-       (run! (continue answer) state-box)))
-    (`(set-state ,state ,continue)
-     (begin (set-box! state-box state)
-            (run! (continue) state-box)))))
