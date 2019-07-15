@@ -32,9 +32,9 @@
                                  ((cyan) (,c))))))
                         (set->list current-contexts))
                    " ")))
-        (term:render `(()
-                       (,contexts
-                        ((black) ("> ")))))))
+    (term:render `(()
+                   (,contexts
+                    ((black) ("> ")))))))
 
 (define (user-loop! state-box)
   (define (recur)
