@@ -8,8 +8,8 @@
 (define (export-state-to-string state)
   (format "~v" state))
 
-(define (read-state-from-string item-data-string)
-  (eval (read (open-input-string item-data-string))
+(define (read-state-from-string state-string)
+  (eval (read (open-input-string state-string))
         (let ((ns (make-base-namespace)))
           (namespace-attach-module (current-namespace) 'racket ns)
           (namespace-require 'racket ns)
