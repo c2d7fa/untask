@@ -61,13 +61,6 @@
     ((interp (do expr))
      #'expr)))
 
-;; TODO: This should probably not be allowed to read file directly.
-(define (has-unsaved-state? state)
-  (not (or (not (a:get (state state.open-file)))
-           (and (file-exists? (a:get (state state.open-file)))
-                (equal? (export:read-state-from-file (a:get (state state.open-file)))
-                        state)))))
-
 (define (check-fm/i fm-expression filter? continue)
   (let ((check-value (check-filter/modify-expression fm-expression filter?)))
     (if (eq? #t check-value)
@@ -167,13 +160,15 @@
 (define (confirm-unsaved/i continue)
   (interp
    (let (state) (get-state/i))
-   (do (if (has-unsaved-state? state)
+   (let (open-file-content) (read-file/i (a:get (state state.open-file))))
+   (do (if (or (not open-file-content)
+               (equal? (export:read-state-from-string open-file-content) state))
+           (continue #t)
            (interp
             (let (answer) (confirm/i "You have unsaved data. Proceed?"))
             (do (if answer
                     (continue #t)
-                    (continue #f))))
-           (continue #t)))))
+                    (continue #f))))))))
 
 ;; Takes a command (the value returned by parse) and returns an interpretation
 ;; whose value is one of 'proceed and 'quit.
