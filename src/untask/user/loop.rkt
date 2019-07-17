@@ -18,7 +18,8 @@
 (define (prompt-line prompt)
   (display prompt)
   (with-handlers ((exn:break? (λ (e) #f)))
-    (read-line)))
+    (let ((line (read-line)))
+      (if (equal? eof line) #f line))))
 
 (define (try-parse input)
   (with-handlers ((exn? (λ (e) '(parse-error))))
@@ -41,8 +42,7 @@
     (user-loop! state-box))
   (let ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts))))))
     (let ((result
-           (if (not input)
-               (run! `(exit) state-box)
-               (run! (interpret-string input) state-box))))
+           (run! (if (not input) (interpret '(exit)) (interpret-string input))
+                 state-box)))
       (when (equal? 'proceed result)
         (user-loop! state-box)))))
