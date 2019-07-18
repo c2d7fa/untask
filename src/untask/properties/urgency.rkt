@@ -6,14 +6,17 @@
   (prefix-in item: "../core/item.rkt")
   (prefix-in prop: "../core/property.rkt")
   (prefix-in val: "../core/value.rkt")
-  (prefix-in depends: "./dependencies.rkt"))
+  (prefix-in depends: "./dependencies.rkt")
+  (prefix-in status: "./status.rkt"))
 
 (define (calculate-urgency item-data item)
   (val:make-number (+ (val:unwrap-number (item:get-raw-property item-data item urgency-property-type))
                       (apply max 0
                              (map (λ (blo)
                                     (val:unwrap-number (calculate-urgency item-data (val:unwrap-item blo))))
-                                  (set->list (val:unwrap-set (item:get-property item-data item depends:blocks-property-type))))))))
+                                  (filter (λ (blo)
+                                            (not (status:done? item-data (val:unwrap-item blo))))
+                                          (set->list (val:unwrap-set (item:get-property item-data item depends:blocks-property-type)))))))))
 
 (define (translate-urgency item-data item value)
   (item:set-raw-property item-data item urgency-property-type value))
