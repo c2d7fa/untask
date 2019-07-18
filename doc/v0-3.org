@@ -1,0 +1,39 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Untask 0.3
+
+This file describes the changes between version 0.2 and version 0.3 of Untask.
+
+* Enabling context for single command
+
+In version 0.3, it is possible to enable a context for just a single
+command. For example, to use the context "example" while adding an item without
+enabling that context, enter this command:
+#+BEGIN_EXAMPLE
+> @example add {This item has the properties associated with @example.}
+>
+#+END_EXAMPLE
+Additionally, the syntax =@= can be used to disable all contexts, either for a
+single command or in general:
+#+BEGIN_EXAMPLE
+@a @b @c> @ add {This item has no contexts enabled.}
+@a @b @c> @ @d
+@d> add {This item has the @d context enabled.}
+#+END_EXAMPLE
+
+* Working with dates
+
+Version 0.3 of Untask introduces dates. Dates are written on the form
+=2000-12-31T23:59=, with the time part being optional (so =2000-12-31= is also
+valid).
+
+Dates are used in the /start/ and /due/ properties. The /start/ property should
+contain the first time at which the task can be done; until this time, the task
+is automatically marked as inactive. The /due/ property should contain the
+latest time at which the task should be done. The /due/ property is used in the
+agenda view (see below) and for formatting items as overdue or due today.
+
+This version also introduces a new command, /agneda/. This command is used to
+print a view of the upcoming tasks, as indicated by their due dates. It prints a
+daily agenda containing all items that are due on a particular day. Like /list/,
+/agenda/ can be used with a filter expression to narrow the kinds of items that
+are included.
