@@ -37,3 +37,25 @@ print a view of the upcoming tasks, as indicated by their due dates. It prints a
 daily agenda containing all items that are due on a particular day. Like /list/,
 /agenda/ can be used with a filter expression to narrow the kinds of items that
 are included.
+
+* Visualizing dependency tress
+
+Sometimes it may not be obvious how different tasks depend on each other. In
+particular, it can be difficult to find out which tasks one would need to
+complete in order to be able to start on a particular task.
+
+Version 0.3 adds the /tree/ command which will print out the dependency tree for
+a particular task (or set of tasks).
+
+For example:
+
+#+BEGIN_EXAMPLE
+> 23 tree
+- 23. Win the Nobel Prize in Physics 1.0 D:2
+  - 37. Get a PhD in physics 1.0 D:3
+    - 60. Get a Master's in physics 1.5 B:1
+      - 42. Read a book about physics 2.0 D:1 B:2
+        - 43. Find a good book about physics 2.0 B:1
+  - 42. Read a book about physics 2.0 D:1 B:2
+    - 43. Find a good book about physics 2.0 B:1
+#+END_EXAMPLE
