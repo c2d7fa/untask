@@ -109,7 +109,10 @@
                     ;; Urgency
                     (()
                      (((black) ("Urgency: "))
-                      ((bold) (yellow) (,(~a (val:unwrap-number urgency))))))
+                      ((bold) (yellow) (,(~a (val:unwrap-number urgency))))
+                      ,(if (equal? urgency base-urgency)
+                           `(() ())
+                           `((black) (" (Base " ((yellow) (,(~a (val:unwrap-number base-urgency)))) ")")))))
                     "\n"
                     ;; Tags
                     (()
