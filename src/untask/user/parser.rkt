@@ -11,6 +11,7 @@
 
 (define digit/p (char-between/p #\0 #\9))
 (define int/p (f:map (λ (ds) (string->number (apply string ds))) (many+/p digit/p)))
+(define (range/p low high) (guard/p int/p (λ (x) (<= low x high))))
 (define number/p
   (let ((float/p (f:do (a <- int/p)
                        (string/p ".")
@@ -56,8 +57,33 @@
                (string/p "]")
                (f:pure element-exprs))))
 
+(define literal-date-expression/p
+  (let ((year/p int/p)
+        (month/p (range/p 1 12))
+        (day/p (range/p 1 31))
+        (hour/p (range/p 0 23))
+        (minute/p (range 0 59)))
+    (or/p
+     (try/p (f:do (year <- year/p)
+                  (string/p "-")
+                  (month <- month/p)
+                  (string/p "-")
+                  (day <- day/p)
+                  (string/p "T")
+                  (hour <- hour/p)
+                  (string/p ":")
+                  (minute <- minute/p)
+                  (f:pure `(date ,year ,month ,day ,hour ,minute))))
+     (f:do (year <- year/p)
+           (string/p "-")
+           (month <- month/p)
+           (string/p "-")
+           (day <- day/p)
+           (f:pure `(date ,year ,month ,day))))))
+
 (define literal-expression/p
   (or/p literal-set-expression/p
+        (try/p literal-date-expression/p)
         literal-item-expression/p
         literal-number-expression/p
         literal-string-expression/p))
@@ -84,10 +110,14 @@
         (let ((filter-or-modify-operator/p
                (f:map (λ (c) (string->symbol (string c)))
                       (char-in/p valid-operator-names))))
-          (f:do (key <- property-key/p)
-                (op <- filter-or-modify-operator/p)
-                (val <- literal-expression/p)
-                (f:pure (list key op val))))))
+          (or/p (try/p
+                 (f:do (key <- property-key/p)
+                       (op <- filter-or-modify-operator/p)
+                       (val <- literal-expression/p)
+                       (f:pure (list key op val))))
+                (f:do (key <- property-key/p)
+                      (string/p ":")
+                      (f:pure (list key ': #f)))))))
 
 (define whitespace/p (many+/p (char/p #\space)))
 (define comma-whitespace/p (list/p (char/p #\,) whitespace/p))

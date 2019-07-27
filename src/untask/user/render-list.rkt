@@ -12,6 +12,7 @@
  (prefix-in tags: "../properties/tags.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
  (prefix-in depends: "../properties/dependencies.rkt")
+ (prefix-in date: "../properties/date.rkt")
 
  (prefix-in term: "../../terminal.rkt")
  )
@@ -87,6 +88,7 @@
     (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
+    (define wait (item:get-property item-data item date:wait-property-type))
     (term:render `(()
                    (
                     ;; Description
@@ -105,6 +107,11 @@
                          ((status:active? item-data item) '((bold) ("active")))
                          ((status:done? item-data item) '((strikethrough) (white) ("done")))
                          (else `((white) (,(val:unwrap-string status)))))))
+                    "\n"
+                    ;; Wait
+                    (()
+                     (((black) ("Wait:    "))
+                      ,(~a wait)))
                     "\n"
                     ;; Urgency
                     (()
