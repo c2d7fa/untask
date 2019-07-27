@@ -26,11 +26,10 @@ Version 0.3 of Untask introduces dates. Dates are written on the form
 =2000-12-31T23:59=, with the time part being optional (so =2000-12-31= is also
 valid).
 
-Dates are used in the /start/ and /due/ properties. The /start/ property should
+Dates are used in the /wait/ and /date/ properties. The /wait/ property should
 contain the first time at which the task can be done; until this time, the task
-is automatically marked as inactive. The /due/ property should contain the
-latest time at which the task should be done. The /due/ property is used in the
-agenda view (see below) and for formatting items as overdue or due today.
+is automatically marked as inactive. The /date/ property is used in the agenda
+view (see below) and for formatting items as overdue or due today.
 
 This version also introduces a new command, /agneda/. This command is used to
 print a view of the upcoming tasks, as indicated by their due dates. It prints a
