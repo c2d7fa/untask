@@ -62,7 +62,7 @@
         (month/p (range/p 1 12))
         (day/p (range/p 1 31))
         (hour/p (range/p 0 23))
-        (minute/p (range 0 59)))
+        (minute/p (range/p 0 59)))
     (or/p
      (try/p (f:do (year <- year/p)
                   (string/p "-")
