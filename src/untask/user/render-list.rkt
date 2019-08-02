@@ -79,6 +79,19 @@
                     (string-split s "\n"))
                "\n"))
 
+;; TODO:
+;; - Show date in red, yellow or green depending on whether it is in the past, present or future.
+;; - Use shorter version of date when it is in the current year.
+;; - Show weekday.
+(define (style-date d)
+  (define (~ x) (~r x #:min-width 2 #:pad-string "0"))
+  (match d
+    (`(date ,year ,month ,day #f #f) `((green) (bold) (,(~a year) "-" ,(~ month) "-" ,(~ day))))
+    (`(date ,year ,month ,day ,hours ,minutes) `(()
+                                                 (((green) (bold) (,(~a year) "-" ,(~ month) "-" ,(~ day)))
+                                                  ((black) ("T"))
+                                                  ((green) (,(~ hours) ":" ,(~ minutes))))))))
+
 (define (render-listing-info item-data items)
   (define (render-item item)
     (define description (item:get-property item-data item description:description-property-type))
@@ -109,10 +122,12 @@
                          (else `((white) (,(val:unwrap-string status)))))))
                     "\n"
                     ;; Wait
-                    (()
-                     (((black) ("Wait:    "))
-                      ,(~a wait)))
-                    "\n"
+                    ,(if wait
+                         `(()
+                           (((black) ("Wait:    "))
+                            ,(style-date wait)
+                            "\n"))
+                         '(() ()))
                     ;; Urgency
                     (()
                      (((black) ("Urgency: "))
