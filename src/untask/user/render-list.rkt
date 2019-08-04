@@ -73,10 +73,12 @@
                            (((black) (" D:"))
                             ((bold) (,(~a (set-count (val:unwrap-set depends))))))))
                     ;; Wait
-                    ,(if (not wait)
-                         ""
+                    ,(if (not (date:wait-active? item-data item))  ; Display only when task is waiting
                          `(() (((black) (" W:"))
-                               ,(style-date (val:unwrap-date wait)))))
+                               ,(style-date (val:unwrap-date wait))))
+                         (if wait                                  ; If task has "wait" but is not waiting, simply display "W"
+                             `((black) (" W"))
+                             ""))
                     ;; Date
                     ,(if (not date)
                          ""
