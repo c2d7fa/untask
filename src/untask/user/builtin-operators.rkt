@@ -58,7 +58,8 @@
                    #:object 'string
                    #:filter? #t
                    #:check-types (check-argument 'string)
-                   #:body (λ (str sst) (val:make-boolean (string-contains? (val:unwrap-string str) (val:unwrap-string sst))))))
+                   #:body (λ (str sst) (val:make-boolean (string-contains? (string-downcase (val:unwrap-string str))
+                                                                           (string-downcase (val:unwrap-string sst)))))))
 (define op-string-prefix?
   (create-operator #:name '<
                    #:object 'string
