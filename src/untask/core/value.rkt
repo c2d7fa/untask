@@ -3,7 +3,8 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in expr: "../command/expression.rkt"))
+ (prefix-in expr: "../command/expression.rkt")
+ (prefix-in dt: "../../datetime.rkt"))
 
 (define (make-string string-content)
   `(string . ,string-content))
@@ -15,8 +16,8 @@
   `(item . ,id))
 (define (make-boolean v)
   `(boolean . ,v))
-(define (make-date year month day (hours #f) (minutes #f))
-  `(date ,year ,month ,day ,hours ,minutes))
+(define (make-date datetime)
+  `(date . ,datetime))
 
 (define (get-type v)
   (if (eq? #f v)
@@ -46,7 +47,7 @@
 (define unwrap-number cdr)
 (define unwrap-item cdr)
 (define unwrap-boolean cdr)
-(define unwrap-date cdr)  ; Returns (year month day hours minutes).
+(define unwrap-date cdr)
 
 (define (evaluate-literal literal-expression)
   (match literal-expression
@@ -55,7 +56,7 @@
     (`(item . ,item-id) `(item . ,item-id))
     (`(set . ,set-expressions) `(set . ,(list->set (map evaluate-literal set-expressions))))
     (`(boolean . ,boolean-value) (make-boolean boolean-value))
-    (`(date ,year ,month ,day) (make-date year month day))
-    (`(date ,year ,month ,day ,hours ,minutes) (make-date year month day hours minutes))
+    (`(date ,year ,month ,day) (make-date (dt:datetime year month day)))
+    (`(date ,year ,month ,day ,hours ,minutes) (make-date (dt:datetime year month day hours minutes)))
     (#f #f)
     ))
