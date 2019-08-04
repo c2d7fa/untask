@@ -1,3 +1,3 @@
 #lang info
 
-(define deps '("megaparsack" "rackunit"))
+(define deps '("megaparsack" "rackunit" "gregor-lib"))
