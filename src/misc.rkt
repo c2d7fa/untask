@@ -2,6 +2,20 @@
 
 (provide (all-defined-out))
 
+;; Behaves like `read-line', but when user presses ^C or ^D, returns #f instead.
+(define (try-read-line)
+  (with-handlers ((exn:break? (λ (e) #f)))   ; Handle ^C
+    (let ((line (read-line)))
+      (if (equal? eof line) #f               ; Handle ^D
+          line))))
+
+;; Behaves like `try-read-line', but automatically prints a newline if the user
+;; does not enter one themselves.
+(define (try-read-line*)
+  (let ((input (try-read-line)))
+    (when (not input) (displayln ""))
+    input))
+
 (define (set-filter pred set)
   (list->set (filter pred (set->list set))))
 
