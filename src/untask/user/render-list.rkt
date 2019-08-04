@@ -15,6 +15,7 @@
  (prefix-in date: "../properties/date.rkt")
 
  (prefix-in term: "../../terminal.rkt")
+ (prefix-in dt: "../../datetime.rkt")
  )
 
 (define (render-listing item-data items)
@@ -31,6 +32,7 @@
     (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
+    (define wait (item:get-property item-data item date:wait-property-type))
     (term:render `(()
                    (
                     ;; ID
@@ -61,14 +63,19 @@
                     ,(if (set-empty? (val:unwrap-set blocks))
                          ""
                          `((red)
-                           ((() (" B:"))
+                           (((black) (" B:"))
                             ((bold) (,(~a (set-count (val:unwrap-set blocks))))))))
                     ;; Depends
                     ,(if (set-empty? (val:unwrap-set depends))
                          ""
                          `((blue)
-                           ((() (" D:"))
+                           (((black) (" D:"))
                             ((bold) (,(~a (set-count (val:unwrap-set depends))))))))
+                    ;; Wait
+                    ,(if (not wait)
+                         ""
+                         `(() (((black) (" W:"))
+                               ,(style-date (val:unwrap-date wait)))))
                     ))))
   (string-join
    (map (λ (item) (render-item item-data item)) items)
@@ -79,18 +86,22 @@
                     (string-split s "\n"))
                "\n"))
 
-;; TODO:
-;; - Show date in red, yellow or green depending on whether it is in the past, present or future.
-;; - Use shorter version of date when it is in the current year.
-;; - Show weekday.
 (define (style-date d)
   (define (~ x) (~r x #:min-width 2 #:pad-string "0"))
-  (match d
-    (`(date ,year ,month ,day #f #f) `((green) (bold) (,(~a year) "-" ,(~ month) "-" ,(~ day))))
-    (`(date ,year ,month ,day ,hours ,minutes) `(()
-                                                 (((green) (bold) (,(~a year) "-" ,(~ month) "-" ,(~ day)))
-                                                  ((black) ("T"))
-                                                  ((green) (,(~ hours) ":" ,(~ minutes))))))))
+  (let ((colors (cond
+                  ((dt:future? d) `((green)))
+                  ((dt:today? d) `((yellow) (bold)))
+                  (else `((red) (bold))))))
+    (if (dt:has-time? d)
+        `(,@colors (,(~a (dt:datetime-year d)) "-"
+                    ,(~ (dt:datetime-month d)) "-"
+                    ,(~ (dt:datetime-day d))
+                    ((reset) (black) ("T"))
+                    ,(~ (dt:datetime-hour d)) ":"
+                    ,(~ (dt:datetime-minute d))))
+        `(,@colors (,(~a (dt:datetime-year d)) "-"
+                    ,(~ (dt:datetime-month d)) "-"
+                    ,(~ (dt:datetime-day d)))))))
 
 (define (render-listing-info item-data items)
   (define (render-item item)
@@ -125,7 +136,7 @@
                     ,(if wait
                          `(()
                            (((black) ("Wait:    "))
-                            ,(style-date wait)
+                            ,(style-date (val:unwrap-date wait))
                             "\n"))
                          '(() ()))
                     ;; Urgency
