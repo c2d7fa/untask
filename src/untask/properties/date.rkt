@@ -1,6 +1,7 @@
 #lang racket
 
 (provide wait-property-type
+         date-property-type
          wait-active?)
 
 (require
@@ -12,6 +13,11 @@
 
 (define wait-property-type
   (prop:make-property-type #:key 'wait
+                           #:type '(opt date)
+                           #:default #f))
+
+(define date-property-type
+  (prop:make-property-type #:key 'date
                            #:type '(opt date)
                            #:default #f))
 

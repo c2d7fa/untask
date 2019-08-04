@@ -33,6 +33,7 @@
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
     (define wait (item:get-property item-data item date:wait-property-type))
+    (define date (item:get-property item-data item date:date-property-type))
     (term:render `(()
                    (
                     ;; ID
@@ -76,6 +77,11 @@
                          ""
                          `(() (((black) (" W:"))
                                ,(style-date (val:unwrap-date wait)))))
+                    ;; Date
+                    ,(if (not date)
+                         ""
+                         `(() (((black) (" D:"))
+                               ,(style-date (val:unwrap-date date)))))
                     ))))
   (string-join
    (map (λ (item) (render-item item-data item)) items)
@@ -113,6 +119,7 @@
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
     (define wait (item:get-property item-data item date:wait-property-type))
+    (define date (item:get-property item-data item date:date-property-type))
     (term:render `(()
                    (
                     ;; Description
@@ -137,6 +144,13 @@
                          `(()
                            (((black) ("Wait:    "))
                             ,(style-date (val:unwrap-date wait))
+                            "\n"))
+                         '(() ()))
+                    ;; Date
+                    ,(if date
+                         `(()
+                           (((black) ("Date:    "))
+                            ,(style-date (val:unwrap-date date))
                             "\n"))
                          '(() ()))
                     ;; Urgency

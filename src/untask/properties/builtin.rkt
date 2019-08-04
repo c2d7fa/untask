@@ -18,7 +18,6 @@
  (prefix-in date: "./date.rkt")
  )
 
-
 (define (set-property-by-key item-data item key value)
   (item:set-property item-data item (prop:get-property-type builtin-property-types key) value))
 
@@ -34,4 +33,5 @@
     (prop:add-property-type depends:depends-property-type)
     (prop:add-property-type depends:blocks-property-type)
     (prop:add-property-type date:wait-property-type)
+    (prop:add-property-type date:date-property-type)
     ))
