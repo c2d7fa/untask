@@ -11,15 +11,15 @@
  (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
  (prefix-in a: "../../attribute.rkt")
- (prefix-in term: "../../terminal.rkt"))
+ (prefix-in term: "../../terminal.rkt")
+
+ (only-in "../../misc.rkt" try-read-line*))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
 (define (prompt-line prompt)
   (display prompt)
-  (with-handlers ((exn:break? (λ (e) #f)))
-    (let ((line (read-line)))
-      (if (equal? eof line) #f line))))
+  (try-read-line*))
 
 (define (try-parse input)
   (with-handlers ((exn? (λ (e) '(parse-error))))

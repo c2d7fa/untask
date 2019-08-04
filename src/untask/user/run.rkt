@@ -8,7 +8,9 @@
 
  "../core/state.rkt"
  (prefix-in a: "../../attribute.rkt")
- (prefix-in term: "../../terminal.rkt"))
+ (prefix-in term: "../../terminal.rkt")
+
+ (only-in "../../misc.rkt" try-read-line))
 
 (define (write-file! path content)
   (call-with-output-file path #:exists 'replace
@@ -46,8 +48,9 @@
     (`(confirm ,prompt ,continue)
      (let ((answer (begin
                      (display (term:render `((bold) (blue) (,(format "~a " prompt)))))
-                     (let ((input (read-line)))
-                       (or (string-prefix? input "y")
+                     (let ((input (try-read-line)))
+                       (or (not input)
+                           (string-prefix? input "y")
                            (string-prefix? input "Y"))))))
        (run! (continue answer) state-box)))
     (`(set-state ,state ,continue)
