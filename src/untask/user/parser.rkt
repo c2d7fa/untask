@@ -102,6 +102,9 @@
   (or/p (f:do (char/p #\!)
               (fp <- filter-or-modify-pair/p)
               (f:pure (list 'not fp)))
+        (f:do (string/p "/")
+              (s <- literal-string-expression/p)
+              (f:pure `(description / ,s)))
         filter-or-modify-pair/p
         literal-item-expression/p))
 
