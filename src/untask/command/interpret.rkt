@@ -197,8 +197,12 @@
         (let (file-content) (read-file/i filename))
         (let (confirm?) (confirm-unsaved/i))
         (do (if confirm?
-                (interp (let () (set-state/i (load-state state (export:read-state-from-string file-content))))
-                        (do (value/i 'proceed)))
+                (if file-content
+                    (interp (let () (set-state/i (load-state state (export:read-state-from-string file-content))))
+                            (do (value/i 'proceed)))
+                    (interp (let () (set-state/i (thread state-empty
+                                                         ((λ (state) (a:set (state state.open-file) filename))))))
+                            (do (value/i 'proceed))))
                 (value/i 'proceed))))))
     (`(save)
      (interp
