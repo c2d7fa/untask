@@ -1,7 +1,8 @@
 #lang racket
 
 (provide render-listing
-         render-listing-info)
+         render-listing-info
+         render-agenda)
 
 (require
  (prefix-in item: "../core/item.rkt")
@@ -194,3 +195,27 @@
   (string-join
    (map (λ (item) (render-item item)) items)
    "\n\n\n"))
+
+(define (render-agenda item-data blocks)
+  ;; `blocks' is a list of blocks of the form (date . items), where `date' is a
+  ;; datetime as defined in the datetime module and `items' is a list of items
+  ;; to display for that date.
+  (define (style-date d)
+    (define (~ x) (~r x #:min-width 2 #:pad-string "0"))
+    (let ((colors (cond
+                    ((dt:future? d) `((bold)))
+                    ((dt:today? d) `((blue) (bold)))
+                    (else `((red) (bold))))))
+          `(() ((,@colors (,(~a (dt:datetime-year d)) "-"
+                           ,(~ (dt:datetime-month d)) "-"
+                           ,(~ (dt:datetime-day d))))
+                " "
+                ((black) ("(" ((bold) (,(~r (dt:days-from-today d) #:sign '++) "d")) ")"))))))
+  (define (render-block block)
+    (term:render `(() (,(style-date (car block))
+                       "\n"
+                       ,(string-indent (render-listing* item-data (cdr block)) 4)
+                       ))))
+  (string-join
+   (map (λ (block) (render-block block)) blocks)
+   "\n\n"))

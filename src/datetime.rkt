@@ -6,7 +6,8 @@
 
 (provide (all-defined-out))
 
-(require (prefix-in g: gregor))
+(require (prefix-in g: gregor)
+         (prefix-in gp: gregor/period))
 
 (define (datetime year month day (hour #f) (minute #f))
   (list year month day hour minute))
@@ -40,3 +41,18 @@
 
 (define (today? dt)
   (g:date=? (g:today) (g:->date (datetime->gregor dt))))
+
+(define (days-from-today dt)
+  (cdr (assoc 'days (gp:period->list (gp:date-period-between (g:today) (datetime->gregor dt))))))
+
+(define (drop-time dt)
+  (datetime (datetime-year dt)
+            (datetime-month dt)
+            (datetime-day dt)))
+
+(define (same-date? dt1 dt2)
+  (equal? (drop-time dt1) (drop-time dt2)))
+
+(define (date-before? dt1 dt2)
+  (g:date<? (datetime->gregor (drop-time dt1))
+            (datetime->gregor (drop-time dt2))))

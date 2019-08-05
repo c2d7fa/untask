@@ -233,6 +233,7 @@
    (try/p (normal-command/p 'remove #:takes-filter? #t))
    (try/p (normal-command/p 'info #:takes-filter? #t))
    (try/p (normal-command/p 'exit #:takes-filter? #f))
+   (try/p (normal-command/p 'agenda))
    (f:map (λ (fe) `(,fe list)) filter-expression/p)))
 
 (define (parse command-line-input)
