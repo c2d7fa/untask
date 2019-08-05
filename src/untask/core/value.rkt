@@ -3,7 +3,8 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in expr: "../command/expression.rkt"))
+ (prefix-in expr: "../command/expression.rkt")
+ (prefix-in dt: "../../datetime.rkt"))
 
 (define (make-string string-content)
   `(string . ,string-content))
@@ -15,14 +16,19 @@
   `(item . ,id))
 (define (make-boolean v)
   `(boolean . ,v))
+(define (make-date datetime)
+  `(date . ,datetime))
 
 (define (get-type v)
-  (let ((type (car v)))
-    (if (eq? type 'set)
-        (if (set-empty? (cdr v))
-            '(set any)
-            `(set ,(get-type (car (set->list (cdr v))))))
-        type)))
+  (if (eq? #f v)
+      'none
+      (let ((type (car v)))
+        (if (eq? type 'set)
+            (if (set-empty? (cdr v))
+                '(set any)
+                `(set ,(get-type (car (set->list (cdr v))))))
+            type))))
+
 (define (type<=? t1 t2)
   (or (equal? t1 t2)
       (eq? 'any t1)
@@ -30,14 +36,18 @@
       (and (list? t1)
            (list? t2)
            (type<=? (cadr t1)
-                    (cadr t2))
-      )))
+                    (cadr t2)))
+      (and (list? t2)
+           (eq? 'opt (car t2))
+           (or (eq? 'none t1)
+               (type<=? t1 (cadr t2))))))
 
 (define unwrap-string cdr)
 (define unwrap-set cdr)
 (define unwrap-number cdr)
 (define unwrap-item cdr)
 (define unwrap-boolean cdr)
+(define unwrap-date cdr)
 
 (define (evaluate-literal literal-expression)
   (match literal-expression
@@ -46,4 +56,7 @@
     (`(item . ,item-id) `(item . ,item-id))
     (`(set . ,set-expressions) `(set . ,(list->set (map evaluate-literal set-expressions))))
     (`(boolean . ,boolean-value) (make-boolean boolean-value))
+    (`(date ,year ,month ,day) (make-date (dt:datetime year month day)))
+    (`(date ,year ,month ,day ,hours ,minutes) (make-date (dt:datetime year month day hours minutes)))
+    (#f #f)
     ))

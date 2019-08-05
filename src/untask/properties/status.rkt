@@ -7,7 +7,8 @@
   (prefix-in prop: "../core/property.rkt")
   (prefix-in val: "../core/value.rkt")
 
-  (prefix-in depends: "dependencies.rkt"))
+  (prefix-in depends: "dependencies.rkt")
+  (prefix-in date: "date.rkt"))
 
 ;; Each task has a status, which is one of active, inactive and done. Active
 ;; means that the task still needs to be completed and can be worked on now;
@@ -19,10 +20,11 @@
   (if (or (equal? base-status (val:make-string "inactive"))
           (equal? base-status (val:make-string "done")))
       base-status
-      (if (ormap (λ (dep)
-                   (not (equal? (calculate-status item-data (val:unwrap-item dep))
-                                (val:make-string "done"))))
-                 (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type))))
+      (if (or (ormap (λ (dep)
+                       (not (equal? (calculate-status item-data (val:unwrap-item dep))
+                                    (val:make-string "done"))))
+                     (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type))))
+              (not (date:wait-active? item-data item)))
           (val:make-string "inactive")
           (val:make-string "active"))))
 

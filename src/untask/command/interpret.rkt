@@ -5,8 +5,10 @@
 (require
  "../core/state.rkt"
  (prefix-in item: "../core/item.rkt")
+ (prefix-in val: "../core/value.rkt")
  (prefix-in export: "../core/export.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
+ (prefix-in date: "../properties/date.rkt")
 
  "../properties/builtin.rkt"
 
@@ -17,6 +19,7 @@
 
  (prefix-in parser: "../user/parser.rkt")
  (prefix-in a: "../../attribute.rkt")
+ (prefix-in dt: "../../datetime.rkt")
  (only-in "../../misc.rkt" thread)
  )
 
@@ -29,6 +32,7 @@
 ;; - (confirm prompt (λ (confirmed?) ...))
 ;; - (list-items state items (λ () ...))
 ;; - (info-items state items (λ () ...))
+;; - (agenda-items state items (λ () ...))
 ;; - (message string (λ () ...))
 ;;
 ;; The interpretation (value x) represents the simple value x. In each other
@@ -46,6 +50,7 @@
 (define (error/i message continue) `(error ,message ,continue))
 (define (list/i state items continue) `(list-items ,state ,items ,continue))
 (define (info/i state items continue) `(info-items ,state ,items ,continue))
+(define (agenda/i state blocks continue) `(agenda-items ,state ,blocks ,continue))
 (define (value/i value) `(value ,value))
 
 ;; This macro constructs an interpretation in a style inspired by Haskell's
@@ -118,6 +123,26 @@
    (let () (info/i state items))
    (do (continue))))
 
+(define (interpret-agenda filter-expression continue)
+  (interp
+   (let (state) (get-state/i))
+   (let (items) (search-sorted/i `(and (not (date : #f)) ,filter-expression)))
+   (let () (agenda/i state (sort (foldl (λ (item blocks)
+                                          (let ((item-date (val:unwrap-date (item:get-property (a:get (state state.item-data))
+                                                                                               item
+                                                                                               date:date-property-type))))
+                                            (if (assoc item-date blocks dt:same-date?)
+                                                (map (λ (block)
+                                                       (if (dt:same-date? (car block) item-date)
+                                                           `(,@block ,item)
+                                                           block))
+                                                     blocks)
+                                                `(,@blocks (,item-date ,item)))))
+                                        (list)
+                                        items)
+                                 #:key car dt:date-before?)))
+   (do (continue))))
+
 (define (interpret-add modify-expression continue)
   (interp
    (let (state) (get-state/i))
@@ -182,6 +207,8 @@
      (interpret-remove filter-expression (λ () '(value proceed))))
     (`(,filter-expression info)
      (interpret-info filter-expression (λ () '(value proceed))))
+    (`(,filter-expression agenda)
+     (interpret-agenda filter-expression (λ () '(value proceed))))
     (`(open ,filename)
      (let ((load-state (λ (old-state file-state)
                          (thread old-state
