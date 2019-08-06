@@ -126,10 +126,12 @@
    (let () (info/i state items))
    (do (continue))))
 
-(define (interpret-tree filter-expression continue)
+(define (interpret-tree filter-expression rhs-filter-expression continue)
   (define (build-tree item-data item)
     (cons item (map (λ (i) (build-tree item-data (val:unwrap-item i)))
-                    (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type))))))
+                    (filter (λ (i)
+                              (evaluate-filter-expression rhs-filter-expression item-data (val:unwrap-item i)))
+                            (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type)))))))
   (interp
    (let (state) (get-state/i))
    (let (items) (search-sorted/i filter-expression))
@@ -239,8 +241,8 @@
      (interpret-info filter-expression proceed))
     (`(,filter-expression agenda)
      (interpret-agenda filter-expression proceed))
-    (`(,filter-expression tree)
-     (interpret-tree filter-expression proceed))
+    (`(,filter-expression tree ,rhs-filter-expression)
+     (interpret-tree filter-expression rhs-filter-expression proceed))
     (`(open ,filename)
      (let ((load-state (λ (old-state file-state)
                          (thread old-state

@@ -177,7 +177,7 @@
                    (f:pure (list))))
         (string/p (symbol->string command-name))
         (args <- (if arguments/p
-                     (f:do whitespace/p
+                     (f:do (opt/p whitespace/p)
                            (args <- arguments/p)
                            (f:pure args))
                      (f:pure (list))))
@@ -267,7 +267,7 @@
    (try/p (with-context/p (normal-command/p 'info #:takes-filter? #t)))
    (try/p (normal-command/p 'exit #:takes-filter? #f))
    (try/p (with-context/p (normal-command/p 'agenda)))
-   (try/p (with-context/p (normal-command/p 'tree)))
+   (try/p (with-context/p (normal-command/p 'tree #:arguments (opt/p (list/p filter-expression/p) #:default '(())))))
    (try/p (with-context/p (f:map (λ (fe) `(,fe list)) filter-expression/p)))
    context-command/p))
 
