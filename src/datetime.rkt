@@ -85,3 +85,6 @@
 (define (this-year? dt)
   (equal? (g:->year (g:today))
           (g:->year (datetime->gregor dt))))
+
+(define (current-year)
+  (g:->year (g:today)))
