@@ -102,14 +102,16 @@
                   ((dt:today? d) `((yellow) (bold)))
                   (else `((red) (bold))))))
     (if (dt:has-time? d)
-        `(,@colors (,(~a (dt:datetime-year d)) "-"
-                    ,(~ (dt:datetime-month d)) "-"
+        `(,@colors (,@(if (dt:this-year? d) '()
+                         `(,(~a (dt:datetime-year d)) "-"))
+                    ,(dt:month-short-string d) "-"
                     ,(~ (dt:datetime-day d))
                     ((reset) (black) ("T"))
                     ,(~ (dt:datetime-hour d)) ":"
                     ,(~ (dt:datetime-minute d))))
-        `(,@colors (,(~a (dt:datetime-year d)) "-"
-                    ,(~ (dt:datetime-month d)) "-"
+        `(,@colors (,@(if (dt:this-year? d) '()
+                         `(,(~a (dt:datetime-year d)) "-"))
+                    ,(dt:month-short-string d) "-"
                     ,(~ (dt:datetime-day d)))))))
 
 (define (render-listing-info item-data items)
@@ -206,11 +208,12 @@
                     ((dt:future? d) `((bold)))
                     ((dt:today? d) `((blue) (bold)))
                     (else `((red) (bold))))))
-          `(() ((,@colors (,(~a (dt:datetime-year d)) "-"
-                           ,(~ (dt:datetime-month d)) "-"
-                           ,(~ (dt:datetime-day d))))
-                " "
-                ((black) ("(" ((bold) (,(~r (dt:days-from-today d) #:sign '++) "d")) ")"))))))
+      `(() ((,@colors (,(dt:weekday-short-string d) " "
+                       ,(~a (dt:datetime-year d)) "-"
+                       ,(dt:month-short-string d) "-"
+                       ,(~ (dt:datetime-day d))))
+            " "
+            ((black) ("(" ((bold) (,(~r (dt:days-from-today d) #:sign '++) "d")) ")"))))))
   (define (render-block block)
     (term:render `(() (,(style-date (car block))
                        "\n"
