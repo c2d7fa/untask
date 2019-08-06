@@ -183,9 +183,26 @@
                      (f:pure (list))))
         (f:pure (append fe (list command-name) args))))
 
+(define context-name/p bare-word/p)
+
+(define context-toggles/p
+  (let ((toggle/p (or/p (f:do (string/p "@")
+                              (name <- context-name/p)
+                              (f:pure `(on ,name)))
+                        (f:do (string/p "-@")
+                              (name <- context-name/p)
+                              (f:pure `(off ,name))))))
+    (f:do (x <- toggle/p)
+          (xs <- (many/p
+                  (f:map cadr
+                         ;; We use this instead of (many+/p toggle/p #:sep
+                         ;; whitespace/p), beucase we need this try/p here for it to
+                         ;; work with commands like "@context list".
+                         (try/p (list/p whitespace/p toggle/p)))))
+          (f:pure `(,x ,@xs)))))
+
 (define context-command/p
-  (let* ((context-name/p bare-word/p)
-         (context-list-command/p
+  (let* ((context-list-command/p
           (f:do (string/p "context")
                 whitespace/p
                 (string/p "list")
@@ -217,14 +234,7 @@
                 (name <- context-name/p)
                 (f:pure `(context remove ,name))))
          (context-set-active-command/p
-          (f:do (toggles <- (many+/p #:sep whitespace/p
-                                     (or/p
-                                      (f:do (string/p "@")
-                                            (name <- context-name/p)
-                                            (f:pure `(on ,name)))
-                                      (f:do (string/p "-@")
-                                            (name <- context-name/p)
-                                            (f:pure `(off ,name))))))
+          (f:do (toggles <- context-toggles/p)
                 (f:pure `(context active ,toggles)))))
     (or/p (try/p context-list-command/p)
           (try/p context-add-command/p)
@@ -236,19 +246,27 @@
   (f:map (λ (cs) (apply string cs))
          (many/p any-char/p)))
 
+(define (with-context/p p)
+  (or/p
+   (try/p (f:do (toggles <- context-toggles/p)
+                whitespace/p
+                (subcommand <- p)
+                (f:pure `(with-contexts ,toggles ,subcommand))))
+   p))
+
 (define command-line-input/p
   (or/p
-   (try/p context-command/p)
-   (try/p (normal-command/p 'modify #:arguments (list/p modify-expression/p)))
-   (try/p (normal-command/p 'list))
-   (try/p (normal-command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p)))
+   (try/p (with-context/p (normal-command/p 'modify #:arguments (list/p modify-expression/p))))
+   (try/p (with-context/p (normal-command/p 'list)))
+   (try/p (with-context/p (normal-command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p))))
    (try/p (normal-command/p 'save #:takes-filter? #f))
    (try/p (normal-command/p 'open #:takes-filter? #f #:arguments (list/p filename/p)))
-   (try/p (normal-command/p 'remove #:takes-filter? #t))
-   (try/p (normal-command/p 'info #:takes-filter? #t))
+   (try/p (with-context/p (normal-command/p 'remove #:takes-filter? #t)))
+   (try/p (with-context/p (normal-command/p 'info #:takes-filter? #t)))
    (try/p (normal-command/p 'exit #:takes-filter? #f))
-   (try/p (normal-command/p 'agenda))
-   (f:map (λ (fe) `(,fe list)) filter-expression/p)))
+   (try/p (with-context/p (normal-command/p 'agenda)))
+   (try/p (with-context/p (f:map (λ (fe) `(,fe list)) filter-expression/p)))
+   context-command/p))
 
 (define (parse command-line-input)
   (parse-result! (parse-string (f:do (result <- command-line-input/p)

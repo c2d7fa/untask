@@ -193,22 +193,35 @@
                     (continue #t)
                     (continue #f))))))))
 
+(define (interpret-context-active toggles continue)
+  (interp
+   (let (state) (get-state/i))
+   (let () (set-state/i (a:update (state state.active-contexts)
+                                  (λ (active-contexts)
+                                    (foldl (λ (expr active-contexts)
+                                             (match expr
+                                               (`(on ,name)  (set-add active-contexts name))
+                                               (`(off ,name) (set-remove active-contexts name))))
+                                           active-contexts
+                                           toggles)))))
+   (do (continue))))
+
 ;; Takes a command (the value returned by parse) and returns an interpretation
 ;; whose value is one of 'proceed and 'quit.
-(define (interpret command)
+(define (interpret command #:proceed (proceed (λ () '(value proceed))) #:exit (exit (λ () '(value exit))))
   (match command
     (`(,filter-expression list)
-     (interpret-list filter-expression (λ () '(value proceed))))
+     (interpret-list filter-expression proceed))
     (`(add ,modify-expression)
-     (interpret-add modify-expression (λ () '(value proceed))))
+     (interpret-add modify-expression proceed))
     (`(,filter-expression modify ,modify-expression)
-     (interpret-modify filter-expression modify-expression (λ () '(value proceed))))
+     (interpret-modify filter-expression modify-expression proceed))
     (`(,filter-expression remove)
-     (interpret-remove filter-expression (λ () '(value proceed))))
+     (interpret-remove filter-expression proceed))
     (`(,filter-expression info)
-     (interpret-info filter-expression (λ () '(value proceed))))
+     (interpret-info filter-expression proceed))
     (`(,filter-expression agenda)
-     (interpret-agenda filter-expression (λ () '(value proceed))))
+     (interpret-agenda filter-expression proceed))
     (`(open ,filename)
      (let ((load-state (λ (old-state file-state)
                          (thread old-state
@@ -226,51 +239,51 @@
         (do (if confirm?
                 (if file-content
                     (interp (let () (set-state/i (load-state state (export:read-state-from-string file-content))))
-                            (do (value/i 'proceed)))
+                            (do (proceed)))
                     (interp (let () (set-state/i (thread state-empty
                                                          ((λ (state) (a:set (state state.open-file) filename))))))
-                            (do (value/i 'proceed))))
-                (value/i 'proceed))))))
+                            (do (proceed))))
+                (proceed))))))
     (`(save)
      (interp
       (let (state) (get-state/i))
       (let () (write-file/i (a:get (state state.open-file))
                             (export:export-state-to-string state)))
-      (do (value/i 'proceed))))
+      (do (proceed))))
     (`(exit)
      (interp
       (let (confirm?) (confirm-unsaved/i))
-      (do (if confirm? (value/i 'exit) (value/i 'proceed)))))
+      (do (if confirm? (exit) (proceed)))))
     (`(context add ,name ,filter-expression ,modify-expression)
      (interp
       (let (state) (get-state/i))
       (let () (set-state/i (a:set (state state.defined-contexts (contexts.named name))
                                   (context #:filter filter-expression
                                            #:modify modify-expression))))
-      (do (value/i 'proceed))))
+      (do (proceed))))
     (`(context active ,toggles)
-     (interp
-      (let (state) (get-state/i))
-      (let () (set-state/i (a:update (state state.active-contexts)
-                                     (λ (active-contexts)
-                                       (foldl (λ (expr active-contexts)
-                                                (match expr
-                                                  (`(on ,name)  (set-add active-contexts name))
-                                                  (`(off ,name) (set-remove active-contexts name))))
-                                              active-contexts
-                                              toggles)))))
-      (do (value/i 'proceed))))
+     (interpret-context-active toggles proceed))
     (`(context show)
      (interp
       (let (state) (get-state/i))
       (let () (message/i (format "~a" (available-contexts (a:get (state state.defined-contexts))))))
-      (do (value/i 'proceed))))
+      (do (proceed))))
     (`(context remove ,name)
      (interp
       (let (state) (get-state/i))
       (let () (set-state/i (a:update (state state.defined-contexts)
                                      (λ (x) (remove-context x name)))))
-      (do (value/i 'proceed))))))
+      (do (proceed))))
+    (`(with-contexts ,toggles ,subcommand)
+     (interp
+      (let (old-state) (get-state/i))
+      (let () (interpret-context-active toggles))
+      (let () ((λ (continue) (interpret subcommand #:proceed continue))))
+      (let (state) (get-state/i))
+      (let () (set-state/i (a:set (state state.active-contexts)
+                                  (a:get (old-state state.active-contexts)))))
+      (do (proceed))))
+    ))
 
 ;; Parse input string and interpret it like `interpret'. If input is #f, return
 ;; 'exit value. If input cannot be parsed, print a human-readable error instead.
