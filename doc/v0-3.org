@@ -22,9 +22,13 @@ single command or in general:
 
 * Working with dates
 
-Version 0.3 of Untask introduces dates. Dates are written on the form
-=2000-12-31T23:59=, with the time part being optional (so =2000-12-31= is also
-valid).
+Version 0.3 of Untask introduces dates.
+
+Dates are written on the form =2000-12-31T23:59=, with the time part being
+optional (so =2000-12-31= is also valid). If the year is omitted, the current
+year is assumed. Optionally, the month can be written as a three-letter
+abbreviation with the first letter capitalized. Thus, =2000-Dec-31= and
+=Dec-31T23:59= are also valid dates.
 
 Dates are used in the /wait/ and /date/ properties. The /wait/ property should
 contain the first time at which the task can be done; until this time, the task
