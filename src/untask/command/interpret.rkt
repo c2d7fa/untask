@@ -9,6 +9,7 @@
  (prefix-in export: "../core/export.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
  (prefix-in date: "../properties/date.rkt")
+ (prefix-in depends: "../properties/dependencies.rkt")
 
  "../properties/builtin.rkt"
 
@@ -33,6 +34,7 @@
 ;; - (list-items state items (λ () ...))
 ;; - (info-items state items (λ () ...))
 ;; - (agenda-items state items (λ () ...))
+;; - (tree-items state items (λ () ...))
 ;; - (message string (λ () ...))
 ;;
 ;; The interpretation (value x) represents the simple value x. In each other
@@ -51,6 +53,7 @@
 (define (list/i state items continue) `(list-items ,state ,items ,continue))
 (define (info/i state items continue) `(info-items ,state ,items ,continue))
 (define (agenda/i state blocks continue) `(agenda-items ,state ,blocks ,continue))
+(define (tree/i state trees continue) `(tree-items ,state ,trees ,continue))
 (define (value/i value) `(value ,value))
 
 ;; This macro constructs an interpretation in a style inspired by Haskell's
@@ -121,6 +124,19 @@
    (let (state) (get-state/i))
    (let (items) (search-sorted/i filter-expression))
    (let () (info/i state items))
+   (do (continue))))
+
+(define (interpret-tree filter-expression continue)
+  (define (build-tree item-data item)
+    (cons item (map (λ (i) (build-tree item-data (val:unwrap-item i)))
+                    (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type))))))
+  (interp
+   (let (state) (get-state/i))
+   (let (items) (search-sorted/i filter-expression))
+   (let () (tree/i state
+                   (map (λ (item)
+                          (build-tree (a:get (state state.item-data)) item))
+                        items)))
    (do (continue))))
 
 (define (interpret-agenda filter-expression continue)
@@ -223,6 +239,8 @@
      (interpret-info filter-expression proceed))
     (`(,filter-expression agenda)
      (interpret-agenda filter-expression proceed))
+    (`(,filter-expression tree)
+     (interpret-tree filter-expression proceed))
     (`(open ,filename)
      (let ((load-state (λ (old-state file-state)
                          (thread old-state

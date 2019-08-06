@@ -2,7 +2,8 @@
 
 (provide render-listing
          render-listing-info
-         render-agenda)
+         render-agenda
+         render-trees)
 
 (require
  (prefix-in item: "../core/item.rkt")
@@ -222,3 +223,14 @@
   (string-join
    (map (λ (block) (render-block block)) blocks)
    "\n\n"))
+
+(define (render-trees item-data trees)
+  (define (render-tree tree)
+    (string-join
+     (filter (λ (s) (not (equal? "" s)))
+             (list (render-listing* item-data (list (car tree)))
+                   (string-indent (render-trees item-data (cdr tree)) 2)))
+     "\n"))
+  (string-join
+   (map render-tree trees)
+   "\n"))
