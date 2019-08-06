@@ -186,12 +186,14 @@
 (define context-name/p bare-word/p)
 
 (define context-toggles/p
-  (let ((toggle/p (or/p (f:do (string/p "@")
-                              (name <- context-name/p)
-                              (f:pure `(on ,name)))
+  (let ((toggle/p (or/p (try/p (f:do (string/p "@")
+                                     (name <- context-name/p)
+                                     (f:pure `(on ,name))))
                         (f:do (string/p "-@")
                               (name <- context-name/p)
-                              (f:pure `(off ,name))))))
+                              (f:pure `(off ,name)))
+                        (f:do (string/p "@")
+                              (f:pure '(reset))))))
     (f:do (x <- toggle/p)
           (xs <- (many/p
                   (f:map cadr

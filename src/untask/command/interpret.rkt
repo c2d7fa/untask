@@ -201,7 +201,8 @@
                                     (foldl (λ (expr active-contexts)
                                              (match expr
                                                (`(on ,name)  (set-add active-contexts name))
-                                               (`(off ,name) (set-remove active-contexts name))))
+                                               (`(off ,name) (set-remove active-contexts name))
+                                               (`(reset) (set))))
                                            active-contexts
                                            toggles)))))
    (do (continue))))
