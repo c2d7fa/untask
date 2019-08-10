@@ -68,3 +68,11 @@ argument. When such an argument is provided, it is used to filter the children
 of the tree. For example, the command =23 tree !status:done= recursively
 displays all dependencies of item 23, omitting any dependencies that have
 already been completed.
+* Minor changes
+
+- The =/= filter is now case-insensitive and uses the description property by
+  default. For example, =/remember= will show an item with description "Remember
+  the milk".
+- The urgency of an item no longer takes into account any finished items that
+  are being blocked by the item in question.
+
