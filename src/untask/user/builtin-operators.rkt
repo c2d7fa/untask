@@ -4,6 +4,7 @@
 
 (require "../core/operator.rkt"
          (prefix-in val: "../core/value.rkt")
+         (prefix-in dt: "../../datetime.rkt")
          (only-in "../../misc.rkt" thread-first))
 
 (define ((check-argument expected-argument-type) object-type argument-types)
@@ -99,6 +100,20 @@
                    #:check-types (check-argument 'number)
                    #:body (λ (x y) (val:make-boolean (< (val:unwrap-number x) (val:unwrap-number y))))))
 
+(define op-date-after?
+  (create-operator #:name '>
+                   #:object 'date
+                   #:filter? #t
+                   #:check-types (check-argument 'date)
+                   #:body (λ (x y) (val:make-boolean (dt:after? (val:unwrap-date x)
+                                                                (val:unwrap-date y))))))
+(define op-date-before?
+  (create-operator #:name '<
+                   #:object 'date
+                   #:filter? #t
+                   #:check-types (check-argument 'date)
+                   #:body (λ (x y) (val:make-boolean (dt:before? (val:unwrap-date x)
+                                                                 (val:unwrap-date y))))))
 ;;
 
 (define builtin-operators
@@ -117,5 +132,7 @@
     (operator-definitions-add op-set-doesnt-contain?)
     (operator-definitions-add op-number-greater-than?)
     (operator-definitions-add op-number-less-than?)
+    (operator-definitions-add op-date-after?)
+    (operator-definitions-add op-date-before?)
     ))
 

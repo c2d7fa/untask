@@ -57,6 +57,20 @@
   (g:date<? (datetime->gregor (drop-time dt1))
             (datetime->gregor (drop-time dt2))))
 
+(define (before? dt1 dt2)
+  (if (and (has-time? dt1) (has-time? dt2))
+      (g:datetime<? (datetime->gregor dt1)
+                    (datetime->gregor dt2))
+      (g:date<? (datetime->gregor (drop-time dt1))
+                (datetime->gregor (drop-time dt2)))))
+
+(define (after? dt1 dt2)
+  (if (and (has-time? dt1) (has-time? dt2))
+      (g:datetime>? (datetime->gregor dt1)
+                    (datetime->gregor dt2))
+      (g:date>? (datetime->gregor (drop-time dt1))
+                (datetime->gregor (drop-time dt2)))))
+
 (define (weekday-short-string dt)
   (case (g:->wday (datetime->gregor dt))
     ((0) "Sun")
