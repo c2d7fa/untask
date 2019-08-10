@@ -89,6 +89,9 @@
    (let (state) (get-state/i))
    (do (continue (contextify-expression fm-expression filter? state)))))
 
+(define (check-filter/i filter-expression continue)
+  (check-fm/i filter-expression #t continue))
+
 (define (check-contextify-filter/i filter-expression continue)
   (check-contextify-fm/i filter-expression #t continue))
 
@@ -135,6 +138,7 @@
   (interp
    (let (state) (get-state/i))
    (let (items) (search-sorted/i filter-expression))
+   (let () (check-filter/i rhs-filter-expression))
    (let () (tree/i state
                    (map (λ (item)
                           (build-tree (a:get (state state.item-data)) item))
