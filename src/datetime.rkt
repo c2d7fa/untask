@@ -88,3 +88,6 @@
 
 (define (current-year)
   (g:->year (g:today)))
+
+(define (is-valid-date? dt)
+  (<= (datetime-day dt) (g:days-in-month (datetime-year dt) (datetime-month dt))))
