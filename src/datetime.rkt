@@ -43,7 +43,7 @@
   (g:date=? (g:today) (g:->date (datetime->gregor dt))))
 
 (define (days-from-today dt)
-  (cdr (assoc 'days (gp:period->list (gp:date-period-between (g:today) (datetime->gregor dt))))))
+  (cdr (assoc 'days (gp:period->list (gp:date-period-between (g:today) (datetime->gregor dt) '(days))))))
 
 (define (drop-time dt)
   (datetime (datetime-year dt)
