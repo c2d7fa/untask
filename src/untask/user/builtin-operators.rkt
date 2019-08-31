@@ -21,6 +21,17 @@
               (cadr object-type)
               (car argument-types))))
 
+(define (check-equal object-type argument-types)
+  (if (val:type<=? (car argument-types) object-type)
+      #t
+      (format "Invalid argument type: Expected type ~a but got ~a." object-type (car argument-types))))
+
+(define op-any-assign
+  (create-operator #:name ':
+                   #:object 'any
+                   #:check-types check-equal
+                   #:body (λ (x y) y)))
+
 (define op-string-suffix
   (create-operator #:name '>
                    #:object 'string
@@ -53,6 +64,16 @@
                    #:object 'set
                    #:check-types check-set
                    #:body (λ (xs x) (val:make-set (set-remove (val:unwrap-set xs) x)))))
+
+;; TODO: Why do we wrap return values of filter operators in Untask's boolean
+;; type? Shouldn't we just use plain Racket booleans?
+
+(define op-any-equal?
+  (create-operator #:name ':
+                   #:object 'any
+                   #:filter? #t
+                   #:check-types check-equal
+                   #:body (λ (x y) (val:make-boolean (equal? x y)))))
 
 (define op-string-match?
   (create-operator #:name '/
@@ -118,6 +139,7 @@
 
 (define builtin-operators
   (thread-first operator-definitions-empty
+    (operator-definitions-add op-any-assign)
     (operator-definitions-add op-string-suffix)
     (operator-definitions-add op-string-prefix)
     (operator-definitions-add op-number-add)
@@ -125,6 +147,7 @@
     (operator-definitions-add op-set-add)
     (operator-definitions-add op-set-remove)
 
+    (operator-definitions-add op-any-equal?)
     (operator-definitions-add op-string-match?)
     (operator-definitions-add op-string-prefix?)
     (operator-definitions-add op-string-suffix?)

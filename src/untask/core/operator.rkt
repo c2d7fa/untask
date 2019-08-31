@@ -35,7 +35,8 @@
                         (`(set ,t) 'set)
                         (`(opt ,t) t)
                         (else object-type))))
-    (hash-ref opdefs (list* name object-type* filter-context?) #f)))
+    (or (hash-ref opdefs (list* name object-type* filter-context?) #f)
+        (hash-ref opdefs (list* name 'any filter-context?) #f))))
 
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression

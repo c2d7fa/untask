@@ -16,13 +16,11 @@
 (define (evaluate-modify-expression modify-expression item-data item)
   (match modify-expression
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (if (eq? operator ':)
-         (set-property-by-key item-data item property (val:evaluate-literal literal-expr))
-         (set-property-by-key item-data item property (operators:evaluate-operator-expression
-                                                       builtin-operators
-                                                       (list (get-property-by-key item-data item property)
-                                                             operator
-                                                             (val:evaluate-literal literal-expr))))))
+     (set-property-by-key item-data item property (operators:evaluate-operator-expression
+                                                   builtin-operators
+                                                   (list (get-property-by-key item-data item property)
+                                                         operator
+                                                         (val:evaluate-literal literal-expr)))))
     (`(and ,subexpressions ...)
      (foldl (λ (subexpression item-data)
               (evaluate-modify-expression subexpression item-data item))

@@ -28,14 +28,11 @@
     (`(not ,subexpr)
      (not (evaluate-filter-expression subexpr item-data item)))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (if (eq? operator ':)
-         (equal? (get-property-by-key item-data item property)
-                 (val:evaluate-literal literal-expr))
-         (operators:evaluate-operator-expression builtin-operators
-                                                 (list (get-property-by-key item-data item property)
-                                                       operator
-                                                       (val:evaluate-literal literal-expr))
-                                                 #t)))
+     (operators:evaluate-operator-expression builtin-operators
+                                             (list (get-property-by-key item-data item property)
+                                                   operator
+                                                   (val:evaluate-literal literal-expr))
+                                             #t))
     (`(item . ,id)
      (= (item:item-id item-data item) id))
     ((list)
