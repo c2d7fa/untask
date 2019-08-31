@@ -40,7 +40,7 @@
 
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
-    (`(,object ,operator ,argument-literal-exprs ...)
+    (`(,object ,operator ,arguments ...)
      ;; Note: object will be #f when it has type (opt t) and operator
      ;; works on type t. In this case, we return #f no matter what; in
      ;; filter context, this means not to include an item and in modify
@@ -50,7 +50,7 @@
          (apply operator-eval
                 (operator-definitions-find opdefs operator (val:get-type object) filter-context?)
                 object
-                (map val:evaluate-literal argument-literal-exprs))))))
+                arguments)))))
 
 ;; Returns #t if operator can be used with an object of type object-type and
 ;; argument-types as arguments. Otherwise, returns a human-readable string
