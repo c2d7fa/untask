@@ -65,76 +65,71 @@
                    #:check-types check-set
                    #:body (λ (xs x) (val:make-set (set-remove (val:unwrap-set xs) x)))))
 
-;; TODO: Why do we wrap return values of filter operators in Untask's boolean
-;; type? Shouldn't we just use plain Racket booleans?
-
 (define op-any-equal?
   (create-operator #:name ':
                    #:object 'any
                    #:filter? #t
                    #:check-types check-equal
-                   #:body (λ (x y) (val:make-boolean (equal? x y)))))
+                   #:body (λ (x y) (equal? x y))))
 
 (define op-string-match?
   (create-operator #:name '/
                    #:object 'string
                    #:filter? #t
                    #:check-types (check-argument 'string)
-                   #:body (λ (str sst) (val:make-boolean (string-contains? (string-downcase (val:unwrap-string str))
-                                                                           (string-downcase (val:unwrap-string sst)))))))
+                   #:body (λ (str sst) (string-contains? (string-downcase (val:unwrap-string str))
+                                                         (string-downcase (val:unwrap-string sst))))))
 (define op-string-prefix?
   (create-operator #:name '<
                    #:object 'string
                    #:filter? #t
                    #:check-types (check-argument 'string)
-                   #:body (λ (str prf) (val:make-boolean (string-prefix? (val:unwrap-string str) (val:unwrap-string prf))))))
+                   #:body (λ (str prf) (string-prefix? (val:unwrap-string str) (val:unwrap-string prf)))))
 (define op-string-suffix?
   (create-operator #:name '>
                    #:object 'string
                    #:filter? #t
                    #:check-types (check-argument 'string)
-                   #:body (λ (str sfx) (val:make-boolean (string-suffix? (val:unwrap-string str) (val:unwrap-string sfx))))))
+                   #:body (λ (str sfx) (string-suffix? (val:unwrap-string str) (val:unwrap-string sfx)))))
 
 (define op-set-contains?
   (create-operator #:name '+
                    #:object 'set
                    #:filter? #t
                    #:check-types check-set
-                   #:body (λ (xs x) (val:make-boolean (set-member? (val:unwrap-set xs) x)))))
+                   #:body (λ (xs x) (set-member? (val:unwrap-set xs) x))))
 (define op-set-doesnt-contain?
   (create-operator #:name '-
                    #:object 'set
                    #:filter? #t
                    #:check-types check-set
-                   #:body (λ (xs x) (val:make-boolean (not (set-member? (val:unwrap-set xs) x))))))
+                   #:body (λ (xs x) (not (set-member? (val:unwrap-set xs) x)))))
 
 (define op-number-greater-than?
   (create-operator #:name '>
                    #:object 'number
                    #:filter? #t
                    #:check-types (check-argument 'number)
-                   #:body (λ (x y) (val:make-boolean (> (val:unwrap-number x) (val:unwrap-number y))))))
+                   #:body (λ (x y) (> (val:unwrap-number x) (val:unwrap-number y)))))
 (define op-number-less-than?
   (create-operator #:name '<
                    #:object 'number
                    #:filter? #t
                    #:check-types (check-argument 'number)
-                   #:body (λ (x y) (val:make-boolean (< (val:unwrap-number x) (val:unwrap-number y))))))
+                   #:body (λ (x y) (< (val:unwrap-number x) (val:unwrap-number y)))))
 
 (define op-date-after?
   (create-operator #:name '>
                    #:object 'date
                    #:filter? #t
                    #:check-types (check-argument 'date)
-                   #:body (λ (x y) (val:make-boolean (dt:after? (val:unwrap-date x)
-                                                                (val:unwrap-date y))))))
+                   #:body (λ (x y) (dt:after? (val:unwrap-date x) (val:unwrap-date y)))))
 (define op-date-before?
   (create-operator #:name '<
                    #:object 'date
                    #:filter? #t
                    #:check-types (check-argument 'date)
-                   #:body (λ (x y) (val:make-boolean (dt:before? (val:unwrap-date x)
-                                                                 (val:unwrap-date y))))))
+                   #:body (λ (x y) (dt:before? (val:unwrap-date x) (val:unwrap-date y)))))
 ;;
 
 (define builtin-operators
