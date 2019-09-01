@@ -7,24 +7,22 @@
          (prefix-in dt: "../../datetime.rkt")
          (only-in "../../misc.rkt" thread-first))
 
-(define ((check-argument expected-argument-type) object-type argument-types)
-  (if (val:type<=? (car argument-types) expected-argument-type)
+(define ((check-argument expected-argument-type) object-type argument-type)
+  (if (val:type<=? argument-type expected-argument-type)
       #t
-      (format "Invalid argument type: Expected type ~a but got ~a." expected-argument-type (car argument-types))))
+      (format "Invalid argument type: Expected type ~a but got ~a." expected-argument-type argument-type)))
 
-(define (check-set object-type argument-types)
-  ;; object-type has format `(set ,type).
-  (if (val:type<=? (car argument-types) (cadr object-type))
+(define (check-set object-type argument-type)
+  ;; object-type (and argument-type) has format `(set ,type).
+  (if (val:type<=? argument-type (cadr object-type))
       #t
       (format "Invalid argument type for set of type ~a: Expected type ~a but got ~a."
               (cadr object-type)
               (cadr object-type)
-              (car argument-types))))
+              argument-type)))
 
-(define (check-equal object-type argument-types)
-  (if (val:type<=? (car argument-types) object-type)
-      #t
-      (format "Invalid argument type: Expected type ~a but got ~a." object-type (car argument-types))))
+(define (check-equal object-type argument-type)
+  ((check-argument object-type) object-type argument-type))
 
 (define op-any-assign
   (create-operator #:name ':

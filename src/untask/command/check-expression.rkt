@@ -41,6 +41,6 @@
                  (format "Unknown operator '~a' on property '~a'." operator property)
                  (op:check-types op
                                  #:object-type (prop:property-type-type pr)
-                                 #:argument-types (list (val:get-type (val:evaluate-literal literal-expr)))))))))   ; TODO: Do we need to evaluate the literal to know its type?
+                                 #:argument-type (val:get-type (val:evaluate-literal literal-expr))))))))
     (`(item . ,id) #t)
     ('() #t)))
