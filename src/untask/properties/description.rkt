@@ -7,6 +7,6 @@
  (prefix-in val: "../core/value.rkt"))
 
 (define description-property-type
-  (prop:make-property-type #:key 'description
-                           #:type 'string
-                           #:default (val:make-string "")))
+  (prop:property-type #:key 'description
+                      #:type 'string
+                      #:default (val:make-string "")))

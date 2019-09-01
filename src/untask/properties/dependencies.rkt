@@ -12,9 +12,9 @@
   (only-in "../../misc.rkt" set-diff))
 
 (define depends-property-type
-  (prop:make-property-type #:key 'depends
-                           #:type '(set item)
-                           #:default (val:make-set)))
+  (prop:property-type #:key 'depends
+                      #:type '(set item)
+                      #:default (val:make-set)))
 
 (define (calculate-blocks item-data item)
   (val:make-set
@@ -52,7 +52,7 @@
            (set->list added-blocks)))
 
 (define blocks-property-type
-  (prop:make-property-type #:key 'blocks
-                           #:type '(set any)
-                           #:calculate calculate-blocks
-                           #:translate translate-blocks))
+  (prop:property-type #:key 'blocks
+                      #:type '(set any)
+                      #:calculate calculate-blocks
+                      #:translate translate-blocks))

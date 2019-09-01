@@ -7,6 +7,9 @@
 
 (provide (all-defined-out))
 
+(require
+ (prefix-in a: "../../attribute.rkt"))
+
 ;;; Property type collection
 
 ;; Property type collections are used to access information about all the
@@ -16,22 +19,11 @@
   (hash))
 
 (define (add-property-type collection property-type)
-  (hash-set collection (property-type-key property-type) property-type))
+  (hash-set collection (a:get (property-type property-type.key)) property-type))
 
 (define (get-property-type collection key)
   (hash-ref collection key #f))
 
 ;;; Property type
 
-(define (make-property-type #:key key
-                            #:type type
-                            #:default (default #f)
-                            #:calculate (calculate #f)
-                            #:translate (translate #f))
-  (list key type default calculate translate))
-
-(define (property-type-key t) (list-ref t 0))
-(define (property-type-type t) (list-ref t 1))
-(define (property-type-default t) (list-ref t 2))
-(define (property-type-calculate t) (list-ref t 3))
-(define (property-type-translate t) (list-ref t 4))
+(a:define-record property-type (key type (default #f) (calculate #f) (translate #f)))

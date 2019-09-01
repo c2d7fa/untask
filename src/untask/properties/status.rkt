@@ -32,11 +32,11 @@
   (item:set-raw-property item-data item status-property-type value))
 
 (define status-property-type
-  (prop:make-property-type #:key 'status
-                           #:type 'string
-                           #:default (val:make-string "active")
-                           #:calculate calculate-status
-                           #:translate translate-status))
+  (prop:property-type #:key 'status
+                      #:type 'string
+                      #:default (val:make-string "active")
+                      #:calculate calculate-status
+                      #:translate translate-status))
 
 (define (active? item-data item)
   (equal? (val:make-string "active") (item:get-property item-data item status-property-type)))

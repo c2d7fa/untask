@@ -12,14 +12,14 @@
  (prefix-in dt: "../../datetime.rkt"))
 
 (define wait-property-type
-  (prop:make-property-type #:key 'wait
-                           #:type '(opt date)
-                           #:default #f))
+  (prop:property-type #:key 'wait
+                      #:type '(opt date)
+                      #:default #f))
 
 (define date-property-type
-  (prop:make-property-type #:key 'date
-                           #:type '(opt date)
-                           #:default #f))
+  (prop:property-type #:key 'date
+                      #:type '(opt date)
+                      #:default #f))
 
 (define (wait-active? item-data item)
   (let ((prop (item:get-property item-data item wait-property-type)))

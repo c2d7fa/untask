@@ -3,12 +3,12 @@
 (provide check-filter/modify-expression)
 
 (require
- (prefix-in prop: "../core/property.rkt")
  (prefix-in val: "../core/value.rkt")
  (prefix-in op: "../core/operator.rkt")
-
+ "../core/property.rkt"
  "../user/builtin-operators.rkt"
- "../properties/builtin.rkt")
+ "../properties/builtin.rkt"
+ (prefix-in a: "../../attribute.rkt"))
 
 ;; Returns #t if expression is valid, otherwise returns human-readable string
 ;; representing error.
@@ -30,17 +30,17 @@
     (`(not ,subexpr)
      (check subexpr))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (let ((pr (prop:get-property-type builtin-property-types property)))
+     (let ((pr (get-property-type builtin-property-types property)))
        (if (eq? pr #f)
            (format "Unknown property '~a'." property)
            (let ((op (op:operator-definitions-find builtin-operators
                                                    operator
-                                                   (prop:property-type-type pr)
+                                                   (a:get (pr property-type.type))
                                                    filter?)))
              (if (eq? op #f)
                  (format "Unknown operator '~a' on property '~a'." operator property)
                  (op:check-types op
-                                 #:object-type (prop:property-type-type pr)
+                                 #:object-type (a:get (pr property-type.type))
                                  #:argument-type (val:get-type (val:evaluate-literal literal-expr))))))))
     (`(item . ,id) #t)
     ('() #t)))

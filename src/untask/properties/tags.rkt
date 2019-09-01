@@ -7,6 +7,6 @@
   (prefix-in val: "../core/value.rkt"))
 
 (define tags-property-type
-  (prop:make-property-type #:key 'tags
-                           #:type '(set string)
-                           #:default (val:make-set)))
+  (prop:property-type #:key 'tags
+                      #:type '(set string)
+                      #:default (val:make-set)))

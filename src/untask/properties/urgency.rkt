@@ -22,11 +22,11 @@
   (item:set-raw-property item-data item urgency-property-type value))
 
 (define urgency-property-type
-  (prop:make-property-type #:key 'urgency
-                           #:type 'number
-                           #:default (val:make-number 0)
-                           #:calculate calculate-urgency
-                           #:translate translate-urgency))
+  (prop:property-type #:key 'urgency
+                      #:type 'number
+                      #:default (val:make-number 0)
+                      #:calculate calculate-urgency
+                      #:translate translate-urgency))
 
 ;; Takes item-data and a set of items, returns sorted list of items.
 (define (sort-items-by-urgency-descending item-data item-set)

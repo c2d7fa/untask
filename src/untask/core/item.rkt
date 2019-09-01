@@ -9,7 +9,7 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in prop: "./property.rkt")
+ "./property.rkt"
  (prefix-in a: "../../attribute.rkt"))
 
 (a:define-record item-data (next properties))
@@ -35,7 +35,7 @@
   (a:set (item-data
           item-data.properties
           (a:hash.key item #:default (hash))
-          (a:hash.key (prop:property-type-key property-type)))
+          (a:hash.key (a:get (property-type property-type.key))))
          value))
 
 ;; Returns value.
@@ -43,18 +43,20 @@
   (a:get (item-data
           item-data.properties
           (a:hash.key item #:default (hash))
-          (a:hash.key (prop:property-type-key property-type)
-                      #:default (prop:property-type-default property-type)))))
+          (a:hash.key (a:get (property-type property-type.key))
+                      #:default (a:get (property-type property-type.default))))))
 
 (define (get-property item-data item property-type)
-  (if (prop:property-type-calculate property-type)
-      ((prop:property-type-calculate property-type) item-data item)
-      (get-raw-property item-data item property-type)))
+  (let ((calculate (a:get (property-type property-type.calculate))))
+    (if calculate
+        (calculate item-data item)
+        (get-raw-property item-data item property-type))))
 
 (define (set-property item-data item property-type value)
-  (if (prop:property-type-translate property-type)
-      ((prop:property-type-translate property-type) item-data item value)
-      (set-raw-property item-data item property-type value)))
+  (let ((translate (a:get (property-type property-type.translate))))
+    (if translate
+        (translate item-data item value)
+        (set-raw-property item-data item property-type value))))
 
 ;; Returns set of all items.
 (define (all-items item-data)
