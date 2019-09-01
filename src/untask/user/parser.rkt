@@ -3,8 +3,6 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in expr: "../command/expression.rkt")
-
  (combine-in megaparsack megaparsack/text)
  (prefix-in f: (combine-in data/functor data/applicative data/monad data/either))
  (only-in data/monad <-)
@@ -35,12 +33,12 @@
          (many/p (char-between/p #\a #\z))))
 
 (define literal-item-expression/p
-  (f:map expr:make-item int/p))
+  (f:map (λ (x) `(item . ,x)) int/p))
 
 (define literal-number-expression/p
-  (f:map expr:make-number
-         (f:do (char/p #\$)
-               number/p)))
+  (f:do (char/p #\$)
+        (n <- number/p)
+        (f:pure `(number . ,n))))
 
 (define bracketed-string/p
   (f:do (char/p #\{)
@@ -49,15 +47,14 @@
         (f:pure (apply string cs))))
 
 (define literal-string-expression/p
-  (f:map expr:make-string
+  (f:map (λ (s) `(string . ,s))
          (or/p bare-word/p bracketed-string/p)))
 
 (define literal-set-expression/p
-  (f:map expr:make-set
-         (f:do (string/p "[")
-               (element-exprs <- (many/p literal-expression/p #:sep whitespace/p))
-               (string/p "]")
-               (f:pure element-exprs))))
+  (f:do (string/p "[")
+        (element-exprs <- (many/p literal-expression/p #:sep whitespace/p))
+        (string/p "]")
+        (f:pure `(set ,@element-exprs))))
 
 (define literal-date-expression/p
   (let* ((year/p int/p)

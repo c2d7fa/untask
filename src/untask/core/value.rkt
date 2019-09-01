@@ -3,7 +3,6 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in expr: "../command/expression.rkt")
  (prefix-in dt: "../../datetime.rkt"))
 
 (define (make-string string-content)
