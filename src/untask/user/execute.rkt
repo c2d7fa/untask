@@ -22,11 +22,7 @@
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
  (prefix-in dt: "../../datetime.rkt")
- (only-in "../../misc.rkt" try-read-line thread)
-
- "../command/interpret.rkt"
- "run.rkt"
- )
+ (only-in "../../misc.rkt" try-read-line thread))
 
 ;; For convenience, the internal procedures in this module pass boxed state
 ;; around as a parameter. Exceptions are used for error reporting.

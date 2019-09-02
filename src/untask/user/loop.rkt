@@ -6,7 +6,6 @@
  "render-list.rkt"
  "parser.rkt"
  "execute.rkt"
- "../command/interpret.rkt"
 
  (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
