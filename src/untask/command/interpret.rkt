@@ -1,6 +1,6 @@
 #lang racket
 
-(provide interpret interpret-string)
+(provide interpret)
 
 (require
  "../core/state.rkt"
@@ -309,9 +309,3 @@
                                   (a:get (old-state state.active-contexts)))))
       (do (proceed))))
     ))
-
-;; Parse input string and interpret it like `interpret'. If input is #f, return
-;; 'exit value. If input cannot be parsed, print a human-readable error instead.
-(define (interpret-string input)
-  (with-handlers ((exn:fail:read? (λ (e) `(error "Unable to parse command." ,(λ () '(value proceed))))))
-    (if input (interpret (parser:parse input)) `(value exit))))

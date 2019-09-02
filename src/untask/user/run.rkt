@@ -1,6 +1,6 @@
 #lang racket
 
-(provide run!)
+(provide run! execute!)
 
 (require
  "../command/interpret.rkt"
@@ -62,3 +62,7 @@
     (`(set-state ,state ,continue)
      (begin (set-box! state-box state)
             (run! (continue) state-box)))))
+
+;; Run a command and update the state by setting the boxed state.
+(define (execute! command state-box)
+  (run! (interpret command) state-box))

@@ -6,7 +6,6 @@
  (prefix-in export: "./src/untask/core/export.rkt")
  "./src/untask/properties/builtin.rkt"
 
- "./src/untask/command/interpret.rkt"
  "./src/untask/user/run.rkt"
  "./src/untask/user/loop.rkt"
 
@@ -16,6 +15,6 @@
 
 (void
  (when (not (zero? (vector-length (current-command-line-arguments))))
-   (run! (interpret `(open ,(vector-ref (current-command-line-arguments) 0))) state-box)))
+   (execute! `(open ,(vector-ref (current-command-line-arguments) 0)) state-box))
+ (user-loop! state-box))
 
-(user-loop! state-box)
