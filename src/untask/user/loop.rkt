@@ -5,8 +5,7 @@
 (require
  "render-list.rkt"
  "parser.rkt"
- "run.rkt"
- "../command/interpret.rkt"
+ "execute.rkt"
 
  (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
@@ -38,11 +37,11 @@
                     ((black) ("> ")))))))
 
 (define (user-loop! state-box)
-  (define (recur)
-    (user-loop! state-box))
-  (let ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts))))))
-    (let ((result
-           (run! (if (not input) (interpret '(exit)) (interpret-string input))
-                 state-box)))
-      (when (equal? 'proceed result)
-        (user-loop! state-box)))))
+  (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
+         (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
+                    (if input (parse input) '(exit))))
+         (result (if command
+                     (execute! command state-box)
+                     'proceed)))
+    (when (equal? 'proceed result)
+      (user-loop! state-box))))
