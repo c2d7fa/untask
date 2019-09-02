@@ -1,15 +1,12 @@
 #lang racket
 
-(provide run! execute!)
+(provide run!)
 
 (require
- "../command/interpret.rkt"
  "render-list.rkt"
-
  "../core/state.rkt"
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
-
  (only-in "../../misc.rkt" try-read-line))
 
 (define (write-file! path content)
@@ -62,7 +59,3 @@
     (`(set-state ,state ,continue)
      (begin (set-box! state-box state)
             (run! (continue) state-box)))))
-
-;; Run a command and update the state by setting the boxed state.
-(define (execute! command state-box)
-  (run! (interpret command) state-box))
