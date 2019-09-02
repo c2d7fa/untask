@@ -38,8 +38,6 @@
                     ((black) ("> ")))))))
 
 (define (user-loop! state-box)
-  (define (recur)
-    (user-loop! state-box))
   (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
          (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
                     (if input (parse input) '(exit))))
