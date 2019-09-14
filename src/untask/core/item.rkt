@@ -30,6 +30,14 @@
             (λ (property-values)
               (hash-remove property-values item))))
 
+;; Copies all the properties of from-item into to-item. Returns updated
+;; item-data.
+(define (copy-item item-data from-item to-item)
+  (a:update (item-data item-data.properties)
+            (λ (props)
+              (a:set (props (a:hash.key to-item))
+                     (a:get (props (a:hash.key from-item #:default (hash))))))))
+
 ;; Returns new-item-data.
 (define (set-raw-property item-data item property-type value)
   (a:set (item-data

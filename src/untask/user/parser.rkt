@@ -263,6 +263,7 @@
    (try/p (with-context/p (normal-command/p 'modify #:arguments (list/p modify-expression/p))))
    (try/p (with-context/p (normal-command/p 'list)))
    (try/p (with-context/p (normal-command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p))))
+   (try/p (with-context/p (normal-command/p 'copy #:arguments (list/p modify-expression/p))))
    (try/p (normal-command/p 'save #:takes-filter? #f))
    (try/p (normal-command/p 'open #:takes-filter? #f #:arguments (list/p filename/p)))
    (try/p (with-context/p (normal-command/p 'remove #:takes-filter? #t)))
