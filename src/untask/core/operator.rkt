@@ -68,12 +68,10 @@
 (define (evaluate-operator-expression opdefs expression (filter-context? #f))
   (match expression
     (`(,object ,operator ,argument)
-     ;; Note: object will be #f when it has type (opt t) and operator
-     ;; works on type t. In this case, we return #f no matter what; in
-     ;; filter context, this means not to include an item and in modify
-     ;; context, this means not to modify the item (since it was already
-     ;; #f before).
-     (if (not object) (val:make-boolean #f)
+     ;; Note: object will be #f when it has type (opt t) and operator works on
+     ;; type t. In this case, we return #f in filter context, which means not to
+     ;; include an item.
+     (if (and filter-context? (not object)) #f
          (operator-eval (operator-definitions-find opdefs operator (val:get-type object) filter-context?)
                         object
                         argument)))))
