@@ -63,6 +63,14 @@
                    #:check-types check-set
                    #:body (λ (xs x) (val:make-set (set-remove (val:unwrap-set xs) x)))))
 
+;; TODO: We should probably add some new type representing a period of time, and
+;; then add that to the date instead of always thinking in terms of days.
+(define op-date-add-days
+  (create-operator #:name '+
+                   #:object 'date  ; Optional; may be #f!
+                   #:check-types (check-argument 'number)
+                   #:body (λ (x y) (and x (val:make-date (dt:add-days (val:unwrap-date x) (val:unwrap-number y)))))))
+
 (define op-any-equal?
   (create-operator #:name ':
                    #:object 'any
@@ -139,6 +147,7 @@
     (operator-definitions-add op-number-subtract)
     (operator-definitions-add op-set-add)
     (operator-definitions-add op-set-remove)
+    (operator-definitions-add op-date-add-days)
 
     (operator-definitions-add op-any-equal?)
     (operator-definitions-add op-string-match?)

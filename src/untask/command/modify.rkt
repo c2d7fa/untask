@@ -18,9 +18,11 @@
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (set-property-by-key item-data item property (operators:evaluate-operator-expression
                                                    builtin-operators
-                                                   (list (get-property-by-key item-data item property)
-                                                         operator
-                                                         (val:evaluate-literal literal-expr)))))
+                                                   #:object (get-property-by-key item-data item property)
+                                                   #:operator operator
+                                                   #:argument (val:evaluate-literal literal-expr)
+                                                   #:object-type (get-property-type-type property)
+                                                   #:filter? #f)))
     (`(and ,subexpressions ...)
      (foldl (λ (subexpression item-data)
               (evaluate-modify-expression subexpression item-data item))

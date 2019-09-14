@@ -29,10 +29,11 @@
      (not (evaluate-filter-expression subexpr item-data item)))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (operators:evaluate-operator-expression builtin-operators
-                                             (list (get-property-by-key item-data item property)
-                                                   operator
-                                                   (val:evaluate-literal literal-expr))
-                                             #t))
+                                             #:object (get-property-by-key item-data item property)
+                                             #:operator operator
+                                             #:argument (val:evaluate-literal literal-expr)
+                                             #:object-type (get-property-type-type property)
+                                             #:filter? #f))
     (`(item . ,id)
      (= (item:item-id item-data item) id))
     ((list)

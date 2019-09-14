@@ -28,6 +28,11 @@
     (`(,y ,m ,d #f #f) (g:date y m d))
     (`(,y ,m ,d ,h ,min) (g:datetime y m d h min))))
 
+(define (gregor->datetime gdt)
+  (if (g:datetime? gdt)
+      (datetime (g:->year gdt) (g:->month gdt) (g:->day gdt) (g:->hours gdt) (g:->minutes gdt))
+      (datetime (g:->year gdt) (g:->month gdt) (g:->day gdt))))
+
 ;; Return #t if the given datetime is in the future.
 ;;
 ;; Datetimes that do not contain a time component, are not in the future if they
@@ -105,3 +110,6 @@
 
 (define (is-valid-date? dt)
   (<= (datetime-day dt) (g:days-in-month (datetime-year dt) (datetime-month dt))))
+
+(define (add-days dt n)
+  (gregor->datetime (g:+days (datetime->gregor dt) n)))
