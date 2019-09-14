@@ -65,14 +65,10 @@
     (or (hash-ref opdefs (list* name object-type* filter-context?) #f)
         (hash-ref opdefs (list* name 'any filter-context?) #f))))
 
-(define (evaluate-operator-expression opdefs #:object object #:operator operator #:argument argument #:object-type object-type #:filter? (filter-context? #f))
-  ;; Note: object will be #f when it has type (opt t) and operator works on
-  ;; type t. In this case, we return #f in filter context, which means not to
-  ;; include an item.
-  (if (and filter-context? (not object)) #f
-      (operator-eval (operator-definitions-find opdefs operator object-type filter-context?)
-                     object
-                     argument)))
+(define (evaluate-operator-expression opdefs #:object object #:operator operator #:argument argument #:object-type object-type #:filter? filter?)
+  (operator-eval (operator-definitions-find opdefs operator object-type filter?)
+                 object
+                 argument))
 
 ;; Returns #t if operator can be used with an object of type object-type and
 ;; argument-type as the argument. Otherwise, returns a human-readable string

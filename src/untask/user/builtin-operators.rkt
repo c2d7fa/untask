@@ -67,7 +67,7 @@
 ;; then add that to the date instead of always thinking in terms of days.
 (define op-date-add-days
   (create-operator #:name '+
-                   #:object 'date  ; Optional; may be #f!
+                   #:object 'date  ; TODO: May be optional! We should encode this somewhere.
                    #:check-types (check-argument 'number)
                    #:body (λ (x y) (and x (val:make-date (dt:add-days (val:unwrap-date x) (val:unwrap-number y)))))))
 
@@ -126,16 +126,16 @@
 
 (define op-date-after?
   (create-operator #:name '>
-                   #:object 'date
+                   #:object 'date   ; TODO: May be optional! We should encode this somewhere.
                    #:filter? #t
                    #:check-types (check-argument 'date)
-                   #:body (λ (x y) (dt:after? (val:unwrap-date x) (val:unwrap-date y)))))
+                   #:body (λ (x y) (and x (dt:after? (val:unwrap-date x) (val:unwrap-date y))))))
 (define op-date-before?
   (create-operator #:name '<
-                   #:object 'date
+                   #:object 'date   ; TODO: May be optional! We should encode this somewhere.
                    #:filter? #t
                    #:check-types (check-argument 'date)
-                   #:body (λ (x y) (dt:before? (val:unwrap-date x) (val:unwrap-date y)))))
+                   #:body (λ (x y) (and x (dt:before? (val:unwrap-date x) (val:unwrap-date y))))))
 ;;
 
 (define builtin-operators

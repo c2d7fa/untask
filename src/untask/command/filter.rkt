@@ -33,7 +33,7 @@
                                              #:operator operator
                                              #:argument (val:evaluate-literal literal-expr)
                                              #:object-type (get-property-type-type property)
-                                             #:filter? #f))
+                                             #:filter? #t))
     (`(item . ,id)
      (= (item:item-id item-data item) id))
     ((list)
