@@ -161,9 +161,15 @@
                            (many/p and-list/p #:sep comma-whitespace/p))))
     or-list/p))
 
+(define modify-pair/p
+  (or/p (try/p (f:do (key <- property-key/p)
+                     (string/p "..")
+                     (f:pure `(edit ,key))))
+        filter-or-modify-pair/p))
+
 (define modify-expression/p
   (let* ((and-list/p (f:map (λ (subexprs) (cons 'and subexprs))
-                            (many/p filter-or-modify-pair/p #:sep whitespace/p))))
+                            (many/p modify-pair/p #:sep whitespace/p))))
     and-list/p))
 
 (define (opt/p parser #:default (default (void)))

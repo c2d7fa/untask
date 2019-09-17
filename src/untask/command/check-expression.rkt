@@ -29,6 +29,14 @@
      (collect subexprs))
     (`(not ,subexpr)
      (check subexpr))
+    (`(edit ,property)
+     (when filter? (error "Error!")) ; NOTE: This cannot be parsed in filter context.
+     (let ((pr (get-property-type builtin-property-types property)))
+       (if (eq? pr #f)
+           (format "Unknown property '~a'." property)
+           (if (equal? 'string (a:get (pr property-type.type)))
+               #t
+               (format "Property '~a' of type '~a' cannot be edited because it is not of type string." property (a:get (pr property-type.type)))))))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (let ((pr (get-property-type builtin-property-types property)))
        (if (eq? pr #f)
