@@ -28,6 +28,7 @@
 (define (render-listing* item-data items)
   (define (render-item item-data item)
     (define description (item:get-property item-data item description:description-property-type))
+    (define notes (item:get-property item-data item description:notes-property-type))
     (define tags (item:get-property item-data item tags:tags-property-type))
     (define urgency (item:get-property item-data item urgency:urgency-property-type))
     (define base-urgency (item:get-raw-property item-data item urgency:urgency-property-type))
@@ -48,6 +49,10 @@
                          ((status:done? item-data item) '((strikethrough) (white)))
                          (else '((white))))
                      (,(val:unwrap-string description)))
+                    ;; Notes
+                    ,(if (equal? "" (val:unwrap-string notes))
+                         '(() ())
+                         '((bold) (green) (" [..]")))
                     ;; Tags
                     " "
                     ,(string-join
@@ -118,6 +123,7 @@
 (define (render-listing-info item-data items)
   (define (render-item item)
     (define description (item:get-property item-data item description:description-property-type))
+    (define notes (item:get-property item-data item description:notes-property-type))
     (define tags (item:get-property item-data item tags:tags-property-type))
     (define urgency (item:get-property item-data item urgency:urgency-property-type))
     (define base-urgency (item:get-raw-property item-data item urgency:urgency-property-type))
@@ -132,6 +138,11 @@
                     ((bold)
                      (,(val:unwrap-string description)))
                     "\n\n"
+                    ;; Notes
+                    (()
+                     (,(if (not (equal? "" (val:unwrap-string notes)))
+                           (string-append (val:unwrap-string notes) "\n\n")
+                           "")))
                     ;; Id
                     (()
                      (((black) ("ID:      "))

@@ -29,6 +29,9 @@
      (collect subexprs))
     (`(not ,subexpr)
      (check subexpr))
+    (`(edit)
+     (when filter? (error "Error!")) ; NOTE: This cannot be parsed in filter context.
+     #t)
     (`(edit ,property)
      (when filter? (error "Error!")) ; NOTE: This cannot be parsed in filter context.
      (let ((pr (get-property-type builtin-property-types property)))

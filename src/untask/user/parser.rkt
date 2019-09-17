@@ -30,7 +30,7 @@
 
 (define property-key/p
   (f:map (λ (cs) (string->symbol (apply string cs)))
-         (many/p (char-between/p #\a #\z))))
+         (many+/p (char-between/p #\a #\z))))
 
 (define literal-item-expression/p
   (f:map (λ (x) `(item . ,x)) int/p))
@@ -165,6 +165,7 @@
   (or/p (try/p (f:do (key <- property-key/p)
                      (string/p "..")
                      (f:pure `(edit ,key))))
+        (try/p (f:do (string/p "..") (f:pure `(edit))))
         filter-or-modify-pair/p))
 
 (define modify-expression/p

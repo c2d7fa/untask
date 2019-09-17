@@ -25,6 +25,17 @@
 ;; modify-expression.
 (define (evaluate-modify-expression modify-expression item-data item)
   (match modify-expression
+    (`(edit)
+     (let* ((old-description (val:unwrap-string (get-property-by-key item-data item 'description)))
+            (old-notes (val:unwrap-string (get-property-by-key item-data item 'notes)))
+            (str (string-trim (string-join (list old-description old-notes) "\n\n")))
+            (text (result-of-editor-on! str))
+            (lines (string-split (string-trim text) "\n"))
+            (new-description (car lines))
+            (new-notes (string-trim (string-join (cdr lines) "\n"))))
+       (set-property-by-key
+        (set-property-by-key item-data item 'description (val:make-string new-description))
+        item 'notes (val:make-string new-notes))))
     (`(edit ,property)
      (set-property-by-key item-data item property (val:make-string (result-of-editor-on! (val:unwrap-string (get-property-by-key item-data item property))))))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)

@@ -10,3 +10,8 @@
   (prop:property-type #:key 'description
                       #:type 'string
                       #:default (val:make-string "")))
+
+(define notes-property-type
+  (prop:property-type #:key 'notes
+                      #:type 'string
+                      #:default (val:make-string "")))
