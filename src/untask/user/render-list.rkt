@@ -41,7 +41,7 @@
                    (
                     ;; ID
                     ((black)
-                     (,(~a (item:item-id item-data item))
+                     (,(~r (item:item-id item-data item) #:min-width 3 #:pad-string " ")
                       ". "))
                     ;; Description
                     (,@(cond
