@@ -14,6 +14,7 @@
  (prefix-in tags: "../properties/tags.rkt")
  (prefix-in urgency: "../properties/urgency.rkt")
  (prefix-in depends: "../properties/dependencies.rkt")
+ (prefix-in links: "../properties/links.rkt")
  (prefix-in date: "../properties/date.rkt")
 
  (prefix-in term: "../../terminal.rkt")
@@ -35,6 +36,8 @@
     (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
+    (define children (item:get-property item-data item links:children-property-type))
+    (define parents (item:get-property item-data item links:parents-property-type))
     (define wait (item:get-property item-data item date:wait-property-type))
     (define date (item:get-property item-data item date:date-property-type))
     (term:render `(()
@@ -79,6 +82,14 @@
                          `((blue)
                            (((black) (" D:"))
                             ((bold) (,(~a (set-count (val:unwrap-set depends))))))))
+                    ;; Children
+                    ,(if (set-empty? (val:unwrap-set children))
+                         ""
+                         `((red) (bold) (" C")))
+                    ;; Parents
+                    ,(if (set-empty? (val:unwrap-set parents))
+                         ""
+                         `((blue) (bold) (" P")))
                     ;; Wait
                     ,(if (not (date:wait-active? item-data item))  ; Display only when task is waiting
                          `(() (((black) (" W:"))
@@ -130,6 +141,8 @@
     (define status (item:get-property item-data item status:status-property-type))
     (define depends (item:get-property item-data item depends:depends-property-type))
     (define blocks (item:get-property item-data item depends:blocks-property-type))
+    (define children (item:get-property item-data item links:children-property-type))
+    (define parents (item:get-property item-data item links:parents-property-type))
     (define wait (item:get-property item-data item date:wait-property-type))
     (define date (item:get-property item-data item date:date-property-type))
     (term:render `(()
@@ -205,6 +218,22 @@
                             ((black) ("Blocks:\n"))
                             ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set blocks))))
                                             4))))
+                    ;; Children
+                    ,(if (set-empty? (val:unwrap-set children))
+                         ""
+                         `(()
+                           ("\n\n"
+                            ((black) ("Children:\n"))
+                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set children))))
+                                            4))))
+                    ;; Parents
+                    ,(if (set-empty? (val:unwrap-set parents))
+                         ""
+                         `(()
+                           ("\n\n"
+                            ((black) ("Parents:\n"))
+                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set parents))))
+                                            4))))
                     ))))
   (string-join
    (map (λ (item) (render-item item)) items)
@@ -237,11 +266,13 @@
 
 (define (render-trees item-data trees)
   (define (render-tree tree)
-    (string-join
-     (filter (λ (s) (not (equal? "" s)))
-             (list (render-listing* item-data (list (car tree)))
-                   (string-indent (render-trees item-data (cdr tree)) 2)))
-     "\n"))
+    (if (null? tree)
+        (term:render '((black) ("   ...")))
+        (string-join
+         (filter (λ (s) (not (equal? "" s)))
+                 (list (render-listing* item-data (list (car tree)))
+                       (string-indent (render-trees item-data (cdr tree)) 2)))
+         "\n")))
   (string-join
    (map render-tree trees)
    "\n"))

@@ -15,6 +15,7 @@
 
  (prefix-in urgency: "../properties/urgency.rkt")
  (prefix-in depends: "../properties/dependencies.rkt")
+ (prefix-in links: "../properties/links.rkt")
  (prefix-in date: "../properties/date.rkt")
 
  "../user/render-list.rkt"
@@ -118,14 +119,30 @@
   (check! fe #:filter? #t)
   (displayln (render-listing-info (item-data) (search fe))))
 
+;; TODO: Create other version of "tree" that shows the entire tree, including
+;; parents/blocked items. It should have some way of highlighting the current
+;; item.
+
 (define (execute-tree! fe rhs)
   (check! fe #:filter? #t)
   (check! rhs #:filter? #t)
+  ;; TODO: Distinguish between children and dependencies in output
+  (define seen (list))
   (define (build-tree item-data item)
-    (cons item (map (λ (i) (build-tree item-data (val:unwrap-item i)))
-                    (filter (λ (i)
-                              (filter:evaluate-filter-expression rhs item-data (val:unwrap-item i)))
-                            (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type)))))))
+    ;; TODO: This code is ugly.
+    (define (build-tree* item)
+      (cons item (map (λ (i)
+                        (if (member i seen)
+                            (let ((has-children? (not (and (null? (set->list (val:unwrap-set (item:get-property item-data (val:unwrap-item i) depends:depends-property-type))))
+                                                           (null? (set->list (val:unwrap-set (item:get-property item-data (val:unwrap-item i) links:children-property-type))))))))
+                              `(,(val:unwrap-item i) ,@(if has-children? '(()) '())))
+                            (begin (set! seen (cons i seen))
+                                   (build-tree* (val:unwrap-item i)))))
+                      (filter (λ (i)
+                                (filter:evaluate-filter-expression rhs item-data (val:unwrap-item i)))
+                              (append (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type)))
+                                      (set->list (val:unwrap-set (item:get-property item-data item links:children-property-type))))))))
+    (build-tree* item))
   (displayln (render-trees (item-data)
                            (map (λ (item)
                                   (build-tree (item-data) item))

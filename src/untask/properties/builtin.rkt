@@ -16,6 +16,7 @@
  (prefix-in tags: "./tags.rkt")
  (prefix-in urgency: "./urgency.rkt")
  (prefix-in depends: "./dependencies.rkt")
+ (prefix-in links: "./links.rkt")
  (prefix-in date: "./date.rkt")
 
  (prefix-in a: "../../attribute.rkt")
@@ -39,6 +40,8 @@
     (prop:add-property-type urgency:urgency-property-type)
     (prop:add-property-type depends:depends-property-type)
     (prop:add-property-type depends:blocks-property-type)
+    (prop:add-property-type links:children-property-type)
+    (prop:add-property-type links:parents-property-type)
     (prop:add-property-type date:wait-property-type)
     (prop:add-property-type date:date-property-type)
     ))
