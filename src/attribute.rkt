@@ -3,6 +3,7 @@
 (provide attribute
          get set update
          path
+         get-path set-path update-path
 
          table
          table.
@@ -69,6 +70,25 @@
                               (set (get o (car attrs))
                                    (apply path (cdr attrs))
                                    x))))))
+
+;; The macros get-path, set-path and update-path provide wrappers around get,
+;; set and update with a nicer syntax.
+;;
+;; For example, instead of:
+;;   (update accounts
+;;           (path accounts.by-id
+;;                 (hash. 4283)
+;;                 account.balance)
+;;           (λ (b) (- b 200))),
+;; one can write:
+;;   (update-path (accounts accounts.by-id (hash. 4283) accounts.balance)
+;;                (λ (b) (- b 200)))
+(define-syntax-rule (get-path (head attrs ...))
+  (get head (path attrs ...)))
+(define-syntax-rule (set-path (head attrs ...) x)
+  (set head (path attrs ...) x))
+(define-syntax-rule (update-path (head attrs ...) f)
+  (update head (path attrs ...) f))
 
 ;;; TABLES
 
