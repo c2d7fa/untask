@@ -9,10 +9,12 @@
 
  (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
+ (prefix-in ctx: "../core/context.rkt")
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
 
- (only-in "../../misc.rkt" try-read-line*))
+ (only-in "../../misc.rkt" try-read-line*)
+ "../../squiggle.rkt")
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
@@ -30,14 +32,15 @@
                           (term:render
                            `(() (((black) ("@"))
                                  ((cyan) (,c))))))
-                        (set->list current-contexts))
+                        current-contexts)
                    " ")))
     (term:render `(()
                    (,contexts
                     ((black) ("> ")))))))
 
 (define (user-loop! state-box)
-  (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
+  (let* ((input (prompt-line (format-prompt-line (~> (a:get-path ((unbox state-box) state:state.context-state))
+                                                     (ctx:activated-names)))))
          (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
                     (if input (parse input) '(exit))))
          (result (if command

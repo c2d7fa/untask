@@ -7,10 +7,9 @@
  (prefix-in context: "./context.rkt")
  (prefix-in a: "../../attribute.rkt"))
 
-(a:define-record state (defined-contexts active-contexts open-file item-data))
+(a:define-species state (context-state open-file item-data))
 
 (define state-empty
-  (state #:defined-contexts context:empty-contexts
-         #:active-contexts (set)
+  (state #:context-state context:empty-state
          #:open-file #f
          #:item-data item:item-data-empty))

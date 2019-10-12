@@ -10,10 +10,12 @@
 
          activate
          deactivate
+         deactivate-all
 
          activated-names
          activated-filter
-         activated-modify)
+         activated-modify
+         toggle)
 
 (require (prefix-in rkt: racket)
          (prefix-in a: "../../attribute.rkt")
@@ -49,6 +51,10 @@
 (define (deactivate state name)
   (a:update-path (state state.activated)
                  (λ>> (rkt:remove name))))
+
+;; Deactivate all contexts.
+(define (deactivate-all state)
+  (a:set-path (state state.activated) (list)))
 
 ;; Create a new context or update an existing cotnext in the collection of
 ;; available contexts.
@@ -88,3 +94,15 @@
 ;; Return the modify expression that results from the currently activated contexts.
 (define (activated-modify state)
   `(and ,@(map (λ>> (modify-expression state)) (a:get-path (state state.activated)))))
+
+;; Take a list containing the forms (on ctx), (off ctx) and (reset). Modify
+;; state by activating and deactivating contexts and resetting the activated
+;; contexts.
+(define (toggle state toggles)
+  (foldl (λ (tog state)
+           (match tog
+             (`(on ,name) (activate state name))
+             (`(off ,name) (deactivate state name))
+             (`(reset) (deactivate-all state))))
+         state
+         toggles))

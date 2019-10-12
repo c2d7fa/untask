@@ -1,14 +1,23 @@
 #lang racket
 
+(provide empty-property-type-collection
+         add-property-type
+         get-property-type
+
+         property-type
+         property-type?
+         property-type.key
+         property-type.type
+         property-type.default
+         property-type.calculate
+         property-type.translate)
+
 ;; A property type is a way of representing a certain class of properties.
 ;; Examples of property types are 'urgency', 'description' and 'status'.
 ;; Definitions of concrete property types are defined in ../properties/. The
 ;; property values of each item is handled in ./item-data.rkt.
 
-(provide (all-defined-out))
-
-(require
- (prefix-in a: "../../attribute.rkt"))
+(require (prefix-in a: "../../attribute.rkt"))
 
 ;;; Property type collection
 
@@ -19,11 +28,11 @@
   (hash))
 
 (define (add-property-type collection property-type)
-  (hash-set collection (a:get (property-type property-type.key)) property-type))
+  (hash-set collection (a:get-path (property-type property-type.key)) property-type))
 
 (define (get-property-type collection key)
   (hash-ref collection key #f))
 
 ;;; Property type
 
-(a:define-record property-type (key type (default #f) (calculate #f) (translate #f)))
+(a:define-species property-type (key type (default #f) (calculate #f) (translate #f)))

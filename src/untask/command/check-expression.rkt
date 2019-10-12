@@ -37,21 +37,21 @@
      (let ((pr (get-property-type builtin-property-types property)))
        (if (eq? pr #f)
            (format "Unknown property '~a'." property)
-           (if (equal? 'string (a:get (pr property-type.type)))
+           (if (equal? 'string (a:get-path (pr property-type.type)))
                #t
-               (format "Property '~a' of type '~a' cannot be edited because it is not of type string." property (a:get (pr property-type.type)))))))
+               (format "Property '~a' of type '~a' cannot be edited because it is not of type string." property (a:get-path (pr property-type.type)))))))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (let ((pr (get-property-type builtin-property-types property)))
        (if (eq? pr #f)
            (format "Unknown property '~a'." property)
            (let ((op (op:operator-definitions-find builtin-operators
                                                    operator
-                                                   (a:get (pr property-type.type))
+                                                   (a:get-path (pr property-type.type))
                                                    filter?)))
              (if (eq? op #f)
                  (format "Unknown operator '~a' on property '~a'." operator property)
                  (op:check-types op
-                                 #:object-type (a:get (pr property-type.type))
+                                 #:object-type (a:get-path (pr property-type.type))
                                  #:argument-type (val:get-type (val:evaluate-literal literal-expr))))))))
     (`(item . ,id) #t)
     ('() #t)))

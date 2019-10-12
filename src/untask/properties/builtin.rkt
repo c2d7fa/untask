@@ -29,7 +29,7 @@
   (item:get-property item-data item (prop:get-property-type builtin-property-types key)))
 
 (define (get-property-type-type key)
-  (a:get ((prop:get-property-type builtin-property-types key) prop:property-type.type)))
+  (a:get-path ((prop:get-property-type builtin-property-types key) prop:property-type.type)))
 
 (define builtin-property-types
   (thread-first prop:empty-property-type-collection

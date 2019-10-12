@@ -4,7 +4,7 @@
 
 (require
  "../core/state.rkt"
- "../core/context.rkt"
+ (prefix-in ctx: "../core/context.rkt")
  (prefix-in item: "../core/item.rkt")
  (prefix-in val: "../core/value.rkt")
  (prefix-in export: "../core/export.rkt")
@@ -23,36 +23,19 @@
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
  (prefix-in dt: "../../datetime.rkt")
- (only-in "../../misc.rkt" try-read-line thread))
+ (only-in "../../misc.rkt" try-read-line)
+ "../../squiggle.rkt")
 
 ;; For convenience, the internal procedures in this module pass boxed state
-;; around as a parameter. Exceptions are used for error reporting.
+;; around as a parameter. Error reporting is doen using exceptions.
 
 (define *state (make-parameter #f))
-(define *context-toggles (make-parameter #f))  ; Contexts enabled just for this command
 
 (define (state)
   (unbox (*state)))
 
 (define (item-data)
-  (a:get ((unbox (*state)) state.item-data)))
-
-(define (toggled-contexts toggles)
-  (let ((global (a:get ((state) state.active-contexts))))
-    (list->set (foldl (λ (expr active-contexts)
-                        (match expr
-                          (`(on ,name) (set-add active-contexts name))
-                          (`(off ,name) (set-remove active-contexts name))
-                          (`(reset) (set))))
-                      global
-                      toggles))))
-
-(define (current-contexts)
-  (let ((toggles (*context-toggles))
-        (global (a:get ((state) state.active-contexts))))
-    (if toggles
-        (toggled-contexts toggles)
-        global)))
+  (a:get-path ((state) state.item-data)))
 
 ;; Check whether fme is a valid filter or modify expression. If it isn't, throw
 ;; an exception.
@@ -63,14 +46,9 @@
 
 ;; Extend a filter or modify expression with the currently enabled contexts.
 (define (with-contexts fme #:filter? filter?)
-  (let ((apply-context (if filter? apply-context-filter apply-context-modify)))
-    (foldl (λ (context-name fme)
-             (apply-context (a:get ((state)
-                                    state.defined-contexts
-                                    (contexts.named context-name)))
-                            fme))
-           fme
-           (set->list (current-contexts)))))
+  `(and ,fme
+        ,((if filter? ctx:activated-filter ctx:activated-modify)
+          (a:get-path ((state) state.context-state)))))
 
 ;; Find all items matching filter expression exactly.
 (define (search* fe)
@@ -99,7 +77,7 @@
   (displayln (term:render `((blue) (,message)))))
 
 (define (confirm-unsaved!)
-  (let ((saved (read-file! (a:get ((state) state.open-file)))))
+  (let ((saved (read-file! (a:get-path ((state) state.open-file)))))
     (if (or (not saved)
             (equal? (export:read-state-from-string saved) (state)))
         #t
@@ -168,10 +146,10 @@
 
 (define (execute-add! me)
   (check! me #:filter? #f)
-  (let-values (((item-data-with-new-item new-item) (item:new-item (a:get ((state) state.item-data)))))
+  (let-values (((item-data-with-new-item new-item) (item:new-item (a:get-path ((state) state.item-data)))))
     (set-box! (*state)
-              (a:set ((state) state.item-data)
-                     (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
+              (a:set-path ((state) state.item-data)
+                          (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
                                                         item-data-with-new-item new-item)))
     (list! (list new-item))))
 
@@ -180,18 +158,18 @@
   (check! me #:filter? #f)
   (let ((items (search fe)))
     (set-box! (*state)
-              (a:update ((state) state.item-data)
-                        (λ (item-data)
-                          (modify:modify-items item-data (list->set items) me))))
+              (a:update-path ((state) state.item-data)
+                             (λ (item-data)
+                               (modify:modify-items item-data (list->set items) me))))
     (list! items)))
 
 (define (execute-copy! fe me)
   (define (copy-item! item)
     (let-values (((item-data1 new-item) (item:new-item (a:get ((state) state.item-data)))))
       (let ((item-data2 (item:copy-item item-data1 item new-item)))
-        (set-box! (*state) (a:set ((state) state.item-data)
-                                  (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
-                                                                     item-data2 new-item)))
+        (set-box! (*state) (a:set-path ((state) state.item-data)
+                                       (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
+                                                                          item-data2 new-item)))
         new-item)))
   (check! fe #:filter? #t)
   (check! me #:filter? #f)
@@ -202,12 +180,12 @@
 (define (execute-remove! fe)
   (check! fe #:filter? #t)
   (set-box! (*state)
-            (a:update ((state) state.item-data)
-                      (λ (item-data)
-                        (foldl (λ (item item-data)
-                                 (item:remove-item item-data item))
-                               item-data
-                               (search fe))))))
+            (a:update-path ((state) state.item-data)
+                           (λ (item-data)
+                             (foldl (λ (item item-data)
+                                      (item:remove-item item-data item))
+                                    item-data
+                                    (search fe))))))
 
 ;; Execute a command and update the state by setting the boxed state. Return
 ;; 'exit if the given command should cause the program to exit, and return
@@ -228,43 +206,49 @@
          ;; TODO: Our whole system for saving and loading data is a mess.
          (let ((load-state (λ (old-state file-state)
                              (thread old-state
-                                     ((λ (state) (a:set (state state.open-file) filename)))
-                                     ((λ (state) (a:set (state state.item-data)
-                                                        (a:get (file-state state.item-data)))))
-                                     ((λ (state) (a:set (state state.defined-contexts)
-                                                        (a:get (file-state state.defined-contexts)))))
-                                     ((λ (state) (a:set (state state.active-contexts)
-                                                        (a:get (file-state state.active-contexts)))))))))
+                                     ((λ (state) (a:set-path (state state.open-file) filename)))
+                                     ((λ (state) (a:set-path (state state.item-data)
+                                                             (a:get-path (file-state state.item-data)))))
+                                     ((λ (state) (a:set-path (state state.context-state)
+                                                             (a:get-path (file-state state.context-state)))))))))
            (let ((file-content (read-file! filename))
                  (confirm? (confirm-unsaved!)))
              (when confirm?
                  (if file-content
                      (set-box! (*state) (load-state (state) (export:read-state-from-string file-content)))
-                     (set-box! (*state) (a:set (state-empty state.open-file) filename))))))
+                     (set-box! (*state) (a:set-path (state-empty state.open-file) filename))))))
          'proceed)
         (`(save)
-         (write-file! (a:get ((state) state.open-file)) (export:export-state-to-string (state)))
+         (write-file! (a:get-path ((state) state.open-file)) (export:export-state-to-string (state)))
          'proceed)
         (`(context active ,toggles)
-         (set-box! (*state) (a:set ((state) state.active-contexts)
-                                   (toggled-contexts toggles)))
+         (set-box! (*state) (a:update-path ((state) state.context-state)
+                                           (λ> (ctx:toggle toggles))))
          'proceed)
         (`(context add ,name ,fe ,me)
          (check! fe #:filter? #t)
          (check! me #:filter? #f)
-         (set-box! (*state) (a:set ((state) state.defined-contexts (contexts.named name))
-                                   (context #:filter fe
-                                            #:modify me)))
+         (set-box! (*state) (a:update-path ((state) state.context-state)
+                                           (λ> (ctx:register name #:filter fe #:modify me))))
          'proceed)
         (`(context remove ,name)
-         (set-box! (*state) (a:update ((state) state.defined-contexts)
-                                      (λ (x) (remove-context x name))))
+         (set-box! (*state) (a:update-path ((state) state.context-state)
+                                           (λ> (ctx:remove name))))
          'proceed)
         (`(context show)
-         (display-message! (format "~a" (available-contexts (a:get ((state) state.defined-contexts)))))
+         (display-message! (format "~a" (ctx:available-names (a:get-path ((state) state.context-state)))))
          'proceed)
         (`(with-contexts ,toggles ,subcommand)
-         (parameterize ((*context-toggles toggles))
-           (execute! subcommand state-box)))
+         (let ((old-context-state (a:get-path ((state) state.context-state))))
+           (set-box! (*state) (a:update-path ((state) state.context-state)
+                                             (λ> (ctx:toggle toggles))))
+           ;; TODO: Handle exceptions here to ensure that context state is reset
+           ;; no matter what! (Comment: When testing, this doesn't seem to be a
+           ;; problem, though I don't understand why; surely if there is an
+           ;; error in the execute! below, then we won't be able to reset the
+           ;; contexts, right?)
+           (execute! subcommand (*state))
+           (set-box! (*state) (a:set-path ((state) state.context-state) old-context-state))
+           'proceed))
         (`(exit)
          (if (confirm-unsaved!) 'exit 'proceed))))))
