@@ -157,32 +157,46 @@
 ;; A species consists of a name together with a number of keys. The macro
 ;; define-species defines a constructor, a predicate and a number of attributes.
 ;;
+;; A key may be given a default value. The syntax for this is:
+;;   (define-species species ((key-with-default-value 'default) key-without-default-value))
+;;
 ;; Example:
-;;   (define-species point (x y))               ; defines point?, point, point.x, point.y
-;;   (point? (table 'x 2))                      ; => #f
-;;   (update (point #:x 2 #:y -3) point.y abs)  ; => (point #:x 2 #:y 3)
+;;   (define-species point (x y))                     ; defines point?, point, point.x, point.y
+;;   (point? (table 'x 2))                            ; => #f
+;;   (update (point #:x 2 #:y -3) point.y abs)        ; => (point #:x 2 #:y 3)
 (define-syntax (define-species stx)
-  (define (syntax->keyword stx)
-    (datum->syntax stx (string->keyword (symbol->string (syntax->datum stx)))))
   (define (flat-map proc xs)
     (apply append (map proc xs)))
-  (let ((name (cadr (syntax-e stx)))
-        (keys (caddr (syntax-e stx))))
-    (with-syntax (((attribute-definitions ...)
-                   (map (λ (k)
-                          #`(define #,(format-id k "~a.~a" name k)
-                              (species-attribute '#,name (species-predicate '#,keys) '#,k)))
-                        (syntax-e keys)))
-                  (predicate-definition
-                   #`(define #,(format-id name "~a?" name) (species-predicate '#,keys)))
-                  (constructor-definition
-                   (with-syntax (((params ...)
-                                  (flat-map (λ (k) (list (syntax->keyword k) k))
-                                            (syntax-e keys)))
-                                 ((pairs ...)
-                                  (flat-map (λ (k) (list #`(quote #,k) k))
-                                            (syntax-e keys))))
-                     #`(define (#,name params ...) (table pairs ...)))))
+  ;; Take an argument (to the macro), for example #'key or #'(key 'default) and
+  ;; return the key, in this case #'key.
+  (define (arg->key arg)
+    (if (list? (syntax->datum arg))
+        (car (syntax-e arg))
+        arg))
+  ;; Take an argument (to the macro) and return the corresponding parameter in
+  ;; the constructor. For example, #'(key 'default) becomes (#'#:key #'(key
+  ;; 'default)). The result is intended to be spliced into the final form.
+  (define (arg->param arg)
+    (define (syntax->keyword-syntax stx)
+      (datum->syntax stx (string->keyword (symbol->string (syntax->datum stx)))))
+    (list (syntax->keyword-syntax (arg->key arg)) arg))
+  (let* ((name (cadr (syntax-e stx)))
+         (args (caddr (syntax-e stx)))
+         (keys (map arg->key (syntax-e args))))
+    (with-syntax* (((attribute-definitions ...)
+                    (map (λ (k)
+                           #`(define #,(format-id k "~a.~a" name k)
+                               (species-attribute '#,name (species-predicate '(#,@keys)) '#,k)))
+                         keys))
+                   (predicate-definition
+                    #`(define #,(format-id name "~a?" name)
+                        (species-predicate '(#,@keys))))
+                   ((table-pairs ...)
+                    (flat-map (λ (k) (list #`(quote #,k) k)) keys))
+                   ((params ...)
+                    (flat-map arg->param (syntax-e args)))
+                   (constructor-definition
+                    #`(define (#,name params ...) (table table-pairs ...))))
       #'(begin constructor-definition
                predicate-definition
                attribute-definitions ...))))
