@@ -10,7 +10,8 @@
          (prefix-in state: "state.rkt")
          (prefix-in item: "item.rkt")
          (prefix-in dt: "../../datetime.rkt")
-         (prefix-in a: "../../attribute.rkt"))
+         (prefix-in a: "../../attribute.rkt")
+         racket/pretty)
 
 (define file-version (make-parameter 0))
 
@@ -130,7 +131,7 @@
                                            #:properties (deserialize-item-data-properties (hash-ref h 'item-property-data)))))
 
 (define (save-state-to-string st)
-  (~s (serialize-state st)))
+  (pretty-format #:mode 'write (serialize-state st)))
 
 (define (load-state-from-string st #:open-file open-file)
   (deserialize-state (read (open-input-string st))
