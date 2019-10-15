@@ -114,15 +114,15 @@
   (deserialize-hash properties #:deserialize-value (λ (h) (deserialize-hash h #:deserialize-value deserialize-value))))
 
 (define (serialize-state st)
-  (serialize-hash (hash 'file-version (file-version)
+  (serialize-hash (hash 'version (file-version)
                         'all-contexts (serialize-defined-contexts (a:get (st state:state.defined-contexts context:contexts.definitions)))
                         'active-contexts (serialize-active-contexts (a:get (st state:state.active-contexts)))
                         'next-item-id (a:get (st state:state.item-data item:item-data.next))
                         'item-property-data (serialize-item-data-properties (a:get (st state:state.item-data item:item-data.properties))))))
 (define (deserialize-state st #:open-file open-file)
   (define h (deserialize-hash st))
-  (when (not (= (hash-ref h 'file-version) (file-version)))
-    (error (format "This version of Untask can only read file format version ~A, but the given file has version ~A." (file-version) (hash-ref h 'file-version))))
+  (when (not (= (hash-ref h 'version) (file-version)))
+    (error (format "This version of Untask can only read file format version ~A, but the given file has version ~A." (file-version) (hash-ref h 'version))))
   (state:state #:defined-contexts (context:contexts #:definitions (deserialize-defined-contexts (hash-ref h 'all-contexts)))
                #:active-contexts (deserialize-active-contexts (hash-ref h 'active-contexts))
                #:open-file open-file
