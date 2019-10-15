@@ -24,7 +24,7 @@
   (with-handlers ((exn? (λ (e) '(parse-error))))
     (if (not input) '(exit) (parse input))))
 
-(define (format-prompt-line current-contexts)
+(define (format-prompt-line #:open-file open-file #:current-contexts current-contexts)
   (let ((contexts (string-join
                    (map (λ (c)
                           (term:render
@@ -34,10 +34,11 @@
                    " ")))
     (term:render `(()
                    (,contexts
-                    ((black) ("> ")))))))
+                    ((black) (,(or open-file "") "> ")))))))
 
 (define (user-loop! state-box)
-  (let* ((input (prompt-line (format-prompt-line (a:get ((unbox state-box) state:state.active-contexts)))))
+  (let* ((input (prompt-line (format-prompt-line #:open-file (a:get ((unbox state-box) state:state.open-file))
+                                                 #:current-contexts (a:get ((unbox state-box) state:state.active-contexts)))))
          (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
                     (if input (parse input) '(exit))))
          (result (if command
