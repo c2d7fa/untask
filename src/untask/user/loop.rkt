@@ -7,7 +7,6 @@
  "parser.rkt"
  "execute.rkt"
 
- (prefix-in export: "../core/export.rkt")
  (prefix-in state: "../core/state.rkt")
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")

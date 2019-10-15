@@ -5,6 +5,13 @@
          save-state
          load-state)
 
+(require (prefix-in val: "value.rkt")
+         (prefix-in context: "context.rkt")
+         (prefix-in state: "state.rkt")
+         (prefix-in item: "item.rkt")
+         (prefix-in dt: "../../datetime.rkt")
+         (prefix-in a: "../../attribute.rkt"))
+
 (define file-version (make-parameter 0))
 
 (define (serialize-value x)
@@ -126,7 +133,8 @@
   (~s (serialize-state st)))
 
 (define (load-state-from-string st #:open-file open-file)
-  (deserialize-state (read (open-input-string st)) open-file))
+  (deserialize-state (read (open-input-string st))
+                     #:open-file open-file))
 
 (define (save-state st)
   (with-output-to-file (a:get (st state:state.open-file)) #:exists 'replace
