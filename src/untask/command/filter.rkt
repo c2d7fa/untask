@@ -4,43 +4,41 @@
 
 (require
  (prefix-in operators: "../core/operator.rkt")
- (prefix-in item: "../core/item.rkt")
+ (prefix-in i: "../core/item.rkt")
+ (prefix-in p: "../core/property.rkt")
  (prefix-in val: "../core/value.rkt")
-
+ (prefix-in bp: "../properties/builtin.rkt")
  "../user/builtin-operators.rkt"
- "../properties/builtin.rkt"
-
- (only-in "../../misc.rkt" set-filter)
- )
+ (only-in "../../misc.rkt" set-filter))
 
 ;; Take a filter expression and return a function that returns whether
 ;; an item matches the filter.
-(define (evaluate-filter-expression filter-expression item-data item)
+(define (evaluate-filter-expression filter-expression item-state item)
   (match filter-expression
     (`(and ,subexprs ...)
      (andmap (λ (subexpr)
-               (evaluate-filter-expression subexpr item-data item))
+               (evaluate-filter-expression subexpr item-state item))
              subexprs))
     (`(or ,subexprs ...)
      (ormap (λ (subexpr)
-              (evaluate-filter-expression subexpr item-data item))
+              (evaluate-filter-expression subexpr item-state item))
             subexprs))
     (`(not ,subexpr)
-     (not (evaluate-filter-expression subexpr item-data item)))
+     (not (evaluate-filter-expression subexpr item-state item)))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (operators:evaluate-operator-expression builtin-operators
-                                             #:object (get-property-by-key item-data item property)
+                                             #:object (p:get item-state item (bp:ref property))
                                              #:operator operator
                                              #:argument (val:evaluate-literal literal-expr)
-                                             #:object-type (get-property-type-type property)
+                                             #:object-type (p:type (bp:ref property))
                                              #:filter? #t))
     (`(item . ,id)
-     (= (item:item-id item-data item) id))
+     (= item id))
     ((list)
      #t)))
 
-;; Returns a set of all items with values in item-data matching
+;; Returns a set of all items with values in item state matching
 ;; filter-expression.
-(define (search item-data filter-expression)
-  (set-filter (λ (item) (evaluate-filter-expression filter-expression item-data item))
-              (item:all-items item-data)))
+(define (search item-state filter-expression)
+  (set-filter (λ (item) (evaluate-filter-expression filter-expression item-state item))
+              (i:items item-state)))

@@ -4,8 +4,9 @@
 
 (require
  "../core/state.rkt"
- (prefix-in ctx: "../core/context.rkt")
- (prefix-in item: "../core/item.rkt")
+ (prefix-in c: "../core/context.rkt")
+ (prefix-in i: "../core/item.rkt")
+ (prefix-in p: "../core/property.rkt")
  (prefix-in val: "../core/value.rkt")
  (prefix-in serialize: "../core/serialize.rkt")
 
@@ -27,15 +28,11 @@
  "../../squiggle.rkt")
 
 ;; For convenience, the internal procedures in this module pass boxed state
-;; around as a parameter. Error reporting is doen using exceptions.
+;; around as a parameter. Error reporting is done using exceptions.
 
 (define *state (make-parameter #f))
-
-(define (state)
-  (unbox (*state)))
-
-(define (item-data)
-  (a:get-path ((state) state.item-data)))
+(define (state) (unbox (*state)))
+(define (item-state) (a:get-path ((state) state.item-state)))
 
 ;; Check whether fme is a valid filter or modify expression. If it isn't, throw
 ;; an exception.
@@ -47,22 +44,22 @@
 ;; Extend a filter or modify expression with the currently enabled contexts.
 (define (with-contexts fme #:filter? filter?)
   `(and ,fme
-        ,((if filter? ctx:activated-filter ctx:activated-modify)
+        ,((if filter? c:activated-filter c:activated-modify)
           (a:get-path ((state) state.context-state)))))
 
 ;; Find all items matching filter expression exactly.
 (define (search* fe)
-  (filter:search (item-data) fe))
+  (filter:search (item-state) fe))
 
 ;; Like search*, but automatically uses current contexts and returns list sorted
 ;; by urgency rather than set.
 (define (search fe)
   (urgency:sort-items-by-urgency-descending
-   (item-data)
+   (item-state)
    (search* (with-contexts fe #:filter? #t))))
 
 (define (list! items)
-  (displayln (render-listing (item-data) items)))
+  (displayln (render-listing (item-state) items)))
 
 (define (read-file! path)
   (and path (file-exists? path)
@@ -95,7 +92,7 @@
 
 (define (execute-info! fe)
   (check! fe #:filter? #t)
-  (displayln (render-listing-info (item-data) (search fe))))
+  (displayln (render-listing-info (item-state) (search fe))))
 
 ;; TODO: Create other version of "tree" that shows the entire tree, including
 ;; parents/blocked items. It should have some way of highlighting the current
@@ -106,33 +103,31 @@
   (check! rhs #:filter? #t)
   ;; TODO: Distinguish between children and dependencies in output
   (define seen (list))
-  (define (build-tree item-data item)
+  (define (build-tree item-state item)
     ;; TODO: This code is ugly.
     (define (build-tree* item)
       (cons item (map (λ (i)
                         (if (member i seen)
-                            (let ((has-children? (not (and (null? (set->list (val:unwrap-set (item:get-property item-data (val:unwrap-item i) depends:depends-property-type))))
-                                                           (null? (set->list (val:unwrap-set (item:get-property item-data (val:unwrap-item i) links:children-property-type))))))))
+                            (let ((has-children? (not (and (null? (set->list (val:unwrap-set (p:get item-state (val:unwrap-item i) depends:depends-property))))
+                                                           (null? (set->list (val:unwrap-set (p:get item-state (val:unwrap-item i) links:children-property))))))))
                               `(,(val:unwrap-item i) ,@(if has-children? '(()) '())))
                             (begin (set! seen (cons i seen))
                                    (build-tree* (val:unwrap-item i)))))
                       (filter (λ (i)
-                                (filter:evaluate-filter-expression rhs item-data (val:unwrap-item i)))
-                              (append (set->list (val:unwrap-set (item:get-property item-data item depends:depends-property-type)))
-                                      (set->list (val:unwrap-set (item:get-property item-data item links:children-property-type))))))))
+                                (filter:evaluate-filter-expression rhs item-state (val:unwrap-item i)))
+                              (append (set->list (val:unwrap-set (p:get item-state item depends:depends-property)))
+                                      (set->list (val:unwrap-set (p:get item-state item links:children-property))))))))
     (build-tree* item))
-  (displayln (render-trees (item-data)
+  (displayln (render-trees (item-state)
                            (map (λ (item)
-                                  (build-tree (item-data) item))
+                                  (build-tree (item-state) item))
                                 (search fe)))))
 
 (define (execute-agenda! fe)
   (check! fe #:filter? #t)
-  (displayln (render-agenda (item-data)
+  (displayln (render-agenda (item-state)
                             (sort (foldl (λ (item blocks)
-                                           (let ((item-date (val:unwrap-date (item:get-property (item-data)
-                                                                                                item
-                                                                                                date:date-property-type))))
+                                           (let ((item-date (val:unwrap-date (p:get (item-state) item date:date-property))))
                                              (if (assoc item-date blocks dt:same-date?)
                                                  (map (λ (block)
                                                         (if (dt:same-date? (car block) item-date)
@@ -146,31 +141,31 @@
 
 (define (execute-add! me)
   (check! me #:filter? #f)
-  (let-values (((item-data-with-new-item new-item) (item:new-item (a:get-path ((state) state.item-data)))))
+  (let-values (((item-state* item*) (i:new (item-state))))
     (set-box! (*state)
-              (a:set-path ((state) state.item-data)
+              (a:set-path ((state) state.item-state)
                           (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
-                                                        item-data-with-new-item new-item)))
-    (list! (list new-item))))
+                                                             item-state* item*)))
+    (list! (list item*))))
 
 (define (execute-modify! fe me)
   (check! fe #:filter? #t)
   (check! me #:filter? #f)
   (let ((items (search fe)))
     (set-box! (*state)
-              (a:update-path ((state) state.item-data)
-                             (λ (item-data)
-                               (modify:modify-items item-data (list->set items) me))))
+              (a:update-path ((state) state.item-state)
+                             (λ (item-state)
+                               (modify:modify-items item-state (list->set items) me))))
     (list! items)))
 
 (define (execute-copy! fe me)
   (define (copy-item! item)
-    (let-values (((item-data1 new-item) (item:new-item (a:get ((state) state.item-data)))))
-      (let ((item-data2 (item:copy-item item-data1 item new-item)))
-        (set-box! (*state) (a:set-path ((state) state.item-data)
+    (let-values (((item-state* item*) (i:new (item-state))))
+      (let ((item-state** (i:copy item-state* item item*)))
+        (set-box! (*state) (a:set-path ((state) state.item-state)
                                        (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
-                                                                          item-data2 new-item)))
-        new-item)))
+                                                                          item-state** item*)))
+        item*)))
   (check! fe #:filter? #t)
   (check! me #:filter? #f)
   (list! (map (λ (item)
@@ -180,11 +175,11 @@
 (define (execute-remove! fe)
   (check! fe #:filter? #t)
   (set-box! (*state)
-            (a:update-path ((state) state.item-data)
-                           (λ (item-data)
-                             (foldl (λ (item item-data)
-                                      (item:remove-item item-data item))
-                                    item-data
+            (a:update-path ((state) state.item-state)
+                           (λ (item-state)
+                             (foldl (λ (item item-state)
+                                      (i:remove item-state item))
+                                    item-state
                                     (search fe))))))
 
 ;; Execute a command and update the state by setting the boxed state. Return
@@ -215,30 +210,25 @@
          'proceed)
         (`(context active ,toggles)
          (set-box! (*state) (a:update-path ((state) state.context-state)
-                                           (λ> (ctx:toggle toggles))))
+                                           (λ> (c:toggle toggles))))
          'proceed)
         (`(context add ,name ,fe ,me)
          (check! fe #:filter? #t)
          (check! me #:filter? #f)
          (set-box! (*state) (a:update-path ((state) state.context-state)
-                                           (λ> (ctx:register name #:filter fe #:modify me))))
+                                           (λ> (c:register name #:filter fe #:modify me))))
          'proceed)
         (`(context remove ,name)
          (set-box! (*state) (a:update-path ((state) state.context-state)
-                                           (λ> (ctx:remove name))))
+                                           (λ> (c:remove name))))
          'proceed)
         (`(context show)
-         (display-message! (format "~a" (ctx:available-names (a:get-path ((state) state.context-state)))))
+         (display-message! (format "~a" (c:available-names (a:get-path ((state) state.context-state)))))
          'proceed)
         (`(with-contexts ,toggles ,subcommand)
          (let ((old-context-state (a:get-path ((state) state.context-state))))
            (set-box! (*state) (a:update-path ((state) state.context-state)
-                                             (λ> (ctx:toggle toggles))))
-           ;; TODO: Handle exceptions here to ensure that context state is reset
-           ;; no matter what! (Comment: When testing, this doesn't seem to be a
-           ;; problem, though I don't understand why; surely if there is an
-           ;; error in the execute! below, then we won't be able to reset the
-           ;; contexts, right?)
+                                             (λ> (c:toggle toggles))))
            (execute! subcommand (*state))
            (set-box! (*state) (a:set-path ((state) state.context-state) old-context-state))
            'proceed))

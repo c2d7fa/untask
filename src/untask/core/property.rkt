@@ -63,7 +63,12 @@
 (define (update item-state item property f)
   (set item-state item property (f (get item-state item property))))
 
-;; Given a calculate function, wrap the function to use a default value when no
-;; property is set.
-(define ((default calculate default-value) item-state item)
-  (or (calculate item-state item) default-value))
+;; Given a property, create an equivalent property that has a default value.
+(define (default base-property default-value)
+  (property #:name (name base-property)
+            #:type (type base-property)
+            #:calculate (λ (item-state item)
+                          (or (get item-state item base-property)
+                              default-value))
+            #:translate (λ (item-state item value)
+                          (set item-state item base-property value))))

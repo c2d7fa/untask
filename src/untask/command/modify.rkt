@@ -4,12 +4,12 @@
 
 (require
  (prefix-in operators: "../core/operator.rkt")
- (prefix-in item: "../core/item.rkt")
+ (prefix-in i: "../core/item.rkt")
+ (prefix-in p: "../core/property.rkt")
  (prefix-in val: "../core/value.rkt")
-
+ (prefix-in bp: "../properties/builtin.rkt")
  "../user/builtin-operators.rkt"
- "../properties/builtin.rkt"
-
+ "../../squiggle.rkt"
  racket/system)
 
 ;; TODO: Correctly detect editor on other platforms.
@@ -20,44 +20,41 @@
     (system (format "$EDITOR ~a" temp-file))
     (call-with-input-file temp-file (lambda (in) (port->string in)))))
 
-;; Take a modify expression and return a function that will update the
-;; given item in the given item-data according to the
-;; modify-expression.
-(define (evaluate-modify-expression modify-expression item-data item)
+;; Modify the given item accoring to modify-expression.
+(define (evaluate-modify-expression modify-expression item-state item)
   (match modify-expression
     (`(edit)
-     (let* ((old-description (val:unwrap-string (get-property-by-key item-data item 'description)))
-            (old-notes (val:unwrap-string (get-property-by-key item-data item 'notes)))
+     (let* ((old-description (val:unwrap-string (p:get item-state item (bp:ref 'description))))
+            (old-notes (val:unwrap-string (p:get item-state item (bp:ref 'notes))))
             (str (string-trim (string-join (list old-description old-notes) "\n\n")))
             (text (result-of-editor-on! str))
             (lines (string-split (string-trim text) "\n"))
             (new-description (car lines))
             (new-notes (string-trim (string-join (cdr lines) "\n"))))
-       (set-property-by-key
-        (set-property-by-key item-data item 'description (val:make-string new-description))
-        item 'notes (val:make-string new-notes))))
+       (~> item-state
+           (p:set item (bp:ref 'description) (val:make-string new-description))
+           (p:set item (bp:ref 'notes) (val:make-string new-notes)))))
     (`(edit ,property)
-     (set-property-by-key item-data item property (val:make-string (result-of-editor-on! (val:unwrap-string (get-property-by-key item-data item property))))))
+     (p:set item-state item (bp:ref property) (val:make-string (result-of-editor-on! (val:unwrap-string (p:get item-state item (bp:ref property)))))))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (set-property-by-key item-data item property (operators:evaluate-operator-expression
-                                                   builtin-operators
-                                                   #:object (get-property-by-key item-data item property)
-                                                   #:operator operator
-                                                   #:argument (val:evaluate-literal literal-expr)
-                                                   #:object-type (get-property-type-type property)
-                                                   #:filter? #f)))
+     (p:set item-state item (bp:ref property) (operators:evaluate-operator-expression
+                                               builtin-operators
+                                               #:object (p:get item-state item (bp:ref property))
+                                               #:operator operator
+                                               #:argument (val:evaluate-literal literal-expr)
+                                               #:object-type (p:type (bp:ref property))
+                                               #:filter? #f)))
     (`(and ,subexpressions ...)
-     (foldl (λ (subexpression item-data)
-              (evaluate-modify-expression subexpression item-data item))
-            item-data
+     (foldl (λ (subexpression item-state)
+              (evaluate-modify-expression subexpression item-state item))
+            item-state
             subexpressions))
-    ((list)
-     item-data)))
+    ((list) item-state)))
 
-;; Returns new-item-data after modifying all items in item-data according to
+;; Returns new item-state after modifying all items in the given set accoring to
 ;; modify-expression.
-(define (modify-items item-data items modify-expression)
-  (foldl (λ (item item-data)
-           (evaluate-modify-expression modify-expression item-data item))
-         item-data
+(define (modify-items item-state items modify-expression)
+  (foldl (λ (item item-state)
+           (evaluate-modify-expression modify-expression item-state item))
+         item-state
          (set->list items)))

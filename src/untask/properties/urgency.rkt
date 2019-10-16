@@ -1,37 +1,35 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide urgency-property
+         sort-items-by-urgency-descending)
 
 (require
-  (prefix-in item: "../core/item.rkt")
-  (prefix-in prop: "../core/property.rkt")
-  (prefix-in val: "../core/value.rkt")
-  (prefix-in depends: "./dependencies.rkt")
-  (prefix-in status: "./status.rkt"))
+ (prefix-in i: "../core/item.rkt")
+ (prefix-in p: "../core/property.rkt")
+ (prefix-in val: "../core/value.rkt")
+ "../../squiggle.rkt"
 
-(define (calculate-urgency item-data item)
-  (val:make-number (+ (val:unwrap-number (item:get-raw-property item-data item urgency-property-type))
+ (prefix-in depends: "./dependencies.rkt")
+ (prefix-in status: "./status.rkt"))
+
+(define (calculate-urgency item-state item)
+  (val:make-number (+ (val:unwrap-number (or (i:get item-state item 'urgency) (val:make-number 0)))
                       (apply max 0
                              (map (λ (blo)
-                                    (val:unwrap-number (calculate-urgency item-data (val:unwrap-item blo))))
+                                    (val:unwrap-number (calculate-urgency item-state (val:unwrap-item blo))))
                                   (filter (λ (blo)
-                                            (not (status:done? item-data (val:unwrap-item blo))))
-                                          (set->list (val:unwrap-set (item:get-property item-data item depends:blocks-property-type)))))))))
+                                            (not (status:done? item-state (val:unwrap-item blo))))
+                                          (set->list (val:unwrap-set (p:get item-state item depends:blocks-property)))))))))
 
-(define (translate-urgency item-data item value)
-  (item:set-raw-property item-data item urgency-property-type value))
+(define urgency-property
+  (p:property #:name 'urgency
+              #:type 'number
+              #:calculate calculate-urgency))
 
-(define urgency-property-type
-  (prop:property-type #:key 'urgency
-                      #:type 'number
-                      #:default (val:make-number 0)
-                      #:calculate calculate-urgency
-                      #:translate translate-urgency))
-
-;; Takes item-data and a set of items, returns sorted list of items.
-(define (sort-items-by-urgency-descending item-data item-set)
+;; Takes item state and a set of items, returns sorted list of items.
+(define (sort-items-by-urgency-descending item-state item-set)
   (define (number>= x y)
     (>= (val:unwrap-number x) (val:unwrap-number y)))
   (sort (set->list item-set) number>=
         #:key (λ (item)
-                (calculate-urgency item-data item))))
+                (calculate-urgency item-state item))))

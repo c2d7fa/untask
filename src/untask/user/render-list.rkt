@@ -6,7 +6,8 @@
          render-trees)
 
 (require
- (prefix-in item: "../core/item.rkt")
+ (prefix-in i: "../core/item.rkt")
+ (prefix-in p: "../core/property.rkt")
  (prefix-in val: "../core/value.rkt")
 
  (prefix-in status: "../properties/status.rkt")
@@ -21,35 +22,35 @@
  (prefix-in dt: "../../datetime.rkt")
  )
 
-(define (render-listing item-data items)
+(define (render-listing item-state items)
   (if (= 1 (length items))
-      (render-listing-info item-data items)
-      (render-listing* item-data items)))
+      (render-listing-info item-state items)
+      (render-listing* item-state items)))
 
-(define (render-listing* item-data items)
-  (define (render-item item-data item)
-    (define description (item:get-property item-data item description:description-property-type))
-    (define notes (item:get-property item-data item description:notes-property-type))
-    (define tags (item:get-property item-data item tags:tags-property-type))
-    (define urgency (item:get-property item-data item urgency:urgency-property-type))
-    (define base-urgency (item:get-raw-property item-data item urgency:urgency-property-type))
-    (define status (item:get-property item-data item status:status-property-type))
-    (define depends (item:get-property item-data item depends:depends-property-type))
-    (define blocks (item:get-property item-data item depends:blocks-property-type))
-    (define children (item:get-property item-data item links:children-property-type))
-    (define parents (item:get-property item-data item links:parents-property-type))
-    (define wait (item:get-property item-data item date:wait-property-type))
-    (define date (item:get-property item-data item date:date-property-type))
+(define (render-listing* item-state items)
+  (define (render-item item-state item)
+    (define description (p:get item-state item description:description-property))
+    (define notes (p:get item-state item description:notes-property))
+    (define tags (p:get item-state item tags:tags-property))
+    (define urgency (p:get item-state item urgency:urgency-property))
+    (define base-urgency (or (i:get item-state item urgency:urgency-property) (val:make-number 0)))
+    (define status (p:get item-state item status:status-property))
+    (define depends (p:get item-state item depends:depends-property))
+    (define blocks (p:get item-state item depends:blocks-property))
+    (define children (p:get item-state item links:children-property))
+    (define parents (p:get item-state item links:parents-property))
+    (define wait (p:get item-state item date:wait-property))
+    (define date (p:get item-state item date:date-property))
     (term:render `(()
                    (
                     ;; ID
                     ((black)
-                     (,(~r (item:item-id item-data item) #:min-width 3 #:pad-string " ")
+                     (,(~r item #:min-width 3 #:pad-string " ")
                       ". "))
                     ;; Description
                     (,@(cond
-                         ((status:active? item-data item) '((bold)))
-                         ((status:done? item-data item) '((strikethrough) (white)))
+                         ((status:active? item-state item) '((bold)))
+                         ((status:done? item-state item) '((strikethrough) (white)))
                          (else '((white))))
                      (,(val:unwrap-string description)))
                     ;; Notes
@@ -91,7 +92,7 @@
                          ""
                          `((blue) (bold) (" P")))
                     ;; Wait
-                    ,(if (not (date:wait-active? item-data item))  ; Display only when task is waiting
+                    ,(if (not (date:wait-active? item-state item))  ; Display only when task is waiting
                          `(() (((black) (" W:"))
                                ,(style-date (val:unwrap-date wait))))
                          (if wait                                  ; If task has "wait" but is not waiting, simply display "W"
@@ -104,7 +105,7 @@
                                ,(style-date (val:unwrap-date date)))))
                     ))))
   (string-join
-   (map (λ (item) (render-item item-data item)) items)
+   (map (λ (item) (render-item item-state item)) items)
    "\n"))
 
 (define (string-indent s n)
@@ -131,20 +132,20 @@
                     ,(dt:month-short-string d) "-"
                     ,(~ (dt:datetime-day d)))))))
 
-(define (render-listing-info item-data items)
+(define (render-listing-info item-state items)
   (define (render-item item)
-    (define description (item:get-property item-data item description:description-property-type))
-    (define notes (item:get-property item-data item description:notes-property-type))
-    (define tags (item:get-property item-data item tags:tags-property-type))
-    (define urgency (item:get-property item-data item urgency:urgency-property-type))
-    (define base-urgency (item:get-raw-property item-data item urgency:urgency-property-type))
-    (define status (item:get-property item-data item status:status-property-type))
-    (define depends (item:get-property item-data item depends:depends-property-type))
-    (define blocks (item:get-property item-data item depends:blocks-property-type))
-    (define children (item:get-property item-data item links:children-property-type))
-    (define parents (item:get-property item-data item links:parents-property-type))
-    (define wait (item:get-property item-data item date:wait-property-type))
-    (define date (item:get-property item-data item date:date-property-type))
+    (define description (p:get item-state item description:description-property))
+    (define notes (p:get item-state item description:notes-property))
+    (define tags (p:get item-state item tags:tags-property))
+    (define urgency (p:get item-state item urgency:urgency-property))
+    (define base-urgency (or (i:get item-state item urgency:urgency-property) (val:make-number 0)))
+    (define status (p:get item-state item status:status-property))
+    (define depends (p:get item-state item depends:depends-property))
+    (define blocks (p:get item-state item depends:blocks-property))
+    (define children (p:get item-state item links:children-property))
+    (define parents (p:get item-state item links:parents-property))
+    (define wait (p:get item-state item date:wait-property))
+    (define date (p:get item-state item date:date-property))
     (term:render `(()
                    (
                     ;; Description
@@ -159,14 +160,14 @@
                     ;; Id
                     (()
                      (((black) ("ID:      "))
-                      ,(~a (item:item-id item-data item))))
+                      ,(~a item)))
                     "\n"
                     ;; Status
                     (()
                      (((black) ("Status:  "))
                       ,(cond
-                         ((status:active? item-data item) '((bold) ("active")))
-                         ((status:done? item-data item) '((strikethrough) (white) ("done")))
+                         ((status:active? item-state item) '((bold) ("active")))
+                         ((status:done? item-state item) '((strikethrough) (white) ("done")))
                          (else `((white) (,(val:unwrap-string status)))))))
                     "\n"
                     ;; Wait
@@ -208,7 +209,7 @@
                          `(()
                            ("\n\n"
                             ((black) ("Depends on:\n"))
-                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set depends))))
+                            ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set depends))))
                                             4))))
                     ;; Blocked
                     ,(if (set-empty? (val:unwrap-set blocks))
@@ -216,7 +217,7 @@
                          `(()
                            ("\n\n"
                             ((black) ("Blocks:\n"))
-                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set blocks))))
+                            ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set blocks))))
                                             4))))
                     ;; Children
                     ,(if (set-empty? (val:unwrap-set children))
@@ -224,7 +225,7 @@
                          `(()
                            ("\n\n"
                             ((black) ("Children:\n"))
-                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set children))))
+                            ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set children))))
                                             4))))
                     ;; Parents
                     ,(if (set-empty? (val:unwrap-set parents))
@@ -232,14 +233,14 @@
                          `(()
                            ("\n\n"
                             ((black) ("Parents:\n"))
-                            ,(string-indent (render-listing* item-data (map val:unwrap-item (set->list (val:unwrap-set parents))))
+                            ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set parents))))
                                             4))))
                     ))))
   (string-join
    (map (λ (item) (render-item item)) items)
    "\n\n\n"))
 
-(define (render-agenda item-data blocks)
+(define (render-agenda item-state blocks)
   ;; `blocks' is a list of blocks of the form (date . items), where `date' is a
   ;; datetime as defined in the datetime module and `items' is a list of items
   ;; to display for that date.
@@ -258,20 +259,20 @@
   (define (render-block block)
     (term:render `(() (,(style-date (car block))
                        "\n"
-                       ,(string-indent (render-listing* item-data (cdr block)) 4)
+                       ,(string-indent (render-listing* item-state (cdr block)) 4)
                        ))))
   (string-join
    (map (λ (block) (render-block block)) blocks)
    "\n\n"))
 
-(define (render-trees item-data trees)
+(define (render-trees item-state trees)
   (define (render-tree tree)
     (if (null? tree)
         (term:render '((black) ("   ...")))
         (string-join
          (filter (λ (s) (not (equal? "" s)))
-                 (list (render-listing* item-data (list (car tree)))
-                       (string-indent (render-trees item-data (cdr tree)) 2)))
+                 (list (render-listing* item-state (list (car tree)))
+                       (string-indent (render-trees item-state (cdr tree)) 2)))
          "\n")))
   (string-join
    (map render-tree trees)

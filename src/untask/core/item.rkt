@@ -12,7 +12,10 @@
 
          get
          set
-         update)
+         update
+
+         load-state
+         dump-state)
 
 ;; In this module, the term item is used to describe the numeric IDs that refer
 ;; to a particular item rather than the data associated with that item. Each
@@ -111,3 +114,14 @@
             (not (empty? (property-names state item))))
           (hash-keys (a:get-path (state state.properties)))))
 
+;; Initialize a state from the given parameters:
+;; 1. next-item is the ID of the next item to be created;
+;; 2. property-map is a hash map from items to hash maps from property names to
+;;    property values.
+(define (load-state next-item property-map)
+  (state #:next next-item #:properties property-map))
+
+;; Return the values required by load-state to recreate the given state.
+(define (dump-state state)
+  (values (a:get-path (state state.next))
+          (a:get-path (state state.properties))))

@@ -7,8 +7,8 @@
  "parser.rkt"
  "execute.rkt"
 
- (prefix-in state: "../core/state.rkt")
- (prefix-in ctx: "../core/context.rkt")
+ "../core/state.rkt"
+ (prefix-in c: "../core/context.rkt")
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
 
@@ -38,9 +38,9 @@
                     ((black) (,(if open-file (if (set-empty? current-contexts) open-file (format " ~A" open-file)) "") "> ")))))))
 
 (define (user-loop! state-box)
-  (let* ((input (prompt-line (format-prompt-line #:open-file (a:get-path ((unbox state-box) state:state.open-file))
-                                                 #:current-contexts (~> (a:get-path ((unbox state-box) state:state.context-state))
-                                                                        (ctx:activated-names)))))
+  (let* ((input (prompt-line (format-prompt-line #:open-file (a:get-path ((unbox state-box) state.open-file))
+                                                 #:current-contexts (~> (a:get-path ((unbox state-box) state.context-state))
+                                                                        (c:activated-names)))))
          (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
                     (if input (parse input) '(exit))))
          (result (if command

@@ -5,9 +5,9 @@
 (require
  (prefix-in val: "../core/value.rkt")
  (prefix-in op: "../core/operator.rkt")
- "../core/property.rkt"
+ (prefix-in p: "../core/property.rkt")
  "../user/builtin-operators.rkt"
- "../properties/builtin.rkt"
+ (prefix-in bp: "../properties/builtin.rkt")
  (prefix-in a: "../../attribute.rkt"))
 
 ;; Returns #t if expression is valid, otherwise returns human-readable string
@@ -34,24 +34,22 @@
      #t)
     (`(edit ,property)
      (when filter? (error "Error!")) ; NOTE: This cannot be parsed in filter context.
-     (let ((pr (get-property-type builtin-property-types property)))
-       (if (eq? pr #f)
-           (format "Unknown property '~a'." property)
-           (if (equal? 'string (a:get-path (pr property-type.type)))
-               #t
-               (format "Property '~a' of type '~a' cannot be edited because it is not of type string." property (a:get-path (pr property-type.type)))))))
+     (if (not (bp:has? property))
+         (format "Unknown property '~A'." property)
+         (if (equal? 'string (p:type (bp:ref property)))
+             #t
+             (format "Property '~A' of type '~A' cannot be edited because it is not of type string." property (p:type (bp:ref property))))))
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
-     (let ((pr (get-property-type builtin-property-types property)))
-       (if (eq? pr #f)
-           (format "Unknown property '~a'." property)
-           (let ((op (op:operator-definitions-find builtin-operators
-                                                   operator
-                                                   (a:get-path (pr property-type.type))
-                                                   filter?)))
-             (if (eq? op #f)
-                 (format "Unknown operator '~a' on property '~a'." operator property)
-                 (op:check-types op
-                                 #:object-type (a:get-path (pr property-type.type))
-                                 #:argument-type (val:get-type (val:evaluate-literal literal-expr))))))))
+                                          (if (not (bp:has? property))
+                                              (format "Unknown property '~A'." property)
+                                              (let ((op (op:operator-definitions-find builtin-operators
+                                                                                      operator
+                                                                                      (p:type (bp:ref property))
+                                                                                      filter?)))
+                                                (if (eq? op #f)
+                                                    (format "Unknown operator '~A' on property '~A'." operator property)
+                                                    (op:check-types op
+                                                                    #:object-type (p:type (bp:ref property))
+                                                                    #:argument-type (val:get-type (val:evaluate-literal literal-expr)))))))
     (`(item . ,id) #t)
     ('() #t)))
