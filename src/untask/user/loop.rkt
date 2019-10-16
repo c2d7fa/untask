@@ -34,7 +34,7 @@
                    " ")))
     (term:render `(()
                    (,contexts
-                    ((black) (,(or open-file "") "> ")))))))
+                    ((black) (,(if open-file (if (set-empty? current-contexts) open-file (format " ~A" open-file)) "") "> ")))))))
 
 (define (user-loop! state-box)
   (let* ((input (prompt-line (format-prompt-line #:open-file (a:get ((unbox state-box) state:state.open-file))
