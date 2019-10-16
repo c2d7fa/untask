@@ -1,38 +1,69 @@
 #lang racket
 
-(provide empty-property-type-collection
-         add-property-type
-         get-property-type
+(provide property
+         property?
+         name
+         type
+         get
+         set
+         update
 
-         property-type
-         property-type?
-         property-type.key
-         property-type.type
-         property-type.default
-         property-type.calculate
-         property-type.translate)
+         default)
 
-;; A property type is a way of representing a certain class of properties.
-;; Examples of property types are 'urgency', 'description' and 'status'.
-;; Definitions of concrete property types are defined in ../properties/. The
-;; property values of each item is handled in ./item-data.rkt.
+;; This module builds on top of the concepts of properties defined in the "item"
+;; module, by allowing for the association of certain properties to metadata,
+;; such as type information and dynamic behaviour. In particular, a "property",
+;; in the sense meant by this module has a name, a type, a default value and
+;; functions for setting or getting the value. A function that wraps a setter is
+;; said to "translate" the value, while a function that wraps the getter is said
+;; to "calculate" the value.
 
-(require (prefix-in a: "../../attribute.rkt"))
+(require (prefix-in i: "item.rkt")
+         (prefix-in a: "../../attribute.rkt"))
 
-;;; Property type collection
+;; A property consists of a name, a type, and the two functions calculate and
+;; translate.
+;;
+;; The calculate function is used when looking up the property. It is given the
+;; item-state and the item being looked up as arguments and must return the
+;; value of that item.
+;;
+;; The translate function is used when setting the property. It is given the
+;; item state, the item whose property is being set, and the value that the
+;; property should be set to. It must return the updated item state.
+;;
+;; By default, calculate and translate simply get or set the property directly.
+(a:define-species property (name type
+                            (calculate (λ (item-state item)
+                                         (i:get item-state item name)))
+                            (translate (λ (item-state item value)
+                                         (i:set item-state item name value)))))
 
-;; Property type collections are used to access information about all the
-;; property types that the program has been configured to understand.
+;; Return the name of the given property.
+(define (name property)
+  (a:get-path (property property.name)))
 
-(define empty-property-type-collection
-  (hash))
+;; Return the type of the given property.
+(define (type property)
+  (a:get-path (property property.type)))
 
-(define (add-property-type collection property-type)
-  (hash-set collection (a:get-path (property-type property-type.key)) property-type))
+;; Get the value of a property. This function is similar to item:get, but takes
+;; into account the metadata associated with the give property.
+(define (get item-state item property)
+  ((a:get-path (property property.calculate)) item-state item))
 
-(define (get-property-type collection key)
-  (hash-ref collection key #f))
+;; Set the value of a property. This function is similar to item:set, but takes
+;; into account the metadata associated with the given property.
+(define (set item-state item property value)
+  ((a:get-path (property property.translate)) item-state item value))
 
-;;; Property type
+;; Update the value of a property. This function is similar to item:update, but
+;; takes into account the metadata associated with the given property, both when
+;; reading and writing.
+(define (update item-state item property f)
+  (set item-state item property (f (get item-state item property))))
 
-(a:define-species property-type (key type (default #f) (calculate #f) (translate #f)))
+;; Given a calculate function, wrap the function to use a default value when no
+;; property is set.
+(define ((default calculate default-value) item-state item)
+  (or (calculate item-state item) default-value))
