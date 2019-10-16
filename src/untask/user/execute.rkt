@@ -79,7 +79,7 @@
 (define (confirm-unsaved!)
   (let ((saved (read-file! (a:get-path ((state) state.open-file)))))
     (if (or (not saved)
-            (equal? (serialize:load-state (a:get ((state) state.open-file))) (state)))
+            (equal? (serialize:load-state (a:get-path ((state) state.open-file))) (state)))
         #t
         (begin
           (display (term:render `((bold) (blue) ("You have unsaved data. Proceed? "))))

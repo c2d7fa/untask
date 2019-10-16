@@ -8,6 +8,9 @@
          register
          remove
 
+         filter
+         modify
+
          activate
          deactivate
          deactivate-all
@@ -37,6 +40,18 @@
 ;; Returns #t if the given context is availabe, #f otherwise.
 (define (available? state name)
   (hash-has-key? (a:get-path (state state.available)) name))
+
+;; Returns the filter expression corresponding to an available context.
+;;
+;; If no such context is available, returns #f.
+(define (filter state name)
+  (a:get-path (state state.available (a:hash. name) context.filter)))
+
+;; Returns the modify expression corresponding to an available context.
+;;
+;; If nos uch context is available, returns #f.
+(define (modify state name)
+  (a:get-path (state state.available (a:hash. name) context.modify)))
 
 ;; Activate a context if it is available; otherwise, do nothing.
 (define (activate state name)

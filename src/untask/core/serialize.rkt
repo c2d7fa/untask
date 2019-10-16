@@ -5,12 +5,13 @@
          save-state
          load-state)
 
-(require (prefix-in val: "value.rkt")
-         (prefix-in context: "context.rkt")
-         (prefix-in state: "state.rkt")
+(require "state.rkt"
+         (prefix-in val: "value.rkt")
+         (prefix-in ctx: "context.rkt")
          (prefix-in item: "item.rkt")
          (prefix-in dt: "../../datetime.rkt")
          (prefix-in a: "../../attribute.rkt")
+         "../../squiggle.rkt"
          racket/pretty)
 
 (define file-version (make-parameter 0))
@@ -51,9 +52,6 @@
                                    (list (deserialize-key (car kv))
                                          (deserialize-value (cadr kv))))
                                  kvs))))
-
-(define (serialize-active-contexts active-contexts) (set->list active-contexts))
-(define (deserialize-active-contexts active-contexts) (list->set active-contexts))
 
 ;; NOTE: This depends on the representations of literals.
 (define (serialize-literal x)
@@ -98,16 +96,33 @@
     ('() '())
     (else (error (format "Could not deserialize filter/modify expression: ~S" fme)))))
 
-(define (serialize-defined-contexts defined-contexts)
-  (define (serialize-context x)
-    (list (serialize-fm-expression (a:get (x context:context.filter)))
-          (serialize-fm-expression (a:get (x context:context.modify)))))
-  (serialize-hash defined-contexts #:serialize-value serialize-context))
-(define (deserialize-defined-contexts defined-contexts)
-  (define (deserialize-context x)
-    (context:context #:filter (deserialize-fm-expression (car x))
-                     #:modify (deserialize-fm-expression (cadr x))))
-  (deserialize-hash defined-contexts #:deserialize-value deserialize-context))
+(define (serialize-defined-contexts st)
+  (define context-state (a:get-path (st state.context-state)))
+  (serialize-hash
+   (make-immutable-hash
+    (map (λ (name)
+           (cons name
+                 (list (serialize-fm-expression (ctx:filter context-state name))
+                       (serialize-fm-expression (ctx:modify context-state name)))))
+         (ctx:available-names context-state)))))
+;; Returns a context-state with the new contexts added.
+(define (deserialize-defined-contexts ctx-st defined-contexts)
+  (define h (deserialize-hash defined-contexts))
+  (foldl (λ (name st)
+           (ctx:register st name
+                         #:filter (deserialize-fm-expression (car (hash-ref h name)))
+                         #:modify (deserialize-fm-expression (cadr (hash-ref h name)))))
+         ctx-st
+         (hash-keys h)))
+
+(define (serialize-activated-contexts st)
+  (~> (a:get-path (st state.context-state)) (ctx:activated-names)))
+;; Returns a context-state with the new contexts added.
+(define (deserialize-activated-contexts cst x)
+  (foldl (λ (name cst)
+           (ctx:activate cst name))
+         cst
+         x))
 
 (define (serialize-item-data-properties properties)
   (serialize-hash properties #:serialize-value (λ (h) (serialize-hash h #:serialize-value serialize-value))))
@@ -116,19 +131,20 @@
 
 (define (serialize-state st)
   (serialize-hash (hash 'version (file-version)
-                        'all-contexts (serialize-defined-contexts (a:get (st state:state.defined-contexts context:contexts.definitions)))
-                        'active-contexts (serialize-active-contexts (a:get (st state:state.active-contexts)))
-                        'next-item-id (a:get (st state:state.item-data item:item-data.next))
-                        'item-property-data (serialize-item-data-properties (a:get (st state:state.item-data item:item-data.properties))))))
+                        'all-contexts (serialize-defined-contexts st)
+                        'active-contexts (serialize-activated-contexts st)
+                        'next-item-id (a:get-path (st state.item-data item:item-data.next))
+                        'item-property-data (serialize-item-data-properties (a:get-path (st state.item-data item:item-data.properties))))))
 (define (deserialize-state st #:open-file open-file)
   (define h (deserialize-hash st))
   (when (not (= (hash-ref h 'version) (file-version)))
     (error (format "This version of Untask can only read file format version ~A, but the given file has version ~A." (file-version) (hash-ref h 'version))))
-  (state:state #:defined-contexts (context:contexts #:definitions (deserialize-defined-contexts (hash-ref h 'all-contexts)))
-               #:active-contexts (deserialize-active-contexts (hash-ref h 'active-contexts))
-               #:open-file open-file
-               #:item-data (item:item-data #:next (hash-ref h 'next-item-id)
-                                           #:properties (deserialize-item-data-properties (hash-ref h 'item-property-data)))))
+  (state #:context-state (~> ctx:empty-state
+                             (deserialize-defined-contexts (hash-ref h 'all-contexts))
+                             (deserialize-activated-contexts (hash-ref h 'active-contexts)))
+         #:open-file open-file
+         #:item-data (item:item-data #:next (hash-ref h 'next-item-id)
+                                     #:properties (deserialize-item-data-properties (hash-ref h 'item-property-data)))))
 
 (define (save-state-to-string st)
   (pretty-format #:mode 'write (serialize-state st)))
@@ -138,7 +154,7 @@
                      #:open-file open-file))
 
 (define (save-state st)
-  (with-output-to-file (a:get (st state:state.open-file)) #:exists 'replace
+  (with-output-to-file (a:get-path (st state.open-file)) #:exists 'replace
     (thunk (displayln (save-state-to-string st)))))
 
 (define (load-state path)
