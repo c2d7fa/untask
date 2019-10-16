@@ -18,6 +18,14 @@
 (define (make-date datetime)
   `(date . ,datetime))
 
+(define (string-value? x) (and x (pair? x) (eq? 'string (car x))))
+(define (set-value? x) (and x (pair? x) (eq? 'set (car x))))
+(define (number-value? x) (and x (pair? x) (eq? 'number (car x))))
+(define (item-value? x) (and x (pair? x) (eq? 'item (car x))))
+(define (boolean-value? x) (and x (pair? x) (eq? 'boolean (car x))))
+(define (date-value? x) (and x (pair? x) (eq? 'date (car x))))
+(define (empty-value? x) (not x))
+
 (define (get-type v)
   (if (eq? #f v)
       'none

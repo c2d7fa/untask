@@ -7,7 +7,7 @@
  (prefix-in ctx: "../core/context.rkt")
  (prefix-in item: "../core/item.rkt")
  (prefix-in val: "../core/value.rkt")
- (prefix-in export: "../core/export.rkt")
+ (prefix-in serialize: "../core/serialize.rkt")
 
  "../command/check-expression.rkt"
  (prefix-in filter: "../command/filter.rkt")
@@ -79,7 +79,7 @@
 (define (confirm-unsaved!)
   (let ((saved (read-file! (a:get-path ((state) state.open-file)))))
     (if (or (not saved)
-            (equal? (export:read-state-from-string saved) (state)))
+            (equal? (serialize:load-state (a:get ((state) state.open-file))) (state)))
         #t
         (begin
           (display (term:render `((bold) (blue) ("You have unsaved data. Proceed? "))))
@@ -203,23 +203,15 @@
         (`(,fe agenda)     (execute-agenda! fe)    'proceed)
         (`(,fe tree ,rhs)  (execute-tree! fe rhs)  'proceed)
         (`(open ,filename)
-         ;; TODO: Our whole system for saving and loading data is a mess.
-         (let ((load-state (λ (old-state file-state)
-                             (thread old-state
-                                     ((λ (state) (a:set-path (state state.open-file) filename)))
-                                     ((λ (state) (a:set-path (state state.item-data)
-                                                             (a:get-path (file-state state.item-data)))))
-                                     ((λ (state) (a:set-path (state state.context-state)
-                                                             (a:get-path (file-state state.context-state)))))))))
-           (let ((file-content (read-file! filename))
-                 (confirm? (confirm-unsaved!)))
-             (when confirm?
-                 (if file-content
-                     (set-box! (*state) (load-state (state) (export:read-state-from-string file-content)))
-                     (set-box! (*state) (a:set-path (state-empty state.open-file) filename))))))
+         (let ((file-content (read-file! filename))
+               (confirm? (confirm-unsaved!)))
+           (when confirm?
+             (if file-content
+                 (set-box! (*state) (serialize:load-state-from-string file-content #:open-file filename))
+                 (set-box! (*state) (a:set-path (state-empty state.open-file) filename)))))
          'proceed)
         (`(save)
-         (write-file! (a:get-path ((state) state.open-file)) (export:export-state-to-string (state)))
+         (serialize:save-state (state))
          'proceed)
         (`(context active ,toggles)
          (set-box! (*state) (a:update-path ((state) state.context-state)
