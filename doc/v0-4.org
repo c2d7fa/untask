@@ -1,0 +1,55 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Untask 0.4
+
+This file describes the changes between version 0.3 and version 0.4 of Untask.
+
+* New file format
+
+Previously, files would be saved by just having the program dump it's state to a
+file. This is obviously not a good way of handling save files.
+
+Version 0.4 introduces a proper file format, so that future versions of Untask
+will be able to use files that have been saved in a previous version. This new
+format also ensures that pointless information is not saved to disk -- only what
+is actually needed to restore the program state.
+
+* The copy command
+
+Version 0.4 adds the "copy" command, which is used to copy an item, while
+optionally making certain changes. For example:
+#+begin_example
+> list
+  1. Some item  0
+> 1 copy urgency+$1
+  1. Some item  0
+  2. Some item  1
+#+end_example
+
+* Editing
+
+Version 0.4 adds support for editing string values in an external editor. The
+syntax for this is "property.."; for example, to set the description of item 1,
+one could use the following command:
+#+begin_example
+> 1 modify description..
+#+end_example
+This then opens an editor (the one set by =$EDITOR=), making it easy to edit the
+property live.
+
+Additionally, the token =..= opens an editor with both the description and the
+notes (see below) for an item. For example:
+#+begin_example
+> add ..
+#+end_example
+This command adds a new item with the description and notes decided by what is
+entered in the editor. (The description is the first line; everything else is
+the notes.)
+
+* Notes
+
+Version 0.4 adds the =notes= property. This property is used for storing
+free-form notes attached to an item. It is particularly useful in combination
+with the editing feature (see above). Thus, the command =1 modify notes..= opens
+up a text editor where one can edit a text document associated with the item
+with ID 1.
+
