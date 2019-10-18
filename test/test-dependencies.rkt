@@ -18,10 +18,25 @@
 (define dependencies-tests
   (test-suite
    "Dependencies"
-   (test-case "Adding a dependency also sets blocked item"
+   (test-case "Adding a dependency also updates blocked items"
      (check-equal? (~> i:empty-state
                        (i:new/state)       ; id=1
                        (i:new/state)       ; id=2
                        (p:set 1 depends-property (val:make-set (set (val:make-item 2))))
                        (p:get 2 blocks-property))
-                   (val:make-set (set (val:make-item 1)))))))
+                   (val:make-set (set (val:make-item 1)))))
+   (test-case "Adding a blocked item also updates dependencies"
+     (check-equal? (~> i:empty-state
+                       (i:new/state)       ; id=1
+                       (i:new/state)       ; id=2
+                       (p:set 1 blocks-property (val:make-set (set (val:make-item 2))))
+                       (p:get 2 depends-property))
+                   (val:make-set (set (val:make-item 1)))))
+   (test-case "Removing a blocked item also updates dependencies"
+     (define st1 (~> i:empty-state
+                     (i:new/state)       ; id=1
+                     (i:new/state)       ; id=2
+                     (p:set 1 depends-property (val:make-set (set (val:make-item 2))))))
+     (check-equal? (p:get st1 2 blocks-property) (val:make-set (set (val:make-item 1))))
+     (define st2 (~> st1 (p:set 2 blocks-property (val:make-set (set)))))
+     (check-equal? (p:get st2 1 depends-property) (val:make-set (set))))))
