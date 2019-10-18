@@ -19,8 +19,8 @@
   (val:make-set
    (list->set
     (map val:make-item
-         (filter (λ (item)
-                   (set-member? (set-map (val:unwrap-set (p:get item-state item depends-property))
+         (filter (λ (item*)
+                   (set-member? (set-map (val:unwrap-set (p:get item-state item* depends-property))
                                          val:unwrap-item)
                                 item))
                  (set->list (i:items item-state)))))))

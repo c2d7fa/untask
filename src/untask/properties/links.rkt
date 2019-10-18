@@ -21,8 +21,8 @@
   (val:make-set
    (list->set
     (map val:make-item
-         (filter (λ (item)
-                   (set-member? (set-map (val:unwrap-set (p:get item-state item children-property))
+         (filter (λ (item*)
+                   (set-member? (set-map (val:unwrap-set (p:get item-state item* children-property))
                                          val:unwrap-item)
                                 item))
                  (set->list (i:items item-state)))))))
