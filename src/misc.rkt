@@ -19,9 +19,9 @@
 (define (set-filter pred set)
   (list->set (filter pred (set->list set))))
 
-(define (filter-item-set item-data item-set pred)
+(define (filter-item-set item-state item-set pred)
   (set-filter (λ (item)
-                (pred item-data item))
+                (pred item-state item))
               item-set))
 
 (define-syntax (thread stx)

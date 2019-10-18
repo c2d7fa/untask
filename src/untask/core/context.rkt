@@ -1,39 +1,123 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide state?
+         empty-state
 
-(require (prefix-in a: "../../attribute.rkt"))
+         available-names
+         available?
+         register
+         remove
 
-(a:define-record context (filter modify))
-(a:define-record contexts (definitions))
+         filter
+         modify
 
-(define empty-contexts
-  (contexts #:definitions (hash)))
+         activate
+         deactivate
+         deactivate-all
 
-(define (available-contexts contexts)
-  (hash-keys (a:get (contexts contexts.definitions))))
+         activated-names
+         activated-filter
+         activated-modify
+         toggle)
 
-(define (add-context contexts name #:filter filter-expression #:modify modify-expression)
-  (a:set (contexts contexts.definitions (a:hash.key name))
-         (context #:filter filter-expression #:modify modify-expression)))
+(require (prefix-in rkt: racket)
+         (prefix-in a: "../../attribute.rkt")
+         "../../squiggle.rkt")
 
-(define (remove-context contexts name)
-  (a:update (contexts contexts.definitions)
-            (λ (x) (hash-remove x name))))
+;; A context consists of a filter and modify expression that are automatically
+;; applied to the user's inputs when that context is active.
+(a:define-species context (filter modify))
 
-(define (contexts.named name)
-  (define (get-context definitions)
-    (a:get (definitions
-             (a:hash.key name #:default (context #:filter '() #:modify '())))))
-  (a:make-attribute #:get (λ (x) (get-context (a:get (x contexts.definitions))))
-                    #:set (λ (x v) (a:set (x contexts.definitions (a:hash.key name)) v))))
+;; The program must keep track of all known contexts and their names as well as
+;; the actiated contexts.
+(a:define-species state (available activated))
+(define empty-state (state #:available (hash) #:activated (list)))
 
-(define (apply-context-filter context filter-expression)
-  (list 'and
-        (a:get (context context.filter))
-        filter-expression))
+;; Returns a list of the names of all available contexts.
+(define (available-names state)
+  (hash-keys (a:get state state.available)))
 
-(define (apply-context-modify context modify-expression)
-  (list 'and
-        (a:get (context context.modify))
-        modify-expression))
+;; Returns #t if the given context is availabe, #f otherwise.
+(define (available? state name)
+  (hash-has-key? (a:get-path (state state.available)) name))
+
+;; Returns the filter expression corresponding to an available context.
+;;
+;; If no such context is available, returns #f.
+(define (filter state name)
+  (a:get-path (state state.available (a:hash. name) context.filter)))
+
+;; Returns the modify expression corresponding to an available context.
+;;
+;; If nos uch context is available, returns #f.
+(define (modify state name)
+  (a:get-path (state state.available (a:hash. name) context.modify)))
+
+;; Activate a context if it is available; otherwise, do nothing.
+(define (activate state name)
+  (if (available? state name)
+      (a:update-path (state state.activated)
+                     (λ> (append (list name))))
+      state))
+
+;; Deactivate a context.
+;;
+;; If no such context is active, do nothing.
+(define (deactivate state name)
+  (a:update-path (state state.activated)
+                 (λ>> (rkt:remove name))))
+
+;; Deactivate all contexts.
+(define (deactivate-all state)
+  (a:set-path (state state.activated) (list)))
+
+;; Create a new context or update an existing cotnext in the collection of
+;; available contexts.
+(define (register state name #:filter (filter-expression '()) #:modify (modify-expression '()))
+  (a:set-path (state state.available (a:hash. name))
+              (context #:filter filter-expression #:modify modify-expression)))
+
+;; Remove an existing context by name from the collection of available contexts.
+;;
+;; This also deactivates the context if it is currently active. If the given
+;; context is not available, this function does nothing.
+(define (remove state name)
+  (~> state
+      (a:update state.available (λ> (hash-remove name)))
+      (deactivate name)))
+
+;; Returns the filter expression corresponding to the given context. If no such
+;; context is available, throw an error.
+(define (filter-expression state name)
+  (or (a:get-path (state state.available (a:hash. name) context.filter))
+      (error (format "No such context ~a - state is ~s" name state))))
+
+;; Returns the modify expression corresponding to the given context. If no such
+;; context is available, throw an error.
+(define (modify-expression state name)
+  (or (a:get-path (state state.available (a:hash. name) context.modify))
+      (error (format "No such context ~a - state is ~s" name state))))
+
+;; Returns the list of names of the currently activated contexts.
+(define (activated-names state)
+  (a:get-path (state state.activated)))
+
+;; Return the filter expression that results from the currently activated contexts.
+(define (activated-filter state)
+  `(and ,@(map (λ>> (filter-expression state)) (a:get-path (state state.activated)))))
+
+;; Return the modify expression that results from the currently activated contexts.
+(define (activated-modify state)
+  `(and ,@(map (λ>> (modify-expression state)) (a:get-path (state state.activated)))))
+
+;; Take a list containing the forms (on ctx), (off ctx) and (reset). Modify
+;; state by activating and deactivating contexts and resetting the activated
+;; contexts.
+(define (toggle state toggles)
+  (foldl (λ (tog state)
+           (match tog
+             (`(on ,name) (activate state name))
+             (`(off ,name) (deactivate state name))
+             (`(reset) (deactivate-all state))))
+         state
+         toggles))

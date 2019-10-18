@@ -7,11 +7,13 @@
  "parser.rkt"
  "execute.rkt"
 
- (prefix-in state: "../core/state.rkt")
+ "../core/state.rkt"
+ (prefix-in c: "../core/context.rkt")
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
 
- (only-in "../../misc.rkt" try-read-line*))
+ (only-in "../../misc.rkt" try-read-line*)
+ "../../squiggle.rkt")
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
@@ -29,15 +31,16 @@
                           (term:render
                            `(() (((black) ("@"))
                                  ((cyan) (,c))))))
-                        (set->list current-contexts))
+                        current-contexts)
                    " ")))
     (term:render `(()
                    (,contexts
                     ((black) (,(if open-file (if (set-empty? current-contexts) open-file (format " ~A" open-file)) "") "> ")))))))
 
 (define (user-loop! state-box)
-  (let* ((input (prompt-line (format-prompt-line #:open-file (a:get ((unbox state-box) state:state.open-file))
-                                                 #:current-contexts (a:get ((unbox state-box) state:state.active-contexts)))))
+  (let* ((input (prompt-line (format-prompt-line #:open-file (a:get-path ((unbox state-box) state.open-file))
+                                                 #:current-contexts (~> (a:get-path ((unbox state-box) state.context-state))
+                                                                        (c:activated-names)))))
          (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
                     (if input (parse input) '(exit))))
          (result (if command

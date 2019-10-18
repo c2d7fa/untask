@@ -1,17 +1,19 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide description-property
+         notes-property)
 
 (require
- (prefix-in prop: "../core/property.rkt")
- (prefix-in val: "../core/value.rkt"))
+ (prefix-in p: "../core/property.rkt")
+ (prefix-in val: "../core/value.rkt")
+ "../../squiggle.rkt")
 
-(define description-property-type
-  (prop:property-type #:key 'description
-                      #:type 'string
-                      #:default (val:make-string "")))
+(define description-property
+  (~> (p:property #:name 'description
+                  #:type 'string)
+      (p:default (val:make-string ""))))
 
-(define notes-property-type
-  (prop:property-type #:key 'notes
-                      #:type 'string
-                      #:default (val:make-string "")))
+(define notes-property
+  (~> (p:property #:name 'notes
+                  #:type 'string)
+      (p:default (val:make-string ""))))

@@ -1,83 +1,127 @@
 #lang racket
 
-;; The term 'item-data' is used to refer to the database containing all items
-;; and information about them. Individual items are indexed by a key. Many
-;; functions in this project take an 'item-data' and an 'item' as arguments;
-;; functions that modify item properties usually do so by returning an updated
-;; 'item-data'.
+(provide state?
+         empty-state
+         items
 
-(provide (all-defined-out))
+         new
+         new/state
+         new/item
+         remove
+         copy
 
-(require
- "./property.rkt"
- (prefix-in a: "../../attribute.rkt"))
+         get
+         set
+         update
 
-(a:define-record item-data (next properties))
+         load-state
+         dump-state)
 
-(define item-data-empty
-  (item-data #:next 0
-             #:properties (hash)))
+;; In this module, the term item is used to describe the numeric IDs that refer
+;; to a particular item rather than the data associated with that item. Each
+;; such item is associated with a set of properties, where each property is a
+;; mapping from a name to a value (in the sense of Untask values, defined in the
+;; "value" module).
+;;
+;; Note that the "property" module extends the meaning of the term property, by
+;; assigning types and dynamic behviour to the properties. Usually, item
+;; properties are not changed by using this module, but rather by using the
+;; property module.
+;;
+;; The program needs to keep track of the available items, their properties and
+;; their IDs. These things are handled by this module.
 
-;; Returns (values new-item-data new-item).
-(define (new-item item-data)
-  (let ((next (add1 (a:get (item-data item-data.next)))))
-    (values (a:set (item-data item-data.next) next)
+(require (prefix-in a: "../../attribute.rkt")
+         "../../squiggle.rkt")
+
+;; The state relating to items stores the ID of the next item to be created. The
+;; properties are stored as a hash-map from items to a hash map from property
+;; names to property values.
+(a:define-species state (next properties))
+(define empty-state (state #:next 1 #:properties (hash)))
+
+;; Create a new item which has no properties set. Returns two values: The
+;; updated state and the item.
+(define (new state)
+  (let ((next (a:get-path (state state.next))))
+    (values (a:update-path (state state.next) add1)
             next)))
 
-;; Returns new-item-data.
-(define (remove-item item-data item)
-  (a:update (item-data item-data.properties)
-            (λ (property-values)
-              (hash-remove property-values item))))
+;; new/state - Create a new item, returning only the updated item state.
+;; new/item  - Return the item that would be created by new.
+;;
+;; Note that
+;;   (let ((state* (new/state state))
+;;         (item*  (new/item state)))
+;;     ...)
+;; is equivalent to
+;;   (let-values (((state* item*) (new state)))
+;;     ...)
+(define (new/state state)
+  (let-values (((state* item*) (new state)))
+    state*))
+(define (new/item state)
+  (let-values (((state* item*) (new state)))
+    item*))
 
-;; Copies all the properties of from-item into to-item. Returns updated
-;; item-data.
-(define (copy-item item-data from-item to-item)
-  (a:update (item-data item-data.properties)
-            (λ (props)
-              (a:set (props (a:hash.key to-item))
-                     (a:get (props (a:hash.key from-item #:default (hash))))))))
+;; Get the value of the given property. Returns the updated item state.
+;;
+;; If the given item does not exist or the given property is not set, return #f.
+(define (get state item property-name)
+  (a:get-path (state state.properties (a:hash. item) (a:hash. property-name))))
 
-;; Returns new-item-data.
-(define (set-raw-property item-data item property-type value)
-  (a:set (item-data
-          item-data.properties
-          (a:hash.key item #:default (hash))
-          (a:hash.key (a:get (property-type property-type.key))))
-         value))
+;; Set the value of the given property. Returns the updated item state.
+;;
+;; If the given item does not exist, throws an error.
+(define (set state item property-name property-value)
+  (when (<= (a:get-path (state state.next)) item)
+    (error (format "Cannot set property '~A' of item ~A, because no such item exists; the next item to be added is ~A."
+                   property-name item (a:get-path (state state.next)))))
+  (a:set-path (state state.properties (a:hash. item) (a:hash. property-name)) property-value))
 
-;; Returns value.
-(define (get-raw-property item-data item property-type)
-  (a:get (item-data
-          item-data.properties
-          (a:hash.key item #:default (hash))
-          (a:hash.key (a:get (property-type property-type.key))
-                      #:default (a:get (property-type property-type.default))))))
+;; Update the value of the given property. Returns the updated item state.
+;;
+;; If the given item does not exist, throws an error. If the given property is
+;; not set, calls the updating function with #f as the argument.
+(define (update state item property-name f)
+  (set state item property-name (f (get state item property-name))))
 
-(define (get-property item-data item property-type)
-  (let ((calculate (a:get (property-type property-type.calculate))))
-    (if calculate
-        (calculate item-data item)
-        (get-raw-property item-data item property-type))))
+;; Remove an item. Returns the updated item state.
+(define (remove state item)
+  (a:update-path (state state.properties)
+                 (λ> (hash-remove item))))
 
-(define (set-property item-data item property-type value)
-  (let ((translate (a:get (property-type property-type.translate))))
-    (if translate
-        (translate item-data item value)
-        (set-raw-property item-data item property-type value))))
+;; Returns the names of all set (i.e. non-#f) properties of the given item.
+(define (property-names state item)
+  (filter (λ (property-name)
+            (get state item property-name))
+          (hash-keys (a:get-path (state state.properties (a:hash. item))))))
 
-;; Returns set of all items.
-(define (all-items item-data)
-  (list->set (hash-keys (a:get (item-data item-data.properties)))))
+;; Copy all set properties of source item into destination item. Returns updated
+;; item data.
+;;
+;; If source item does not exist, does nothing. If destination item does not
+;; exist, throws an error.
+(define (copy state source destination)
+  (foldl (λ (property-name state)
+           (set state destination property-name (get state source property-name)))
+         state
+         (property-names state source)))
 
-;; Returns the ID (an integer uniquely representing a reference to an
-;; item) of an item in item-data.
-(define (item-id item-data item)
-  item)
+;; Returns all items that have set properties.
+(define (items state)
+  (filter (λ (item)
+            (not (empty? (property-names state item))))
+          (hash-keys (a:get-path (state state.properties)))))
 
-;;;;
+;; Initialize a state from the given parameters:
+;; 1. next-item is the ID of the next item to be created;
+;; 2. property-map is a hash map from items to hash maps from property names to
+;;    property values.
+(define (load-state next-item property-map)
+  (state #:next next-item #:properties property-map))
 
-;; Returns new-item-data.
-(define (update-property item-data item property-type f)
-  (set-property item-data item property-type (f (get-property item-data item property-type))))
-
+;; Return the values required by load-state to recreate the given state.
+(define (dump-state state)
+  (values (a:get-path (state state.next))
+          (a:get-path (state state.properties))))
