@@ -38,7 +38,7 @@
 ;; properties are stored as a hash-map from items to a hash map from property
 ;; names to property values.
 (a:define-species state (next properties))
-(define empty-state (state #:next 0 #:properties (hash)))
+(define empty-state (state #:next 1 #:properties (hash)))
 
 ;; Create a new item which has no properties set. Returns two values: The
 ;; updated state and the item.
