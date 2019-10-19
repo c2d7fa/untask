@@ -1,7 +1,6 @@
 #lang racket
 
 (require rackunit
-         "util.rkt"
          "../src/untask/properties/dependencies.rkt"
 
          "../src/untask/core/state.rkt"

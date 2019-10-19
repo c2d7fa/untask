@@ -4,14 +4,13 @@
          "test-integration.rkt"
          "test-serialization.rkt"
          "test-dependencies.rkt"
-         "test-links.rkt")
+         "test-links.rkt"
+         "test-item.rkt")
 
-(test/gui #:wait? #t
+(test/gui
  (test-suite
   "Tests"
   integration-tests
-  serialization-tests
-  (test-suite
-   "Properties"
-   dependencies-tests
-   links-tests)))
+  (test-suite "Core modules" item-tests serialization-tests)
+  (test-suite "Properties" dependencies-tests links-tests))
+ #:wait? #t)
