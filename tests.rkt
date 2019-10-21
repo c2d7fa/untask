@@ -10,7 +10,8 @@
          untask/test/test-dependencies
          untask/test/test-integration
          untask/test/test-links
-         untask/test/test-serialization)
+         untask/test/test-serialization
+         untask/test/test-parser)
 
 (provide all-tests test!)
 
@@ -22,7 +23,8 @@
     context-tests
     (test-suite "Properties"
       dependencies-tests
-      links-tests)))
+      links-tests)
+    parser-tests))
 
 (define (test!)
   (run-tests all-tests 'verbose))
