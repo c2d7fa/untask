@@ -223,7 +223,7 @@
                                            (λ> (c:remove name))))
          'proceed)
         (`(context show)
-         (display-message! (format "~a" (c:available-names (a:get-path ((state) state.context-state)))))
+         (display-message! (format "~a" (c:available (a:get-path ((state) state.context-state)))))
          'proceed)
         (`(with-contexts ,toggles ,subcommand)
          (let ((old-context-state (a:get-path ((state) state.context-state))))

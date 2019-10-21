@@ -29,34 +29,34 @@
       (check-equal? (modify example-1 "context-1") '(modify 1)))
 
     (test-case "Listing available contexts"
-      (check same-set? (available-names example-1) '("context-1" "context-2")))
+      (check same-set? (available example-1) '("context-1" "context-2")))
 
     (test-case "Removing contexts"
       (check same-set? (~> example-1
                            (remove "context-1")
-                           (available-names))
+                           (available))
                        '("context-2")))
 
     (test-case "Activating contexts"
-      (check same-set? (~> example-1 (activated-names))
+      (check same-set? (~> example-1 (activated))
                        '())
       (check same-set? (~> example-1
                            (activate "context-1")
-                           (activated-names))
+                           (activated))
                        '("context-1"))
       (check same-set? (~> example-1
                            (activate "context-1")
                            (activate "context-2")
-                           (activated-names))
+                           (activated))
                        '("context-1" "context-2")))
 
     (test-case "Deactivating contexts"
-      (check same-set? (~> example-2 (activated-names)) '("context-1" "context-2"))
-      (check same-set? (~> example-2 (deactivate "context-1") (activated-names)) '("context-2")))
+      (check same-set? (~> example-2 (activated)) '("context-1" "context-2"))
+      (check same-set? (~> example-2 (deactivate "context-1") (activated)) '("context-2")))
 
     (test-case "Deactivating all contexts"
-      (check same-set? (~> example-2 (activated-names)) '("context-1" "context-2"))
-      (check same-set? (~> example-2 (deactivate-all) (activated-names)) '()))
+      (check same-set? (~> example-2 (activated)) '("context-1" "context-2"))
+      (check same-set? (~> example-2 (deactivate-all) (activated)) '()))
 
     (test-case "Activated contexts filter expression"
       ;; TODO: The filter expression may have a different order, and may omit
@@ -71,10 +71,10 @@
 
     (test-case "Toggling contexts"
       (define s example-2)
-      (check same-set? (activated-names s) '("context-1" "context-2"))
+      (check same-set? (activated s) '("context-1" "context-2"))
       (set! s (~> s (toggle '((off "context-1")))))
-      (check same-set? (activated-names s) '("context-2"))
+      (check same-set? (activated s) '("context-2"))
       (set! s (~> s (toggle '((off "context-2") (on "context-1")))))
-      (check same-set? (activated-names s) '("context-1"))
+      (check same-set? (activated s) '("context-1"))
       (set! s (~> s (toggle '((on "context-1") (reset)))))
-      (check same-set? (activated-names s) '()))))
+      (check same-set? (activated s) '()))))

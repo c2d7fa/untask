@@ -104,7 +104,7 @@
            (cons name
                  (list (serialize-fm-expression (c:filter context-state name))
                        (serialize-fm-expression (c:modify context-state name)))))
-         (c:available-names context-state)))))
+         (c:available context-state)))))
 ;; Returns a context-state with the new contexts added.
 (define (deserialize-defined-contexts ctx-st defined-contexts)
   (define h (deserialize-hash defined-contexts))
@@ -116,7 +116,7 @@
          (hash-keys h)))
 
 (define (serialize-activated-contexts st)
-  (~> (a:get-path (st state.context-state)) (c:activated-names)))
+  (~> (a:get-path (st state.context-state)) (c:activated)))
 ;; Returns a context-state with the new contexts added.
 (define (deserialize-activated-contexts cst x)
   (foldl (λ (name cst)

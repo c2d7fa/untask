@@ -40,7 +40,7 @@
 (define (user-loop! state-box)
   (let* ((input (prompt-line (format-prompt-line #:open-file (a:get-path ((unbox state-box) state.open-file))
                                                  #:current-contexts (~> (a:get-path ((unbox state-box) state.context-state))
-                                                                        (c:activated-names)))))
+                                                                        (c:activated)))))
          (command (with-handlers ((exn:fail:read? (λ (e) (displayln (term:render '((bold) (red) ("Error: Unable to parse command.")))) #f)))
                     (if input (parse input) '(exit))))
          (result (if command
