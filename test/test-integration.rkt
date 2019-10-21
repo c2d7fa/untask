@@ -25,7 +25,8 @@
                    "  1. Test item  0 B:1\n  2. Other test item  0 D:1\n"))
    (test-case "Copying item"
      (define sb (box state-empty))
-     (void (execute! (parse "add {Item 1} #tag date:Jan-1") sb)
-           (execute! (parse "1 copy urgency+$1 date+$7") sb))
+     (capture-output
+       (thunk (execute! (parse "add {Item 1} #tag date:Jan-1") sb)
+              (execute! (parse "1 copy urgency+$1 date+$7") sb)))
      (check-equal? (capture-output (thunk (execute! (parse "list") sb)))
                    "  2. Item 1 #tag 1 D:Jan-08\n  1. Item 1 #tag 0 D:Jan-01\n"))))
