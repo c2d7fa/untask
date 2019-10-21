@@ -6,6 +6,7 @@
          racket/enter
 
          untask/test/test-item
+         untask/test/test-context
          untask/test/test-dependencies
          untask/test/test-integration
          untask/test/test-links
@@ -18,6 +19,7 @@
     integration-tests
     serialization-tests
     item-tests
+    context-tests
     (test-suite "Properties"
       dependencies-tests
       links-tests)))

@@ -1,15 +1,12 @@
 #lang racket
 
 (require rackunit
+         untask/test/util
          untask/src/squiggle
 
          untask/src/untask/core/item)
 
 (provide item-tests)
-
-;; Return #t if the lists represent the same set, #f otherwise.
-(define (same-set? l m)
-  (equal? (list->set l) (list->set m)))
 
 (define example-1
   (~> empty-state
