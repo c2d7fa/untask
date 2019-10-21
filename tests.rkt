@@ -2,8 +2,10 @@
 
 (require rackunit
          rackunit/text-ui
+         rackunit/gui
          racket/enter
 
+         untask/test/test-item
          untask/test/test-dependencies
          untask/test/test-integration
          untask/test/test-links
@@ -15,6 +17,7 @@
   (test-suite "Tests"
     integration-tests
     serialization-tests
+    item-tests
     (test-suite "Properties"
       dependencies-tests
       links-tests)))
@@ -28,3 +31,7 @@
 (define (retest!)
   (enter! untask/tests)
   (test!))
+
+(define (retest!/gui)
+  (enter! untask/tests)
+  (test/gui #:wait? #t all-tests))
