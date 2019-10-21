@@ -5,9 +5,9 @@
          wait-active?)
 
 (require
- (prefix-in p: "../core/property.rkt")
- (prefix-in val:  "../core/value.rkt")
- (prefix-in dt: "../../datetime.rkt"))
+ (prefix-in p: untask/src/untask/core/property)
+ (prefix-in val:  untask/src/untask/core/value)
+ (prefix-in dt: untask/src/datetime))
 
 (define wait-property
   (p:property #:name 'wait

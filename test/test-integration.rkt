@@ -1,14 +1,14 @@
 #lang racket
 
 (require rackunit
-         "util.rkt"
-         "../src/untask/user/execute.rkt"
-         "../src/untask/user/parser.rkt"
-         "../src/untask/core/state.rkt"
-         (prefix-in item: "../src/untask/core/item.rkt")
-         "../src/untask/properties/description.rkt"
-         (prefix-in a: "../src/attribute.rkt")
-         (prefix-in val: "../src/untask/core/value.rkt"))
+         untask/test/util
+         untask/src/untask/user/execute
+         untask/src/untask/user/parser
+         untask/src/untask/core/state
+         (prefix-in item: untask/src/untask/core/item)
+         untask/src/untask/properties/description
+         (prefix-in a: untask/src/attribute)
+         (prefix-in val: untask/src/untask/core/value))
 
 (provide integration-tests)
 

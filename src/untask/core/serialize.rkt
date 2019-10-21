@@ -5,13 +5,13 @@
          save-state
          load-state)
 
-(require "state.rkt"
-         (prefix-in val: "value.rkt")
-         (prefix-in c: "context.rkt")
-         (prefix-in i: "item.rkt")
-         (prefix-in dt: "../../datetime.rkt")
-         (prefix-in a: "../../attribute.rkt")
-         "../../squiggle.rkt"
+(require untask/src/untask/core/state
+         (prefix-in val: untask/src/untask/core/value)
+         (prefix-in c: untask/src/untask/core/context)
+         (prefix-in i: untask/src/untask/core/item)
+         (prefix-in dt: untask/src/datetime)
+         (prefix-in a: untask/src/attribute)
+         untask/src/squiggle
          racket/pretty)
 
 (define file-version (make-parameter 0))

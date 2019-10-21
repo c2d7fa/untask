@@ -6,20 +6,20 @@
          render-trees)
 
 (require
- (prefix-in i: "../core/item.rkt")
- (prefix-in p: "../core/property.rkt")
- (prefix-in val: "../core/value.rkt")
+ (prefix-in i: untask/src/untask/core/item)
+ (prefix-in p: untask/src/untask/core/property)
+ (prefix-in val: untask/src/untask/core/value)
 
- (prefix-in status: "../properties/status.rkt")
- (prefix-in description: "../properties/description.rkt")
- (prefix-in tags: "../properties/tags.rkt")
- (prefix-in urgency: "../properties/urgency.rkt")
- (prefix-in depends: "../properties/dependencies.rkt")
- (prefix-in links: "../properties/links.rkt")
- (prefix-in date: "../properties/date.rkt")
+ (prefix-in status: untask/src/untask/properties/status)
+ (prefix-in description: untask/src/untask/properties/description)
+ (prefix-in tags: untask/src/untask/properties/tags)
+ (prefix-in urgency: untask/src/untask/properties/urgency)
+ (prefix-in depends: untask/src/untask/properties/dependencies)
+ (prefix-in links: untask/src/untask/properties/links)
+ (prefix-in date: untask/src/untask/properties/date)
 
- (prefix-in term: "../../terminal.rkt")
- (prefix-in dt: "../../datetime.rkt")
+ (prefix-in term: untask/src/terminal)
+ (prefix-in dt: untask/src/datetime)
  )
 
 (define (render-listing item-state items)

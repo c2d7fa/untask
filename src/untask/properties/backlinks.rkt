@@ -3,10 +3,10 @@
 (provide calculate-backlinks translate-backlinks)
 
 (require
- (prefix-in i: "../core/item.rkt")
- (prefix-in p: "../core/property.rkt")
- (prefix-in val: "../core/value.rkt")
- (only-in "../../misc.rkt" set-diff))
+ (prefix-in i: untask/src/untask/core/item)
+ (prefix-in p: untask/src/untask/core/property)
+ (prefix-in val: untask/src/untask/core/value)
+ (only-in untask/src/misc set-diff))
 
 (define ((calculate-backlinks property) item-state item)
   (val:make-set

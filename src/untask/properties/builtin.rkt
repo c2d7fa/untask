@@ -3,17 +3,17 @@
 (provide ref has?)
 
 (require
- (prefix-in p: "../core/property.rkt")
+ (prefix-in p: untask/src/untask/core/property)
 
- (prefix-in status: "./status.rkt")
- (prefix-in description: "./description.rkt")
- (prefix-in tags: "./tags.rkt")
- (prefix-in urgency: "./urgency.rkt")
- (prefix-in depends: "./dependencies.rkt")
- (prefix-in links: "./links.rkt")
- (prefix-in date: "./date.rkt")
+ (prefix-in status: untask/src/untask/properties/status)
+ (prefix-in description: untask/src/untask/properties/description)
+ (prefix-in tags: untask/src/untask/properties/tags)
+ (prefix-in urgency: untask/src/untask/properties/urgency)
+ (prefix-in depends: untask/src/untask/properties/dependencies)
+ (prefix-in links: untask/src/untask/properties/links)
+ (prefix-in date: untask/src/untask/properties/date)
 
- (prefix-in a: "../../attribute.rkt"))
+ (prefix-in a: untask/src/attribute))
 
 (define builtin-properties
   (list status:status-property

@@ -31,8 +31,8 @@
 ;; The program needs to keep track of the available items, their properties and
 ;; their IDs. These things are handled by this module.
 
-(require (prefix-in a: "../../attribute.rkt")
-         "../../squiggle.rkt")
+(require (prefix-in a: untask/src/attribute)
+         untask/src/squiggle)
 
 ;; The state relating to items stores the ID of the next item to be created. The
 ;; properties are stored as a hash-map from items to a hash map from property

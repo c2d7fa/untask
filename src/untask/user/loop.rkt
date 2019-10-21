@@ -3,17 +3,17 @@
 (provide user-loop!)
 
 (require
- "render-list.rkt"
- "parser.rkt"
- "execute.rkt"
+ untask/src/untask/user/render-list
+ untask/src/untask/user/parser
+ untask/src/untask/user/execute
 
- "../core/state.rkt"
- (prefix-in c: "../core/context.rkt")
- (prefix-in a: "../../attribute.rkt")
- (prefix-in term: "../../terminal.rkt")
+ untask/src/untask/core/state
+ (prefix-in c: untask/src/untask/core/context)
+ (prefix-in a: untask/src/attribute)
+ (prefix-in term: untask/src/terminal)
 
- (only-in "../../misc.rkt" try-read-line*)
- "../../squiggle.rkt")
+ (only-in untask/src/misc try-read-line*)
+ untask/src/squiggle)
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.

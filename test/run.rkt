@@ -1,10 +1,10 @@
 #lang racket
 
 (require rackunit rackunit/gui
-         "test-integration.rkt"
-         "test-serialization.rkt"
-         "test-dependencies.rkt"
-         "test-links.rkt")
+         untask/test/test-integration
+         untask/test/test-serialization
+         untask/test/test-dependencies
+         untask/test/test-links)
 
 (test/gui #:wait? #t
  (test-suite
