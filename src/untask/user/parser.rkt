@@ -7,7 +7,7 @@
  (prefix-in f: (combine-in data/functor data/applicative data/monad data/either))
  (only-in data/monad <-)
 
- (prefix-in dt: "../../datetime.rkt"))
+ (prefix-in dt: untask/src/datetime))
 
 (define digit/p (char-between/p #\0 #\9))
 (define int/p (f:map (λ (ds) (string->number (apply string ds))) (many+/p digit/p)))

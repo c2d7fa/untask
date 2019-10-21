@@ -2,10 +2,10 @@
 
 (provide builtin-operators)
 
-(require "../core/operator.rkt"
-         (prefix-in val: "../core/value.rkt")
-         (prefix-in dt: "../../datetime.rkt")
-         (only-in "../../misc.rkt" thread-first))
+(require untask/src/untask/core/operator
+         (prefix-in val: untask/src/untask/core/value)
+         (prefix-in dt: untask/src/datetime)
+         (only-in untask/src/misc thread-first))
 
 (define ((check-argument expected-argument-type) object-type argument-type)
   (if (val:type<=? argument-type expected-argument-type)

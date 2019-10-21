@@ -3,12 +3,12 @@
 (provide check-filter/modify-expression)
 
 (require
- (prefix-in val: "../core/value.rkt")
- (prefix-in op: "../core/operator.rkt")
- (prefix-in p: "../core/property.rkt")
- "../user/builtin-operators.rkt"
- (prefix-in bp: "../properties/builtin.rkt")
- (prefix-in a: "../../attribute.rkt"))
+ (prefix-in val: untask/src/untask/core/value)
+ (prefix-in op: untask/src/untask/core/operator)
+ (prefix-in p: untask/src/untask/core/property)
+ untask/src/untask/user/builtin-operators
+ (prefix-in bp: untask/src/untask/properties/builtin)
+ (prefix-in a: untask/src/attribute))
 
 ;; Returns #t if expression is valid, otherwise returns human-readable string
 ;; representing error.

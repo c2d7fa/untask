@@ -3,7 +3,7 @@
 (provide state?
          empty-state
 
-         available-names
+         available
          available?
          register
          remove
@@ -15,14 +15,14 @@
          deactivate
          deactivate-all
 
-         activated-names
+         activated
          activated-filter
          activated-modify
          toggle)
 
 (require (prefix-in rkt: racket)
-         (prefix-in a: "../../attribute.rkt")
-         "../../squiggle.rkt")
+         (prefix-in a: untask/src/attribute)
+         untask/src/squiggle)
 
 ;; A context consists of a filter and modify expression that are automatically
 ;; applied to the user's inputs when that context is active.
@@ -34,7 +34,7 @@
 (define empty-state (state #:available (hash) #:activated (list)))
 
 ;; Returns a list of the names of all available contexts.
-(define (available-names state)
+(define (available state)
   (hash-keys (a:get state state.available)))
 
 ;; Returns #t if the given context is availabe, #f otherwise.
@@ -99,7 +99,7 @@
       (error (format "No such context ~a - state is ~s" name state))))
 
 ;; Returns the list of names of the currently activated contexts.
-(define (activated-names state)
+(define (activated state)
   (a:get-path (state state.activated)))
 
 ;; Return the filter expression that results from the currently activated contexts.

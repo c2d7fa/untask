@@ -1,16 +1,17 @@
 #lang racket
 
 (require rackunit
-         "../src/untask/properties/dependencies.rkt"
+         untask/test/util
+         untask/src/untask/properties/dependencies
 
-         "../src/untask/core/state.rkt"
-         (prefix-in i: "../src/untask/core/item.rkt")
-         (prefix-in p: "../src/untask/core/property.rkt")
-         "../src/untask/properties/description.rkt"
-         "../src/untask/properties/dependencies.rkt"
-         (prefix-in a: "../src/attribute.rkt")
-         (prefix-in val: "../src/untask/core/value.rkt")
-         "../src/squiggle.rkt")
+         untask/src/untask/core/state
+         (prefix-in i: untask/src/untask/core/item)
+         (prefix-in p: untask/src/untask/core/property)
+         untask/src/untask/properties/description
+         untask/src/untask/properties/dependencies
+         (prefix-in a: untask/src/attribute)
+         (prefix-in val: untask/src/untask/core/value)
+         untask/src/squiggle)
 
 (provide dependencies-tests)
 

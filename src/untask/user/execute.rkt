@@ -3,29 +3,29 @@
 (provide execute!)
 
 (require
- "../core/state.rkt"
- (prefix-in c: "../core/context.rkt")
- (prefix-in i: "../core/item.rkt")
- (prefix-in p: "../core/property.rkt")
- (prefix-in val: "../core/value.rkt")
- (prefix-in serialize: "../core/serialize.rkt")
+ untask/src/untask/core/state
+ (prefix-in c: untask/src/untask/core/context)
+ (prefix-in i: untask/src/untask/core/item)
+ (prefix-in p: untask/src/untask/core/property)
+ (prefix-in val: untask/src/untask/core/value)
+ (prefix-in serialize: untask/src/untask/core/serialize)
 
- "../command/check-expression.rkt"
- (prefix-in filter: "../command/filter.rkt")
- (prefix-in modify: "../command/modify.rkt")
+ untask/src/untask/command/check-expression
+ (prefix-in filter: untask/src/untask/command/filter)
+ (prefix-in modify: untask/src/untask/command/modify)
 
- (prefix-in urgency: "../properties/urgency.rkt")
- (prefix-in depends: "../properties/dependencies.rkt")
- (prefix-in links: "../properties/links.rkt")
- (prefix-in date: "../properties/date.rkt")
+ (prefix-in urgency: untask/src/untask/properties/urgency)
+ (prefix-in depends: untask/src/untask/properties/dependencies)
+ (prefix-in links: untask/src/untask/properties/links)
+ (prefix-in date: untask/src/untask/properties/date)
 
- "../user/render-list.rkt"
+ untask/src/untask/user/render-list
 
- (prefix-in a: "../../attribute.rkt")
- (prefix-in term: "../../terminal.rkt")
- (prefix-in dt: "../../datetime.rkt")
- (only-in "../../misc.rkt" try-read-line)
- "../../squiggle.rkt")
+ (prefix-in a: untask/src/attribute)
+ (prefix-in term: untask/src/terminal)
+ (prefix-in dt: untask/src/datetime)
+ (only-in untask/src/misc try-read-line)
+ untask/src/squiggle)
 
 ;; For convenience, the internal procedures in this module pass boxed state
 ;; around as a parameter. Error reporting is done using exceptions.
@@ -222,7 +222,7 @@
                                            (λ> (c:remove name))))
          'proceed)
         (`(context show)
-         (display-message! (format "~a" (c:available-names (a:get-path ((state) state.context-state)))))
+         (display-message! (format "~a" (c:available (a:get-path ((state) state.context-state)))))
          'proceed)
         (`(with-contexts ,toggles ,subcommand)
          (let ((old-context-state (a:get-path ((state) state.context-state))))

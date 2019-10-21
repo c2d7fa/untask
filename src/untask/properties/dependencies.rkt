@@ -4,10 +4,10 @@
          blocks-property)
 
 (require
- "backlinks.rkt"
- (prefix-in p: "../core/property.rkt")
- (prefix-in val: "../core/value.rkt")
- "../../squiggle.rkt")
+ untask/src/untask/properties/backlinks
+ (prefix-in p: untask/src/untask/core/property)
+ (prefix-in val: untask/src/untask/core/value)
+ untask/src/squiggle)
 
 (define depends-property
   (~> (p:property #:name 'depends

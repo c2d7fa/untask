@@ -3,13 +3,13 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in operators: "../core/operator.rkt")
- (prefix-in i: "../core/item.rkt")
- (prefix-in p: "../core/property.rkt")
- (prefix-in val: "../core/value.rkt")
- (prefix-in bp: "../properties/builtin.rkt")
- "../user/builtin-operators.rkt"
- "../../squiggle.rkt"
+ (prefix-in operators: untask/src/untask/core/operator)
+ (prefix-in i: untask/src/untask/core/item)
+ (prefix-in p: untask/src/untask/core/property)
+ (prefix-in val: untask/src/untask/core/value)
+ (prefix-in bp: untask/src/untask/properties/builtin)
+ untask/src/untask/user/builtin-operators
+ untask/src/squiggle
  racket/system)
 
 ;; TODO: Correctly detect editor on other platforms.

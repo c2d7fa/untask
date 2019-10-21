@@ -18,8 +18,8 @@
 ;; said to "translate" the value, while a function that wraps the getter is said
 ;; to "calculate" the value.
 
-(require (prefix-in i: "item.rkt")
-         (prefix-in a: "../../attribute.rkt"))
+(require (prefix-in i: untask/src/untask/core/item)
+         (prefix-in a: untask/src/attribute))
 
 ;; A property consists of a name, a type, and the two functions calculate and
 ;; translate.
