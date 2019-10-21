@@ -1,7 +1,6 @@
 #lang racket
 
 (require rackunit
-         untask/src/squiggle
 
          (only-in untask/src/untask/user/parser parse))
 

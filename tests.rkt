@@ -8,6 +8,7 @@
          untask/test/test-item
          untask/test/test-context
          untask/test/test-dependencies
+         untask/test/test-date
          untask/test/test-integration
          untask/test/test-links
          untask/test/test-serialization
@@ -23,7 +24,8 @@
     context-tests
     (test-suite "Properties"
       dependencies-tests
-      links-tests)
+      links-tests
+      date-tests)
     parser-tests))
 
 (define (test!)
