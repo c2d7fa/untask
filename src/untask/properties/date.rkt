@@ -55,7 +55,7 @@
                            (p:set item* date-property (val:make-date d)))
                       (when wait-offset
                         (~>! item-state*
-                             (p:set item* wait-property (val:make-date (dt:add-days d wait-offset)))))
+                             (p:set item* wait-property (val:make-date (dt:add-days d (- wait-offset))))))
                       (cons item-state* (append new-items (list item*))))))
                 (cons item-state (list))
                 (dt:date-range start end skip))))

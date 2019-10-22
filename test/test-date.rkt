@@ -34,8 +34,8 @@
          (i:set it1 'tags (v:make-set (set (v:make-string "tag1"))))
          (i:set it2 'description (v:make-string "Item 2"))
          (i:set it3 'description (v:make-string "Item 3"))
-         (i:set it1 'date (v:make-date (dt:datetime 2018 1 2)))
-         (i:set it1 'wait (v:make-date (dt:datetime 2018 1 4)))
+         (i:set it1 'date (v:make-date (dt:datetime 2018 1 4)))
+         (i:set it1 'wait (v:make-date (dt:datetime 2018 1 2)))
          (i:set it2 'date (v:make-date (dt:datetime 2018 1 2))))
     (values st1 it1 it2 it3)))
 
