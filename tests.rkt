@@ -12,6 +12,7 @@
          untask/test/test-integration
          untask/test/test-links
          untask/test/test-serialization
+         untask/test/test-command
          untask/test/test-parser)
 
 (provide all-tests test!)
@@ -19,6 +20,7 @@
 (define all-tests
   (test-suite "Tests"
     integration-tests
+    command-tests
     serialization-tests
     item-tests
     context-tests
