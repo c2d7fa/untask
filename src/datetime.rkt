@@ -47,6 +47,9 @@
 (define (today? dt)
   (g:date=? (g:today) (g:->date (datetime->gregor dt))))
 
+(define (days-between dt1 dt2)
+  (cdr (assoc 'days (gp:period->list (gp:date-period-between (datetime->gregor dt1) (datetime->gregor dt2) '(days))))))
+
 (define (days-from-today dt)
   (cdr (assoc 'days (gp:period->list (gp:date-period-between (g:today) (datetime->gregor dt) '(days))))))
 
@@ -113,3 +116,8 @@
 
 (define (add-days dt n)
   (gregor->datetime (g:+days (datetime->gregor dt) n)))
+
+(define (date-range start end skip)
+  (if (< (days-between start end) skip)
+      (list start)
+      (cons start (date-range (add-days start skip) end skip))))

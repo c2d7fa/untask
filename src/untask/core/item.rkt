@@ -3,12 +3,14 @@
 (provide state?
          empty-state
          items
+         found?
 
          new
          new/state
          new/item
          remove
          copy
+         clone
 
          get
          set
@@ -108,11 +110,24 @@
          state
          (property-names state source)))
 
+;; Copy the given item, createing a new item. Returns the updated state and the
+;; newly created item.
+;;
+;; If the source item does not exist, throw an error.
+(define (clone state source)
+  (let-values (((state* destination*) (new state)))
+    (values (copy state* source destination*)
+            destination*)))
+
 ;; Returns all items that have set properties.
 (define (items state)
   (filter (λ (item)
             (not (empty? (property-names state item))))
           (hash-keys (a:get-path (state state.properties)))))
+
+;; Returns #t if the given item exists, #f otherwise.
+(define (found? state item)
+  (and (member item (items state)) #t))
 
 ;; Initialize a state from the given parameters:
 ;; 1. next-item is the ID of the next item to be created;

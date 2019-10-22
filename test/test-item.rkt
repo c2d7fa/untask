@@ -18,9 +18,23 @@
       (set 1 'tags '("tag-1" "tag-2"))
       (set 2 'tags '("tag-1"))))
 
+(define example-2 (~> empty-state
+                      (new/state)             ; id=1
+                      (new/state)             ; id=2
+                      (new/state)             ; id=3
+                      (set 2 'description "Item 2")
+                      (set 2 'tags '("tag1" "tag2"))))
+
+
 (define item-tests
   (test-suite "Items"
     (test-check "No items in empty state" same-set? '() (items empty-state))
+
+    (test-false "Nonexistent item is not found" (found? example-2 3))
+
+    (test-false "Empty item is not found" (found? example-2 1))
+
+    (test-true "Existing item is found" (found? example-2 2))
 
     (test-case "Setting properties of new item makes it appear in items"
       (define st (~> empty-state
@@ -49,4 +63,11 @@
 
     (test-case "Updating property"
       (check-equal? (get example-1 1 'urgency) 2)
-      (check-equal? (get (~> example-1 (update 1 'urgency add1)) 1 'urgency) 3))))
+      (check-equal? (get (~> example-1 (update 1 'urgency add1)) 1 'urgency) 3))
+
+    (let-values (((st* item*) (clone example-2 2)))
+      (test-equal? "Cloned item has expected ID" item* 4)
+
+      (test-case "Cloned item has same properties as old"
+        (check-equal? (get st* 4 'description) "Item 2")
+        (check-equal? (get st* 4 'tags) '("tag1" "tag2"))))))

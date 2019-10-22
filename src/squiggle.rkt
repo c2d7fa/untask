@@ -3,7 +3,7 @@
 ;; TODO: We only really want to use λ~ inside of ~>; maybe we should just
 ;; combine the two?
 
-(provide ~> ~>> λ> λ>> λ~)
+(provide ~> ~>> λ> λ>> λ~ ~>!)
 
 (require (for-syntax racket/syntax))
 
@@ -28,3 +28,6 @@
 (define-syntax (λ~ stx)
   (with-syntax ((~ (datum->syntax stx '~)))
     #`(λ (~) #,@(cdr (syntax-e stx)))))
+
+(define-syntax-rule (~>! head tail ...)
+  (set! head (~> head tail ...)))

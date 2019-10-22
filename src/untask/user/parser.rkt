@@ -170,7 +170,7 @@
 
 (define modify-expression/p
   (let* ((and-list/p (f:map (λ (subexprs) (cons 'and subexprs))
-                            (many/p modify-pair/p #:sep whitespace/p))))
+                            (try-many-sep/p modify-pair/p whitespace/p))))
     and-list/p))
 
 (define (opt/p parser #:default (default (void)))
@@ -191,6 +191,18 @@
                            (f:pure args))
                      (f:pure (list))))
         (f:pure (append fe (list command-name) args))))
+
+(define copy-recur-command/p
+  (f:do (fe <- filter-expression/p)
+        whitespace/p (string/p "copy") whitespace/p
+        (me <- (opt/p #:default '(and)
+                      (f:do (me <- modify-expression/p)
+                            whitespace/p
+                            (f:pure me))))
+        (string/p "from") whitespace/p (from <- literal-date-expression/p) whitespace/p
+        (string/p "to") whitespace/p (to <- literal-date-expression/p) whitespace/p
+        (string/p "by") whitespace/p (by <- int/p)
+        (f:pure (list fe 'copy-recur me from to by))))
 
 (define context-name/p bare-word/p)
 
@@ -250,8 +262,7 @@
     (or/p (try/p context-list-command/p)
           (try/p context-add-command/p)
           (try/p context-remove-command/p)
-          (try/p context-set-active-command/p)
-          )))
+          (try/p context-set-active-command/p))))
 
 (define filename/p
   (f:map (λ (cs) (apply string cs))
@@ -270,6 +281,7 @@
    (try/p (with-context/p (normal-command/p 'modify #:arguments (list/p modify-expression/p))))
    (try/p (with-context/p (normal-command/p 'list)))
    (try/p (with-context/p (normal-command/p 'add #:takes-filter? #f #:arguments (list/p modify-expression/p))))
+   (try/p (with-context/p copy-recur-command/p))
    (try/p (with-context/p (normal-command/p 'copy #:arguments (list/p modify-expression/p))))
    (try/p (normal-command/p 'save #:takes-filter? #f))
    (try/p (normal-command/p 'open #:takes-filter? #f #:arguments (list/p filename/p)))
