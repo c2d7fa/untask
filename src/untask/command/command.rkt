@@ -1,6 +1,6 @@
 #lang racket
 
-(provide tree)
+(provide tree agenda)
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -19,7 +19,9 @@
          (prefix-in urgency: untask/src/untask/properties/urgency)
          (prefix-in depends: untask/src/untask/properties/dependencies)
          (prefix-in links: untask/src/untask/properties/links)
+         (prefix-in date: untask/src/untask/properties/date)
 
+         (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute))
 
 
@@ -74,3 +76,21 @@
   (values (map (λ (item)
                  (build-tree item-state item))
                (search state fe))))
+
+;; Returns an agenda view, which can be rendered with 'render-agenda'.
+(define (agenda state #:filter fe)
+  (define item-state (a:get-path (state state.item-state)))
+  (check! fe #:filter? #t)
+  (sort (foldl (λ (item blocks)
+                 (let ((item-date (v:unwrap-date (p:get item-state item date:date-property))))
+                   (if (assoc item-date blocks dt:same-date?)
+                       (map (λ (block)
+                              (if (dt:same-date? (car block) item-date)
+                                  `(,@block ,item)
+                                  block))
+                            blocks)
+                       `(,@blocks (,item-date ,item)))))
+               (list)
+               (search state `(and (not (date : #f)) ,fe)))
+       #:key car dt:date-before?))
+
