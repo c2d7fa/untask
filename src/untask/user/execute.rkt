@@ -11,6 +11,7 @@
  (prefix-in serialize: untask/src/untask/core/serialize)
 
  untask/src/untask/command/check-expression
+ (prefix-in cmd: untask/src/untask/command/command)
  (prefix-in filter: untask/src/untask/command/filter)
  (prefix-in modify: untask/src/untask/command/modify)
 
@@ -98,30 +99,8 @@
 ;; parents/blocked items. It should have some way of highlighting the current
 ;; item.
 
-(define (execute-tree! fe rhs)
-  (check! fe #:filter? #t)
-  (check! rhs #:filter? #t)
-  ;; TODO: Distinguish between children and dependencies in output
-  (define seen (list))
-  (define (build-tree item-state item)
-    ;; TODO: This code is ugly.
-    (define (build-tree* item)
-      (cons item (map (λ (i)
-                        (if (member i seen)
-                            (let ((has-children? (not (and (null? (set->list (val:unwrap-set (p:get item-state (val:unwrap-item i) depends:depends-property))))
-                                                           (null? (set->list (val:unwrap-set (p:get item-state (val:unwrap-item i) links:children-property))))))))
-                              `(,(val:unwrap-item i) ,@(if has-children? '(()) '())))
-                            (begin (set! seen (cons i seen))
-                                   (build-tree* (val:unwrap-item i)))))
-                      (filter (λ (i)
-                                (filter:evaluate-filter-expression rhs item-state (val:unwrap-item i)))
-                              (append (set->list (val:unwrap-set (p:get item-state item depends:depends-property)))
-                                      (set->list (val:unwrap-set (p:get item-state item links:children-property))))))))
-    (build-tree* item))
-  (displayln (render-trees (item-state)
-                           (map (λ (item)
-                                  (build-tree (item-state) item))
-                                (search fe)))))
+(define (execute-tree! fe post-fe)
+  (displayln (render-trees (item-state) (cmd:tree (state) #:filter fe #:post-filter post-fe))))
 
 (define (execute-agenda! fe)
   (check! fe #:filter? #t)
