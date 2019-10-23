@@ -2,7 +2,7 @@
 
 (require rackunit
          racket/enter
-         untask/test/run-tests-fancy
+         rackunit-fancy-runner
 
          untask/test/test-item
          untask/test/test-context
