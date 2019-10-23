@@ -36,3 +36,6 @@
 (define (retest!)
   (enter! untask/tests)
   (test!))
+
+(module+ main
+  (test!))
