@@ -1,7 +1,9 @@
 #lang racket
 
 (require rackunit untask/test/util
-         untask/src/untask/command/command)
+         untask/src/untask/command/command
+
+         (prefix-in dt: untask/src/datetime))
 
 (provide command-tests)
 
@@ -15,6 +17,17 @@
 ;;
 ;; 1 has urgency 1; all others have urgency 0
 (define st1 (load-example "example-2.t"))
+
+;; Example state with dates.
+;;
+;; 1 has no date
+;; 2, 3, 5 have date 2019-10-23
+;; 4 has date 2019-10-27
+;;
+;; 2 has urgency 2
+;; 5 has urgency 1
+;; 3 has urgency 0
+(define st2 (load-example "example-3.t"))
 
 (define command-tests
   (test-suite "Commands"
@@ -51,4 +64,26 @@
 
       (test-case "Using more advanced #:post-filter to filter trees"
         ;; TODO: We shouldn't require this order.
-        (check-equal? (tree st1 #:filter '() #:post-filter '(not (status : (string . "inactive")))) '((1) (3) (2 (3)) (5) (4)))))))
+        (check-equal? (tree st1 #:filter '() #:post-filter '(not (status : (string . "inactive")))) '((1) (3) (2 (3)) (5) (4)))))
+
+    (test-suite "Agenda"
+      (test-case "Filter by date with single item"
+        (check-equal? (agenda st2 #:filter '(date : (date 2019 10 27))) `((,(dt:datetime 2019 10 27) 4))))
+
+      (test-case "Multiple items are sorted by urgency"
+        (check-equal? (agenda st2 #:filter '(date : (date 2019 10 23))) `((,(dt:datetime 2019 10 23) 2 5 3))))
+
+      (test-case "Showing multiple dates"
+        (check-equal? (agenda st2 #:filter '(or (date : (date 2019 10 23))
+                                                (date : (date 2019 10 27))))
+                      `((,(dt:datetime 2019 10 23) 2 5 3)
+                        (,(dt:datetime 2019 10 27) 4))))
+
+      (test-case "Filter matching nothing gives empty agenda"
+        (check-equal? (agenda st2 #:filter '(not ()))
+                      '()))
+
+      (test-case "Showing everything does not include items with no date"
+        (check-equal? (agenda st2 #:filter '())
+                      `((,(dt:datetime 2019 10 23) 2 5 3)
+                        (,(dt:datetime 2019 10 27) 4)))))))
