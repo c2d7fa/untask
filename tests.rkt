@@ -1,9 +1,8 @@
 #lang racket
 
 (require rackunit
-         rackunit/text-ui
-         rackunit/gui
          racket/enter
+         untask/test/run-tests-fancy
 
          untask/test/test-item
          untask/test/test-context
@@ -29,7 +28,7 @@
     parser-tests))
 
 (define (test!)
-  (run-tests all-tests 'verbose))
+  (run-tests/fancy all-tests))
 
 ;; For interactive use. To use this, enter this module (with ",enter
 ;; tests.rkt"), and then run (retest!) after each change. This reduces the
@@ -37,7 +36,3 @@
 (define (retest!)
   (enter! untask/tests)
   (test!))
-
-(define (retest!/gui)
-  (enter! untask/tests)
-  (test/gui #:wait? #t all-tests))
