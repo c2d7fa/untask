@@ -33,7 +33,6 @@
 
 (define *state (make-parameter #f))
 (define (state) (unbox (*state)))
-(define (item-state) (a:get-path ((state) state.item-state)))
 
 ;; Check whether fme is a valid filter or modify expression. If it isn't, throw
 ;; an exception.
@@ -42,25 +41,8 @@
     (when (not (eq? #t check))
       (raise-user-error check))))
 
-;; Extend a filter or modify expression with the currently enabled contexts.
-(define (with-contexts fme #:filter? filter?)
-  `(and ,fme
-        ,((if filter? c:activated-filter c:activated-modify)
-          (a:get-path ((state) state.context-state)))))
-
-;; Find all items matching filter expression exactly.
-(define (search* fe)
-  (filter:search (item-state) fe))
-
-;; Like search*, but automatically uses current contexts and returns list sorted
-;; by urgency rather than set.
-(define (search fe)
-  (urgency:sort-items-by-urgency-descending
-   (item-state)
-   (search* (with-contexts fe #:filter? #t))))
-
 (define (list! items)
-  (displayln (render-listing (item-state) items)))
+  (displayln (render-listing (a:get-path ((state) state.item-state)) items)))
 
 (define (read-file! path)
   (and path (file-exists? path)
@@ -94,10 +76,10 @@
 ;; parents/blocked items. It should have some way of highlighting the current
 ;; item.
 (define (execute-tree! fe post-fe)
-  (displayln (render-trees (item-state) (cmd:tree (state) #:filter fe #:post-filter post-fe))))
+  (displayln (render-trees (a:get-path ((state) state.item-state)) (cmd:tree (state) #:filter fe #:post-filter post-fe))))
 
 (define (execute-agenda! fe)
-  (displayln (render-agenda (item-state) (cmd:agenda (state) #:filter fe))))
+  (displayln (render-agenda (a:get-path ((state) state.item-state)) (cmd:agenda (state) #:filter fe))))
 
 (define (execute-add! me)
   (define-values (state* item*) (cmd:add (state) #:modify me))
