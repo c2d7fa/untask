@@ -3,7 +3,8 @@
 (provide (rename-out (cmd:list list))
          tree
          agenda
-         add)
+         add
+         modify)
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -25,6 +26,7 @@
          (prefix-in links: untask/src/untask/properties/links)
          (prefix-in date: untask/src/untask/properties/date)
 
+         untask/src/squiggle
          (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute))
 
@@ -110,3 +112,12 @@
       (modify:evaluate-modify-expression (with-contexts state me #:filter? #f)
                                          item-state* item*)))
   (values state* item*))
+
+;; Returns updated state and modified items.
+(define (modify state #:filter fe #:modify me)
+  (check! fe #:filter? #t)
+  (check! me #:filter? #f)
+  (define items (search state fe))
+  (values (a:update-path (state state.item-state)
+                         (λ> (modify:modify-items (list->set items) me)))
+          items))

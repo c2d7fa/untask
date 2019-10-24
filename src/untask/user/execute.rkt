@@ -105,14 +105,9 @@
   (list! (list item*)))
 
 (define (execute-modify! fe me)
-  (check! fe #:filter? #t)
-  (check! me #:filter? #f)
-  (let ((items (search fe)))
-    (set-box! (*state)
-              (a:update-path ((state) state.item-state)
-                             (λ (item-state)
-                               (modify:modify-items item-state (list->set items) me))))
-    (list! items)))
+  (define-values (state* items*) (cmd:modify (state) #:filter fe #:modify me))
+  (set-box! (*state) state*)
+  (list! items*))
 
 (define (execute-copy! fe me)
   (define (copy-item! item)

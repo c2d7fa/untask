@@ -138,4 +138,18 @@
                                                               (tags + (string . "new-tag")))))))
           (define item-state (a:get-path (st* s:state.item-state)))
           (check-equal? (i:get item-state item* 'description) (v:make-string "Item 6"))
-          (check-equal? (i:get item-state item* 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag") (v:make-string "other-tag")))))))))
+          (check-equal? (i:get item-state item* 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag") (v:make-string "other-tag")))))))
+
+    (test-suite "Modify"
+      (let-values (((st* items*) (cmd:modify st3
+                                             #:filter '(tags + (string . "tag"))
+                                             #:modify '(and (tags + (string . "new-tag"))
+                                                            (tags - (string . "other-tag"))))))
+        (test-case "Modify returns modified items"
+          (check set=? items* '(2 3 4)))
+
+        (test-case "Modified items have had properties updated"
+          (check-equal? (i:get (a:get-path (st3 s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag"))))
+          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag"))))
+          (check-equal? (i:get (a:get-path (st3 s:state.item-state)) 4 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "other-tag"))))
+          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag")))))))))
