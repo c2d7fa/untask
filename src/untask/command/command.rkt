@@ -5,7 +5,8 @@
          agenda
          add
          modify
-         copy)
+         copy
+         copy-recur)
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -140,3 +141,24 @@
                item-state
                items))))
   (values state* var-items*))
+
+;; Returns updated state and newly created items.
+(define (copy-recur state #:filter fe #:modify me #:start start #:end end #:skip skip)
+  (check! fe #:filter? #t)
+  (check! me #:filter? #f)
+  (define start/dt (v:unwrap-date (v:evaluate-literal start)))
+  (define end/dt (v:unwrap-date (v:evaluate-literal end)))
+  (define items (search state fe))
+  (define var-result-items* (list))
+  (define var-result-state* state)
+  (for-each (λ (item)
+              (let-values (((item-state* items*) (date:copy-recur (a:get-path (var-result-state* state.item-state)) item #:start start/dt #:end end/dt #:skip skip)))
+                (set! var-result-state* (a:set-path (var-result-state* state.item-state) item-state*))
+                (for-each (λ (item*)
+                            (set! var-result-state* (a:set-path (var-result-state* state.item-state)
+                                                                (modify:evaluate-modify-expression me (a:get-path (var-result-state* state.item-state)) item*))))
+                          items*)
+                (set! var-result-items* (append var-result-items* items*))))
+            items)
+  (values var-result-state*
+          var-result-items*))

@@ -33,6 +33,8 @@
 ;; 2 has urgency 2
 ;; 5 has urgency 1
 ;; 3 has urgency 0
+;;
+;; 5 has wait date 2019-10-20
 (define st2 (load-example "example-3.t"))
 
 ;; Example with urgency and tags. Has 5 items.
@@ -165,4 +167,21 @@
           (check-equal? (i:get item-state 6 'description) (v:make-string "Item 5")))
 
         (test-case "Modify expression is applied to item"
-          (check-equal? (i:get item-state 6 'tags) (v:make-set (set (v:make-string "other-tag") (v:make-string "added-tag")))))))))
+          (check-equal? (i:get item-state 6 'tags) (v:make-set (set (v:make-string "other-tag") (v:make-string "added-tag")))))))
+
+    (test-suite "Copy with recurrence"
+      ;; NOTE: Most of the specifics are tested in the unit tests for the "date"
+      ;; module. We just want to check that it does roughly the correct thing
+      ;; here.
+      (let-values (((st* items*) (cmd:copy-recur st2
+                                                 #:filter '(description : (string . "Item 5"))
+                                                 #:modify '()
+                                                 #:start '(date 2019 02 06)
+                                                 #:end '(date 2019 02 11)
+                                                 #:skip 2)))
+        (test-case "Created expected items"
+          (check-equal? items* '(6 7 8)))
+        (test-case "Date and wait properties are set correctly"
+          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 8 'date) (v:make-date (dt:datetime 2019 02 10)))
+          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 8 'wait) (v:make-date (dt:datetime 2019 02 07))))))))
+

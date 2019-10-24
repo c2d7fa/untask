@@ -7,7 +7,8 @@
    (5
     ((description (string "Item 5"))
      (date (date (2019 10 23 #f #f)))
-     (urgency (number 1))))
+     (urgency (number 1))
+     (wait (date (2019 10 20 #f #f)))))
    (3 ((description (string "Item 3")) (date (date (2019 10 23 #f #f)))))
    (2
     ((description (string "Item 2"))
