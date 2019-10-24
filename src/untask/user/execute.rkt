@@ -11,6 +11,7 @@
  (prefix-in serialize: untask/src/untask/core/serialize)
 
  untask/src/untask/command/check-expression
+ (prefix-in cmd: untask/src/untask/command/command)
  (prefix-in filter: untask/src/untask/command/filter)
  (prefix-in modify: untask/src/untask/command/modify)
 
@@ -32,7 +33,6 @@
 
 (define *state (make-parameter #f))
 (define (state) (unbox (*state)))
-(define (item-state) (a:get-path ((state) state.item-state)))
 
 ;; Check whether fme is a valid filter or modify expression. If it isn't, throw
 ;; an exception.
@@ -41,25 +41,8 @@
     (when (not (eq? #t check))
       (raise-user-error check))))
 
-;; Extend a filter or modify expression with the currently enabled contexts.
-(define (with-contexts fme #:filter? filter?)
-  `(and ,fme
-        ,((if filter? c:activated-filter c:activated-modify)
-          (a:get-path ((state) state.context-state)))))
-
-;; Find all items matching filter expression exactly.
-(define (search* fe)
-  (filter:search (item-state) fe))
-
-;; Like search*, but automatically uses current contexts and returns list sorted
-;; by urgency rather than set.
-(define (search fe)
-  (urgency:sort-items-by-urgency-descending
-   (item-state)
-   (search* (with-contexts fe #:filter? #t))))
-
 (define (list! items)
-  (displayln (render-listing (item-state) items)))
+  (displayln (render-listing (a:get-path ((state) state.item-state)) items)))
 
 (define (read-file! path)
   (and path (file-exists? path)
@@ -87,115 +70,39 @@
                 (string-prefix? input "Y")))))))
 
 (define (execute-list! fe)
-  (check! fe #:filter? #t)
-  (list! (search fe)))
-
-(define (execute-info! fe)
-  (check! fe #:filter? #t)
-  (displayln (render-listing-info (item-state) (search fe))))
+  (list! (cmd:list (state) #:filter fe)))
 
 ;; TODO: Create other version of "tree" that shows the entire tree, including
 ;; parents/blocked items. It should have some way of highlighting the current
 ;; item.
-
-(define (execute-tree! fe rhs)
-  (check! fe #:filter? #t)
-  (check! rhs #:filter? #t)
-  ;; TODO: Distinguish between children and dependencies in output
-  (define seen (list))
-  (define (build-tree item-state item)
-    ;; TODO: This code is ugly.
-    (define (build-tree* item)
-      (cons item (map (λ (i)
-                        (if (member i seen)
-                            (let ((has-children? (not (and (null? (set->list (val:unwrap-set (p:get item-state (val:unwrap-item i) depends:depends-property))))
-                                                           (null? (set->list (val:unwrap-set (p:get item-state (val:unwrap-item i) links:children-property))))))))
-                              `(,(val:unwrap-item i) ,@(if has-children? '(()) '())))
-                            (begin (set! seen (cons i seen))
-                                   (build-tree* (val:unwrap-item i)))))
-                      (filter (λ (i)
-                                (filter:evaluate-filter-expression rhs item-state (val:unwrap-item i)))
-                              (append (set->list (val:unwrap-set (p:get item-state item depends:depends-property)))
-                                      (set->list (val:unwrap-set (p:get item-state item links:children-property))))))))
-    (build-tree* item))
-  (displayln (render-trees (item-state)
-                           (map (λ (item)
-                                  (build-tree (item-state) item))
-                                (search fe)))))
+(define (execute-tree! fe post-fe)
+  (displayln (render-trees (a:get-path ((state) state.item-state)) (cmd:tree (state) #:filter fe #:post-filter post-fe))))
 
 (define (execute-agenda! fe)
-  (check! fe #:filter? #t)
-  (displayln (render-agenda (item-state)
-                            (sort (foldl (λ (item blocks)
-                                           (let ((item-date (val:unwrap-date (p:get (item-state) item date:date-property))))
-                                             (if (assoc item-date blocks dt:same-date?)
-                                                 (map (λ (block)
-                                                        (if (dt:same-date? (car block) item-date)
-                                                            `(,@block ,item)
-                                                            block))
-                                                      blocks)
-                                                 `(,@blocks (,item-date ,item)))))
-                                         (list)
-                                         (search `(and (not (date : #f)) ,fe)))
-                                 #:key car dt:date-before?))))
+  (displayln (render-agenda (a:get-path ((state) state.item-state)) (cmd:agenda (state) #:filter fe))))
 
 (define (execute-add! me)
-  (check! me #:filter? #f)
-  (let-values (((item-state* item*) (i:new (item-state))))
-    (set-box! (*state)
-              (a:set-path ((state) state.item-state)
-                          (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
-                                                             item-state* item*)))
-    (list! (list item*))))
+  (define-values (state* item*) (cmd:add (state) #:modify me))
+  (set-box! (*state) state*)
+  (list! (list item*)))
 
 (define (execute-modify! fe me)
-  (check! fe #:filter? #t)
-  (check! me #:filter? #f)
-  (let ((items (search fe)))
-    (set-box! (*state)
-              (a:update-path ((state) state.item-state)
-                             (λ (item-state)
-                               (modify:modify-items item-state (list->set items) me))))
-    (list! items)))
+  (define-values (state* items*) (cmd:modify (state) #:filter fe #:modify me))
+  (set-box! (*state) state*)
+  (list! items*))
 
 (define (execute-copy! fe me)
-  (define (copy-item! item)
-    (let-values (((item-state* item*) (i:clone (item-state) item)))
-      (set-box! (*state) (a:set-path ((state) state.item-state)
-                                     (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
-                                                                        item-state* item*)))
-      item*))
-  (check! fe #:filter? #t)
-  (check! me #:filter? #f)
-  (list! (map (λ (item)
-                (copy-item! item))
-              (search fe))))
+  (define-values (state* items*) (cmd:copy (state) #:filter fe #:modify me))
+  (set-box! (*state) state*)
+  (list! items*))
 
 (define (execute-copy-recur! fe me start end skip)
-  (define start/dt (val:unwrap-date (val:evaluate-literal start)))
-  (define end/dt (val:unwrap-date (val:evaluate-literal end)))
-  (define items (search fe))
-  (define var-result-items (list))
-  (for-each (λ (item)
-              (let-values (((item-state* items*) (date:copy-recur (item-state) item #:start start/dt #:end end/dt #:skip skip)))
-                (set-box! (*state) (a:set-path ((state) state.item-state) item-state*))
-                (for-each (λ (item*)
-                            (set-box! (*state) (a:set-path ((state) state.item-state)
-                                                           (modify:evaluate-modify-expression me (item-state) item*))))
-                          items*)
-                (set! var-result-items (append var-result-items items*))))
-            items)
-  (list! var-result-items))
+  (define-values (state* items*) (cmd:copy-recur (state) #:filter fe #:modify me #:start start #:end end #:skip skip))
+  (set-box! (*state) state*)
+  (list! items*))
 
 (define (execute-remove! fe)
-  (check! fe #:filter? #t)
-  (set-box! (*state)
-            (a:update-path ((state) state.item-state)
-                           (λ (item-state)
-                             (foldl (λ (item item-state)
-                                      (i:remove item-state item))
-                                    item-state
-                                    (search fe))))))
+  (set-box! (*state) (cmd:remove (state) #:filter fe)))
 
 ;; Execute a command and update the state by setting the boxed state. Return
 ;; 'exit if the given command should cause the program to exit, and return

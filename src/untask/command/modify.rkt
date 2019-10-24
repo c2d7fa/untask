@@ -1,6 +1,7 @@
 #lang racket
 
-(provide (all-defined-out))
+(provide evaluate-modify-expression
+         modify-items)
 
 (require
  (prefix-in operators: untask/src/untask/core/operator)
