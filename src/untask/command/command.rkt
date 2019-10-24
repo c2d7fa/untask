@@ -6,7 +6,8 @@
          add
          modify
          copy
-         copy-recur)
+         copy-recur
+         remove)
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -162,3 +163,13 @@
             items)
   (values var-result-state*
           var-result-items*))
+
+;; Returns updated state.
+(define (remove state #:filter fe)
+  (check! fe #:filter? #t)
+  (a:update-path (state state.item-state)
+                 (λ (item-state)
+                   (foldl (λ (item item-state)
+                            (i:remove item-state item))
+                          item-state
+                          (search state fe)))))

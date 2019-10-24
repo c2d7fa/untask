@@ -183,5 +183,11 @@
           (check-equal? items* '(6 7 8)))
         (test-case "Date and wait properties are set correctly"
           (check-equal? (i:get (a:get-path (st* s:state.item-state)) 8 'date) (v:make-date (dt:datetime 2019 02 10)))
-          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 8 'wait) (v:make-date (dt:datetime 2019 02 07))))))))
+          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 8 'wait) (v:make-date (dt:datetime 2019 02 07))))))
 
+    (test-suite "Remove"
+      (let ((st* (cmd:remove st3 #:filter '(or (item . 1)
+                                               (item . 2)))))
+        (test-case "Removing an item causes it to no longer be in the available items"
+          (check set=? (i:items (a:get-path (st3 s:state.item-state))) '(1 2 3 4 5))
+          (check set=? (i:items (a:get-path (st* s:state.item-state))) '(3 4 5)))))))

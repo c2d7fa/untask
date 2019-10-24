@@ -120,14 +120,7 @@
   (list! items*))
 
 (define (execute-remove! fe)
-  (check! fe #:filter? #t)
-  (set-box! (*state)
-            (a:update-path ((state) state.item-state)
-                           (λ (item-state)
-                             (foldl (λ (item item-state)
-                                      (i:remove item-state item))
-                                    item-state
-                                    (search fe))))))
+  (set-box! (*state) (cmd:remove (state) #:filter fe)))
 
 ;; Execute a command and update the state by setting the boxed state. Return
 ;; 'exit if the given command should cause the program to exit, and return
