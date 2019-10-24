@@ -88,8 +88,7 @@
                 (string-prefix? input "Y")))))))
 
 (define (execute-list! fe)
-  (check! fe #:filter? #t)
-  (list! (search fe)))
+  (list! (cmd:list (state) #:filter fe)))
 
 (define (execute-info! fe)
   (check! fe #:filter? #t)

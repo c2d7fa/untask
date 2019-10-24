@@ -1,6 +1,8 @@
 #lang racket
 
-(provide tree agenda)
+(provide tree
+         agenda
+         (rename-out (cmd:list list)))
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -23,7 +25,6 @@
 
          (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute))
-
 
 ;; Check whether fme is a valid filter or modify expression. If it isn't, throw
 ;; an exception.
@@ -50,6 +51,10 @@
    (search* state (with-contexts state fe #:filter? #t))))
 
 ;;;
+
+(define (cmd:list state #:filter fe)
+  (check! fe #:filter? #t)
+  (search state fe))
 
 ;; Returns a list of tree views, which can be rendered with 'render-trees'.
 (define (tree state #:filter fe #:post-filter post-fe)
