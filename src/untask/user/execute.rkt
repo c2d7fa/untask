@@ -90,10 +90,6 @@
 (define (execute-list! fe)
   (list! (cmd:list (state) #:filter fe)))
 
-(define (execute-info! fe)
-  (check! fe #:filter? #t)
-  (displayln (render-listing-info (item-state) (search fe))))
-
 ;; TODO: Create other version of "tree" that shows the entire tree, including
 ;; parents/blocked items. It should have some way of highlighting the current
 ;; item.
