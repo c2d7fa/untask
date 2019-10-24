@@ -4,7 +4,8 @@
          tree
          agenda
          add
-         modify)
+         modify
+         copy)
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -121,3 +122,21 @@
   (values (a:update-path (state state.item-state)
                          (λ> (modify:modify-items (list->set items) me)))
           items))
+
+;; Returns updated state and newly created items.
+(define (copy state #:filter fe #:modify me)
+  (check! fe #:filter? #t)
+  (check! me #:filter? #f)
+  (define items (search state fe))
+  (define var-items* (list))
+  (define state*
+    (a:update-path (state state.item-state)
+      (λ (item-state)
+        (foldl (λ (item item-state)
+                 (let-values (((item-state* item*) (i:clone item-state item)))
+                   (set! var-items* (append var-items* (list item*)))
+                   (modify:evaluate-modify-expression (with-contexts state me #:filter? #f)
+                                                      item-state* item*)))
+               item-state
+               items))))
+  (values state* var-items*))

@@ -152,4 +152,17 @@
           (check-equal? (i:get (a:get-path (st3 s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag"))))
           (check-equal? (i:get (a:get-path (st* s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag"))))
           (check-equal? (i:get (a:get-path (st3 s:state.item-state)) 4 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "other-tag"))))
-          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag")))))))))
+          (check-equal? (i:get (a:get-path (st* s:state.item-state)) 2 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag")))))))
+
+    (test-suite "Copy"
+      (let-values (((st* items*) (cmd:copy st3 #:filter '(description : (string . "Item 5"))
+                                               #:modify '(tags + (string . "added-tag")))))
+        (define item-state (a:get-path (st* s:state.item-state)))
+        (test-case "Created item has expected ID"
+          (check-equal? items* (list 6)))
+
+        (test-case "Created item uses property value of copied item"
+          (check-equal? (i:get item-state 6 'description) (v:make-string "Item 5")))
+
+        (test-case "Modify expression is applied to item"
+          (check-equal? (i:get item-state 6 'tags) (v:make-set (set (v:make-string "other-tag") (v:make-string "added-tag")))))))))
