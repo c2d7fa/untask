@@ -93,7 +93,6 @@
 ;; TODO: Create other version of "tree" that shows the entire tree, including
 ;; parents/blocked items. It should have some way of highlighting the current
 ;; item.
-
 (define (execute-tree! fe post-fe)
   (displayln (render-trees (item-state) (cmd:tree (state) #:filter fe #:post-filter post-fe))))
 
@@ -101,13 +100,9 @@
   (displayln (render-agenda (item-state) (cmd:agenda (state) #:filter fe))))
 
 (define (execute-add! me)
-  (check! me #:filter? #f)
-  (let-values (((item-state* item*) (i:new (item-state))))
-    (set-box! (*state)
-              (a:set-path ((state) state.item-state)
-                          (modify:evaluate-modify-expression (with-contexts me #:filter? #f)
-                                                             item-state* item*)))
-    (list! (list item*))))
+  (define-values (state* item*) (cmd:add (state) #:modify me))
+  (set-box! (*state) state*)
+  (list! (list item*)))
 
 (define (execute-modify! fe me)
   (check! fe #:filter? #t)

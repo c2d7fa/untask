@@ -1,8 +1,9 @@
 #lang racket
 
-(provide tree
+(provide (rename-out (cmd:list list))
+         tree
          agenda
-         (rename-out (cmd:list list)))
+         add)
 
 ;; All procedures in this module accept invalid expressions as arguments, and
 ;; throw exceptions with a human-readable error when such arguments are
@@ -10,6 +11,7 @@
 ;; user.
 
 (require untask/src/untask/core/state
+         (prefix-in i: untask/src/untask/core/item)
          (prefix-in c: untask/src/untask/core/context)
          (prefix-in v: untask/src/untask/core/value)
          (prefix-in p: untask/src/untask/core/property)
@@ -99,3 +101,12 @@
                (search state `(and (not (date : #f)) ,fe)))
        #:key car dt:date-before?))
 
+;; Returns updated state and new item.
+(define (add state #:modify me)
+  (check! me #:filter? #f)
+  (define-values (item-state* item*) (i:new (a:get-path (state state.item-state))))
+  (define state*
+    (a:set-path (state state.item-state)
+      (modify:evaluate-modify-expression (with-contexts state me #:filter? #f)
+                                         item-state* item*)))
+  (values state* item*))

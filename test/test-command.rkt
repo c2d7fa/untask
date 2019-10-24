@@ -7,6 +7,7 @@
          (prefix-in s: untask/src/untask/core/state)
          (prefix-in c: untask/src/untask/core/context)
          (prefix-in v: untask/src/untask/core/value)
+         (prefix-in i: untask/src/untask/core/item)
          (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute))
 
@@ -34,7 +35,7 @@
 ;; 3 has urgency 0
 (define st2 (load-example "example-3.t"))
 
-;; Example with urgency and tags
+;; Example with urgency and tags. Has 5 items.
 (define st3 (load-example "example-4.t"))
 
 (define command-tests
@@ -111,5 +112,30 @@
       (test-case "Showing everything does not include items with no date"
         (check-equal? (cmd:agenda st2 #:filter '())
                       `((,(dt:datetime 2019 10 23) 2 5 3)
-                        (,(dt:datetime 2019 10 27) 4)))))))
+                        (,(dt:datetime 2019 10 27) 4)))))
 
+    (test-suite "Add"
+      (let-values (((st* item*) (cmd:add st3 #:modify '(and (description : (string . "Item 6"))
+                                                            (tags + (string . "tag"))
+                                                            (tags + (string . "new-tag"))))))
+        (define item-state (a:get-path (st* s:state.item-state)))
+
+        (test-case "Added item has expected ID"
+          (check-equal? item* 6))
+
+        (test-case "Added item with properties set is found in new state"
+          (check-true (i:found? item-state item*)))
+
+        (test-case "Added item has correct properties set"
+          (check-equal? (i:get item-state item* 'description) (v:make-string "Item 6"))
+          (check-equal? (i:get item-state item* 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag"))))))
+
+      (test-case "Adding item takes into account modify contexts"
+        (let-values (((st* item*) (~> st3
+                                      (a:update s:state.context-state (λ> (c:activate "tagged")))
+                                      (cmd:add #:modify '(and (description : (string . "Item 6"))
+                                                              (tags + (string . "tag"))
+                                                              (tags + (string . "new-tag")))))))
+          (define item-state (a:get-path (st* s:state.item-state)))
+          (check-equal? (i:get item-state item* 'description) (v:make-string "Item 6"))
+          (check-equal? (i:get item-state item* 'tags) (v:make-set (set (v:make-string "tag") (v:make-string "new-tag") (v:make-string "other-tag")))))))))

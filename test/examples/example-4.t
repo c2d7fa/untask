@@ -1,7 +1,9 @@
 ((version 0)
  (next-item-id 6)
  (active-contexts ())
- (all-contexts (("tagged" ((or (and (tags + (string "tag")))) ()))))
+ (all-contexts
+  (("tagged"
+    ((or (and (tags + (string "tag")))) (and (tags + (string "other-tag")))))))
  (item-property-data
   ((1 ((description (string "Item 1"))))
    (5
