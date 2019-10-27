@@ -32,4 +32,11 @@
                       (and)
                       (date 2019 02 01)
                       (date 2019 02 20)
-                      1)))))
+                      1)))
+
+    (test-case "Parsing command with 'today' and 'today+7'"
+      (check-equal? (parse "14 modify wait:today date:today+7")
+                    '((or (and (item . 14)))
+                      modify
+                      (and (wait : (date today 0))
+                           (date : (date today 7))))))))
