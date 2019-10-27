@@ -94,8 +94,14 @@
                        (string/p ":")
                        (minute <- minute/p)
                        (f:pure `(date ,@date-part ,hour ,minute))))
-          (f:do (date-part <- date-part/p)
-                (f:pure `(date ,@date-part))))))
+          (try/p (f:do (date-part <- date-part/p)
+                       (f:pure `(date ,@date-part))))
+          (f:do (string/p "Today")
+                (offset <- (opt/p #:default 0
+                                  (f:do (string/p "+")
+                                        (offset <- int/p)
+                                        (f:pure offset))))
+                (f:pure `(date . (today ,offset)))))))
 
 (define literal-expression/p
   (or/p literal-set-expression/p

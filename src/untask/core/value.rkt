@@ -65,5 +65,6 @@
     (`(boolean . ,boolean-value) (make-boolean boolean-value))
     (`(date ,year ,month ,day) (make-date (dt:datetime (or year (dt:current-year)) month day)))
     (`(date ,year ,month ,day ,hours ,minutes) (make-date (dt:datetime (or year (dt:current-year)) month day hours minutes)))
+    (`(date today ,offset) (make-date (dt:add-days (dt:today) offset)))
     (#f #f)
     ))

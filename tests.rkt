@@ -4,6 +4,7 @@
          racket/enter
          rackunit-fancy-runner
 
+         untask/test/test-value
          untask/test/test-item
          untask/test/test-context
          untask/test/test-dependencies
@@ -21,6 +22,7 @@
     integration-tests
     command-tests
     serialization-tests
+    value-tests
     item-tests
     context-tests
     (test-suite "Properties"
