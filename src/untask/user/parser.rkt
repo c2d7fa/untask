@@ -96,7 +96,7 @@
                        (f:pure `(date ,@date-part ,hour ,minute))))
           (try/p (f:do (date-part <- date-part/p)
                        (f:pure `(date ,@date-part))))
-          (f:do (string/p "today")
+          (f:do (string/p "Today")
                 (offset <- (opt/p #:default 0
                                   (f:do (string/p "+")
                                         (offset <- int/p)

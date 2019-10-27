@@ -44,6 +44,9 @@
       (g:datetime<? (g:now) (datetime->gregor dt))
       (g:date<? (g:today) (datetime->gregor dt))))
 
+(define (today)
+  (gregor->datetime (g:today)))
+
 (define (today? dt)
   (g:date=? (g:today) (g:->date (datetime->gregor dt))))
 
