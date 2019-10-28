@@ -17,15 +17,21 @@
  (prefix-in depends: untask/src/untask/properties/dependencies)
  (prefix-in links: untask/src/untask/properties/links)
  (prefix-in date: untask/src/untask/properties/date)
+ (prefix-in color: untask/src/untask/properties/color)
 
  (prefix-in term: untask/src/terminal)
- (prefix-in dt: untask/src/datetime)
- )
+ (prefix-in dt: untask/src/datetime))
 
 (define (render-listing item-state items)
   (if (= 1 (length items))
       (render-listing-info item-state items)
       (render-listing* item-state items)))
+
+(define (item-colors item-state item)
+  (let ((color (p:get item-state item color:color-property)))
+    (if color
+        (list `(,(string->symbol (val:unwrap-string color))))
+        (list))))
 
 (define (render-listing* item-state items)
   (define (render-item item-state item)
@@ -49,7 +55,7 @@
                       ". "))
                     ;; Description
                     (,@(cond
-                         ((status:active? item-state item) '((bold)))
+                         ((status:active? item-state item) `((bold) ,@(item-colors item-state item)))
                          ((status:done? item-state item) '((strikethrough) (white)))
                          (else '((white))))
                      (,(val:unwrap-string description)))
@@ -102,8 +108,7 @@
                     ,(if (not date)
                          ""
                          `(() (((black) (" D:"))
-                               ,(style-date (val:unwrap-date date)))))
-                    ))))
+                               ,(style-date (val:unwrap-date date)))))))))
   (string-join
    (map (λ (item) (render-item item-state item)) items)
    "\n"))
@@ -149,7 +154,7 @@
     (term:render `(()
                    (
                     ;; Description
-                    ((bold)
+                    ((bold) ,@(item-colors item-state item)
                      (,(val:unwrap-string description)))
                     "\n\n"
                     ;; Notes
@@ -234,8 +239,7 @@
                            ("\n\n"
                             ((black) ("Parents:\n"))
                             ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set parents))))
-                                            4))))
-                    ))))
+                                            4))))))))
   (string-join
    (map (λ (item) (render-item item)) items)
    "\n\n\n"))
@@ -259,8 +263,7 @@
   (define (render-block block)
     (term:render `(() (,(style-date (car block))
                        "\n"
-                       ,(string-indent (render-listing* item-state (cdr block)) 4)
-                       ))))
+                       ,(string-indent (render-listing* item-state (cdr block)) 4)))))
   (string-join
    (map (λ (block) (render-block block)) blocks)
    "\n\n"))
