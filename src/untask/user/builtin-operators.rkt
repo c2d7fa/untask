@@ -5,7 +5,7 @@
 (require untask/src/untask/core/operator
          (prefix-in val: untask/src/untask/core/value)
          (prefix-in dt: untask/src/datetime)
-         (only-in untask/src/misc thread-first))
+         untask/src/squiggle)
 
 (define ((check-argument expected-argument-type) object-type argument-type)
   (if (val:type<=? argument-type expected-argument-type)
@@ -70,6 +70,11 @@
                    #:object 'date  ; TODO: May be optional! We should encode this somewhere.
                    #:check-types (check-argument 'number)
                    #:body (λ (x y) (and x (val:make-date (dt:add-days (val:unwrap-date x) (val:unwrap-number y)))))))
+(define op-date-subtract-days
+  (create-operator #:name '-
+                   #:object 'date   ; TODO: See above
+                   #:check-types (check-argument 'number)
+                   #:body (λ (x y) (and x (val:make-date (dt:add-days (val:unwrap-date x) (- (val:unwrap-number y))))))))
 
 (define op-any-equal?
   (create-operator #:name ':
@@ -139,7 +144,7 @@
 ;;
 
 (define builtin-operators
-  (thread-first operator-definitions-empty
+  (~> operator-definitions-empty
     (operator-definitions-add op-any-assign)
     (operator-definitions-add op-string-suffix)
     (operator-definitions-add op-string-prefix)
@@ -148,6 +153,7 @@
     (operator-definitions-add op-set-add)
     (operator-definitions-add op-set-remove)
     (operator-definitions-add op-date-add-days)
+    (operator-definitions-add op-date-subtract-days)
 
     (operator-definitions-add op-any-equal?)
     (operator-definitions-add op-string-match?)
@@ -158,6 +164,4 @@
     (operator-definitions-add op-number-greater-than?)
     (operator-definitions-add op-number-less-than?)
     (operator-definitions-add op-date-after?)
-    (operator-definitions-add op-date-before?)
-    ))
-
+    (operator-definitions-add op-date-before?)))
