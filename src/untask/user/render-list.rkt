@@ -57,7 +57,7 @@
                     (,@(cond
                          ((status:active? item-state item) `((bold) ,@(item-colors item-state item)))
                          ((status:done? item-state item) '((strikethrough) (white)))
-                         (else '((white))))
+                         (else `((white) ,@(item-colors item-state item))))
                      (,(val:unwrap-string description)))
                     ;; Notes
                     ,(if (equal? "" (val:unwrap-string notes))
