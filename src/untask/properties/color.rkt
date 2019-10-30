@@ -6,4 +6,4 @@
 
 (define color-property
   (p:property #:name 'color
-              #:type '(enum red green yellow blue magenta cyan)))
+              #:type '(opt (enum red green yellow blue magenta cyan))))

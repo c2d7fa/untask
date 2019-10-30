@@ -37,7 +37,7 @@
                          #:object object-type
                          #:filter? (filter-context #f)
                          #:body body-procedure
-                         #:check-types (check-types (λ (object-type argument-type) #t)))
+                         #:check-types (check-types (λ (object-type argument-value) #t)))
   (list name object-type filter-context body-procedure check-types))
 
 (define (operator-name op) (list-ref op 0))
@@ -70,9 +70,9 @@
                  object
                  argument))
 
-;; Returns #t if operator can be used with an object of type object-type and
-;; argument-type as the argument. Otherwise, returns a human-readable string
-;; describing the reason why this is not a valid cominations of object and
-;; argument types.
-(define (check-types operator #:object-type object-type #:argument-type argument-type)
-  ((operator-check-types operator) object-type argument-type))
+;; Returns #t if operator can be used with an object of type object-type and an
+;; argument with value argument-value as the argument. Otherwise, returns a
+;; human-readable string describing the reason why this is not a valid
+;; cominations of object and argument types.
+(define (check-types operator #:object-type object-type #:argument-value argument-value)
+  ((operator-check-types operator) object-type argument-value))

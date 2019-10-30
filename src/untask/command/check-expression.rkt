@@ -57,17 +57,14 @@
     (`(,property ,operator ,literal-expr) #:when (symbol? operator)
      (if (not (bp:has? property))
          (format "Unknown property '~A'." property)
-         (if (and (list? (p:type (bp:ref property)))
-                  (eq? 'enum (car (p:type (bp:ref property)))))
-             (check-enum property operator literal-expr)
-             (let ((op (op:operator-definitions-find builtin-operators
-                                                     operator
-                                                     (p:type (bp:ref property))
-                                                     filter?)))
-               (if (eq? op #f)
-                   (format "Unknown operator '~A' on property '~A'." operator property)
-                   (op:check-types op
-                                   #:object-type (p:type (bp:ref property))
-                                   #:argument-type (val:get-type (val:evaluate-literal literal-expr))))))))
+         (let ((op (op:operator-definitions-find builtin-operators
+                                                 operator
+                                                 (p:type (bp:ref property))
+                                                 filter?)))
+           (if (eq? op #f)
+               (format "Unknown operator '~A' on property '~A'." operator property)
+               (op:check-types op
+                               #:object-type (p:type (bp:ref property))
+                               #:argument-value (val:evaluate-literal literal-expr))))))
     (`(item . ,id) #t)
     ('() #t)))
