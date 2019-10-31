@@ -18,6 +18,13 @@
 (define (make-date datetime)
   `(date . ,datetime))
 
+(define unwrap-string cdr)
+(define unwrap-set cdr)
+(define unwrap-number cdr)
+(define unwrap-item cdr)
+(define unwrap-boolean cdr)
+(define unwrap-date cdr)
+
 (define (string-value? x) (and x (pair? x) (eq? 'string (car x))))
 (define (set-value? x) (and x (pair? x) (eq? 'set (car x))))
 (define (number-value? x) (and x (pair? x) (eq? 'number (car x))))
@@ -49,12 +56,18 @@
            (or (eq? 'none t1)
                (type<=? t1 (cadr t2))))))
 
-(define unwrap-string cdr)
-(define unwrap-set cdr)
-(define unwrap-number cdr)
-(define unwrap-item cdr)
-(define unwrap-boolean cdr)
-(define unwrap-date cdr)
+(define (has-type? x t)
+  (or ;; Direct subtype
+      (type<=? (get-type x) t)
+      ;; Optional
+      (and (list? t)
+           (eq? 'opt (car t))
+           (or (eq? #f x)
+               (has-type? x (cadr t))))
+      ;; Enums
+      (and (list? t)
+           (eq? 'enum (car t))
+           (member (string->symbol (unwrap-string x)) (cdr t)))))
 
 (define (evaluate-literal literal-expression)
   (match literal-expression
@@ -66,5 +79,5 @@
     (`(date ,year ,month ,day) (make-date (dt:datetime (or year (dt:current-year)) month day)))
     (`(date ,year ,month ,day ,hours ,minutes) (make-date (dt:datetime (or year (dt:current-year)) month day hours minutes)))
     (`(date today ,offset) (make-date (dt:add-days (dt:today) offset)))
-    (#f #f)
-    ))
+    (#f #f)))
+

@@ -7,27 +7,27 @@
          (prefix-in dt: untask/src/datetime)
          untask/src/squiggle)
 
-(define ((check-argument expected-argument-type) object-type argument-type)
-  (if (val:type<=? argument-type expected-argument-type)
+(define ((check-argument expected-argument-type) object-type argument-value)
+  (if (val:has-type? argument-value expected-argument-type)
       #t
-      (format "Invalid argument type: Expected type ~a but got ~a." expected-argument-type argument-type)))
+      (format "Invalid argument type: Expected type ~a but got ~a." expected-argument-type (val:get-type argument-value))))
 
-(define (check-set object-type argument-type)
+(define (check-set object-type argument-value)
   ;; object-type (and argument-type) has format `(set ,type).
-  (if (val:type<=? argument-type (cadr object-type))
+  (if (val:has-type? argument-value (cadr object-type))
       #t
       (format "Invalid argument type for set of type ~a: Expected type ~a but got ~a."
               (cadr object-type)
               (cadr object-type)
-              argument-type)))
+              (val:get-type argument-value))))
 
-(define (check-equal object-type argument-type)
-  ((check-argument object-type) object-type argument-type))
+(define (check-same object-type argument-value)
+  ((check-argument object-type) object-type argument-value))
 
 (define op-any-assign
   (create-operator #:name ':
                    #:object 'any
-                   #:check-types check-equal
+                   #:check-types check-same
                    #:body (λ (x y) y)))
 
 (define op-string-suffix
@@ -80,7 +80,7 @@
   (create-operator #:name ':
                    #:object 'any
                    #:filter? #t
-                   #:check-types check-equal
+                   #:check-types check-same
                    #:body (λ (x y) (equal? x y))))
 
 (define op-string-match?

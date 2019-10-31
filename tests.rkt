@@ -12,6 +12,7 @@
          untask/test/test-integration
          untask/test/test-links
          untask/test/test-serialization
+         untask/test/test-check-expression
          untask/test/test-command
          untask/test/test-parser)
 
@@ -21,6 +22,7 @@
   (test-suite "Tests"
     integration-tests
     command-tests
+    check-expression-tests
     serialization-tests
     value-tests
     item-tests

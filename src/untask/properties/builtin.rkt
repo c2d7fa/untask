@@ -12,6 +12,7 @@
  (prefix-in depends: untask/src/untask/properties/dependencies)
  (prefix-in links: untask/src/untask/properties/links)
  (prefix-in date: untask/src/untask/properties/date)
+ (prefix-in color: untask/src/untask/properties/color)
 
  (prefix-in a: untask/src/attribute))
 
@@ -26,7 +27,8 @@
         links:children-property
         links:parents-property
         date:wait-property
-        date:date-property))
+        date:date-property
+        color:color-property))
 
 (define builtin-properties-hash
   (make-immutable-hash (map (λ (property)
