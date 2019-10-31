@@ -15,13 +15,17 @@
 (define example (a:update-path ((load-state "../../../../../msc/tasks/tasks.t") state.context-state)
                                (λ (cst) (ctx:toggle cst '((reset) (on "weekly"))))))
 
+;; Cache data to improve rerendering performance
+
+(define agenda-view (cmd:agenda example #:filter '()))
+
 ;; GUI setup
 
 (require racket/gui)
 
 (define frame (new frame% (label "Agenda") (width 1200) (height 800)))
 (send frame show #t)
-(define canvas (new canvas% (parent frame) (style '(vscroll hscroll)) (paint-callback (λ (_1 _2) (render!)))))
+(define canvas (new canvas% (parent frame) (style '(no-autoclear vscroll hscroll)) (paint-callback (λ (_1 _2) (rerender!)))))
 (define dc (send canvas get-dc))
 
 ;; Main
@@ -86,9 +90,19 @@
          0
          agenda-view))
 
-(define (render!)
+(define (rerender!)
   (send dc set-background (make-color #xE0 #xE0 #xE0))
   (send dc clear)
-  (render-agenda dc (a:get-path (example state.item-state)) (cmd:agenda example #:filter '())))
+  (render-agenda dc (a:get-path (example state.item-state)) agenda-view))
 
-(render!)
+;; Initialize
+
+(define total-width
+  (+ padding (* (+ task-box-width padding) (length agenda-view))))
+
+(define total-height
+  9999)  ; TODO
+
+(send canvas init-auto-scrollbars total-width total-height 0 0)
+
+(rerender!)
