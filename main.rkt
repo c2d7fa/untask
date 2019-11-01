@@ -6,9 +6,11 @@
  untask/src/untask/user/execute
  untask/src/untask/user/loop)
 
-(define state-box (box state:state-empty))
+(define (main arguments)
+  (define state-box (box state:state-empty))
+  (void
+   (when (not (zero? (vector-length arguments)))
+     (execute! `(open ,(vector-ref arguments 0)) state-box))
+   (user-loop! state-box)))
 
-(void
- (when (not (zero? (vector-length (current-command-line-arguments))))
-   (execute! `(open ,(vector-ref (current-command-line-arguments) 0)) state-box))
- (user-loop! state-box))
+(main (current-command-line-arguments))
