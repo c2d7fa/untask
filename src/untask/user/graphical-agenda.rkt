@@ -8,6 +8,7 @@
          (prefix-in v: untask/src/untask/core/value)
          (prefix-in p: untask/src/untask/core/property)
          (prefix-in bp: untask/src/untask/properties/builtin)
+         (prefix-in status: untask/src/untask/properties/status)
          (prefix-in ctx: untask/src/untask/core/context)
          (prefix-in cmd: untask/src/untask/command/command)
          (prefix-in a: untask/src/attribute)
@@ -25,13 +26,14 @@
 
   (define (translate-color color-name)
     (case color-name
-      ((#f) (make-color #xC0 #xC0 #xC0))
+      ((#f) (make-color #xA0 #xA0 #xA0))
       ((red) (make-color #xE0 #x90 #x90))
       ((green) (make-color #x90 #xE0 #x90))
       ((yellow) (make-color #xC8 #xB0 #x90))
       ((blue) (make-color #x80 #xA0 #xE0))
       ((magenta) (make-color #xB0 #x80 #xC0))
-      ((cyan) (make-color #x70 #xB8 #xC0))))
+      ((cyan) (make-color #x70 #xB8 #xC0))
+      ((done) (make-color #xD0 #xD0 #xD0))))
 
   (define task-description-text-height 18)
   (define task-description-font (make-font #:size task-description-text-height))
@@ -64,7 +66,9 @@
              (define effort temporary-hardcoded-task-effort)
              (define description (truncate-text (v:unwrap-string (p:get item-state task (bp:ref 'description)))))
              (define color (let ((c (p:get item-state task (bp:ref 'color))))
-                             (and c (string->symbol (v:unwrap-string c)))))
+                             (if (status:done? item-state task)
+                                 'done
+                                 (and c (string->symbol (v:unwrap-string c))))))
              (render-task-box dc
                               #:day day
                               #:effort effort
