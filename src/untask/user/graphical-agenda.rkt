@@ -44,26 +44,24 @@
                         line-height))
 
   (define (task-box-height-for-effort effort)
-    (* (+ padding line-height padding) (+ 1 effort)))
+    (+ (* (+ padding line-height padding) (+ 1 effort)) (* padding effort)))
 
   (define (render-task-box dc #:day day #:previous-tasks-efforts previous-tasks-efforts #:effort effort #:description description #:color color)
     (define x (+ padding (* (+ task-box-width padding) day)))
     (define y (foldl (λ (task-effort y)
-                       (+ y padding (task-box-height-for-effort effort)))
+                       (+ y padding (task-box-height-for-effort task-effort)))
                      padding
                      previous-tasks-efforts))
     (send dc set-pen (make-color #x00 #x00 #x00) 0 'transparent)
     (send dc set-brush (translate-color color) 'solid)
-    (send dc draw-rounded-rectangle x y task-box-width (* (+ padding line-height padding) (+ 1 effort)) 4)
+    (send dc draw-rounded-rectangle x y task-box-width (task-box-height-for-effort effort) 4)
     (send dc set-text-foreground (make-color #x30 #x30 #x30))
     (send dc set-font task-description-font)
     (send dc draw-text description (+ padding x) (+ padding y)))
 
-  (define temporary-hardcoded-task-effort 2) ; TODO
-
   (define (render-tasks dc item-state tasks #:day day)
     (foldl (λ (task previous-tasks-efforts)
-             (define effort temporary-hardcoded-task-effort)
+             (define effort (v:unwrap-number (p:get item-state task (bp:ref 'effort))))
              (define description (truncate-text (v:unwrap-string (p:get item-state task (bp:ref 'description)))))
              (define color (let ((c (p:get item-state task (bp:ref 'color))))
                              (if (status:done? item-state task)
@@ -98,7 +96,7 @@
     (exact-ceiling
       (apply max (map (λ (view)
                         (foldl (λ (task height)
-                                 (+ height padding (task-box-height-for-effort temporary-hardcoded-task-effort)))
+                                 (+ height padding (task-box-height-for-effort (v:unwrap-number (p:get item-state task (bp:ref 'effort))))))
                                padding
                                (cdr view)))
                       agenda-view))))
