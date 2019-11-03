@@ -19,6 +19,7 @@
  (prefix-in date: untask/src/untask/properties/date)
  (prefix-in color: untask/src/untask/properties/color)
  (prefix-in effort: untask/src/untask/properties/effort)
+ (prefix-in order: untask/src/untask/properties/order)
 
  (prefix-in term: untask/src/terminal)
  (prefix-in dt: untask/src/datetime))
@@ -49,6 +50,7 @@
     (define wait (p:get item-state item date:wait-property))
     (define date (p:get item-state item date:date-property))
     (define effort (val:unwrap-number (p:get item-state item effort:effort-property)))
+    (define order (p:get item-state item order:order-property))
     (term:render `(()
                    (
                     ;; ID
@@ -114,7 +116,11 @@
                     ,(if (not date)
                          ""
                          `(() (((black) (" D:"))
-                               ,(style-date (val:unwrap-date date)))))))))
+                               ,(style-date (val:unwrap-date date)))))
+                    ;; Order
+                    ,(if (not order)
+                         ""
+                         `((black) (" " ,(~a (val:unwrap-number order)) "th")))))))  ;; TODO: Correctly format as ordinal numeral
   (string-join
    (map (λ (item) (render-item item-state item)) items)
    "\n"))
@@ -158,6 +164,7 @@
     (define wait (p:get item-state item date:wait-property))
     (define date (p:get item-state item date:date-property))
     (define effort (val:unwrap-number (p:get item-state item effort:effort-property)))
+    (define order (p:get item-state item order:order-property))
     (term:render `(()
                    (
                     ;; Description
@@ -209,6 +216,12 @@
                      (((black) ("Effort:  "))
                       ((bold) (magenta) (,(~a effort)))))
                     "\n"
+                    ;; Order
+                    ,(if (not order)
+                         ""
+                         `(()
+                           (((black) ("Order:   "))
+                            (() (,(~a (val:unwrap-number order)) "\n")))))
                     ;; Tags
                     (()
                      (((black) ("Tags:    "))

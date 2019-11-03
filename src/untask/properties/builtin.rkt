@@ -14,6 +14,7 @@
  (prefix-in date: untask/src/untask/properties/date)
  (prefix-in color: untask/src/untask/properties/color)
  (prefix-in effort: untask/src/untask/properties/effort)
+ (prefix-in order: untask/src/untask/properties/order)
 
  (prefix-in a: untask/src/attribute))
 
@@ -30,7 +31,8 @@
         date:wait-property
         date:date-property
         color:color-property
-        effort:effort-property))
+        effort:effort-property
+        order:order-property))
 
 (define builtin-properties-hash
   (make-immutable-hash (map (λ (property)
