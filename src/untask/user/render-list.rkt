@@ -18,6 +18,7 @@
  (prefix-in links: untask/src/untask/properties/links)
  (prefix-in date: untask/src/untask/properties/date)
  (prefix-in color: untask/src/untask/properties/color)
+ (prefix-in effort: untask/src/untask/properties/effort)
 
  (prefix-in term: untask/src/terminal)
  (prefix-in dt: untask/src/datetime))
@@ -47,6 +48,7 @@
     (define parents (p:get item-state item links:parents-property))
     (define wait (p:get item-state item date:wait-property))
     (define date (p:get item-state item date:date-property))
+    (define effort (val:unwrap-number (p:get item-state item effort:effort-property)))
     (term:render `(()
                    (
                     ;; ID
@@ -77,6 +79,10 @@
                     " "
                     ((bold) (yellow)
                       (,(~a (val:unwrap-number urgency))))
+                    ;; Effort
+                    " "
+                    ((bold) (magenta)
+                      (,(~a effort)))
                     ;; Blocks
                     ,(if (set-empty? (val:unwrap-set blocks))
                          ""
@@ -151,6 +157,7 @@
     (define parents (p:get item-state item links:parents-property))
     (define wait (p:get item-state item date:wait-property))
     (define date (p:get item-state item date:date-property))
+    (define effort (val:unwrap-number (p:get item-state item effort:effort-property)))
     (term:render `(()
                    (
                     ;; Description
@@ -196,6 +203,11 @@
                       ,(if (equal? urgency base-urgency)
                            `(() ())
                            `((black) (" (Base " ((yellow) (,(~a (val:unwrap-number base-urgency)))) ")")))))
+                    "\n"
+                    ;; Effort
+                    (()
+                     (((black) ("Effort:  "))
+                      ((bold) (magenta) (,(~a effort)))))
                     "\n"
                     ;; Tags
                     (()
