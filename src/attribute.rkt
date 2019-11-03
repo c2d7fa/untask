@@ -217,6 +217,11 @@
 ;; The object may also be #f instead of a hash. In this case, getting any key
 ;; returns #f and setting a key returns a hash containing just the given
 ;; mapping. This behvior is useful for lookups inside nested hashes.
+;;
+;; When setting a key to the deafult value, remove the key instead.
 (define (hash. k #:default (default #f))
   (attribute #:get (λ (h) (and h (hash-ref h k default)))
-             #:set (λ (h v) (if h (hash-set h k v) (hash k v)))))
+             #:set (λ (h v) (let ((h* (if h (hash-set h k v) (hash k v))))
+                              (if (equal? v default)
+                                  (hash-remove h* k)
+                                  h*)))))

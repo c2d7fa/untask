@@ -21,7 +21,7 @@
 
 (define order-tests
   (test-suite "Order (in agenda)"
-    (test-case "Items have no order set by deafult"
+    (test-case "Items have no order set by default"
       (check-equal? (~> i:empty-state
                         (i:new/state)
                         (i:set 1 'description (v:make-string "Test"))
@@ -59,6 +59,12 @@
         (check-equal? (p:get st* 6 order-property) (v:make-number 3))
         (check-equal? (p:get st* 4 order-property) (v:make-number 4))
         (check-equal? (p:get st* 1 order-property) (v:make-number 5))))
+    (test-case "Resetting an item's order nudges other items"
+      (let ((st* (~> st1 (p:set 2 order-property #f))))
+        (check-equal? (p:get st* 5 order-property) (v:make-number 1))
+        (check-equal? (p:get st* 4 order-property) (v:make-number 2))
+        (check-equal? (p:get st* 1 order-property) (v:make-number 3))
+        (check-equal? (p:get st* 2 order-property) #f)))
     (test-case "Agenda view with both ordered and unordered items"
       ;; If some items have order and others don't, ordered items are displayed first in agenda view.
       (check-equal? (cmd:agenda st1-full #:filter '())
@@ -68,3 +74,4 @@
                         (p:set 1 date-property (v:make-date (dt:datetime 2019 11 04)))
                         (p:get 1 order-property))
                     #f))))
+
