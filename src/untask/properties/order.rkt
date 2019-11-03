@@ -5,17 +5,15 @@
 (require
  (prefix-in p: untask/src/untask/core/property)
  (prefix-in i: untask/src/untask/core/item)
- (prefix-in v: untask/src/untask/core/value)
- (only-in untask/src/untask/properties/date date-property))
+ (prefix-in v: untask/src/untask/core/value))
 
 (define (translate-order item-state item value)
-  ;; TODO: This is not great code style
-  (define date (p:get item-state item date-property))
+  (define date (i:get item-state item 'date))
   (if (not date)
       item-state
       (let* ((neighbours (filter (λ (item*)
                                    (and (not (equal? item* item))
-                                        (equal? (p:get item-state item* date-property) date)
+                                        (equal? (i:get item-state item* 'date) date)
                                         (i:get item-state item* 'order)))
                                  (i:items item-state)))
              (last-order (length neighbours))

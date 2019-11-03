@@ -73,5 +73,11 @@
       (check-equal? (~> st1
                         (p:set 1 date-property (v:make-date (dt:datetime 2019 11 04)))
                         (p:get 1 order-property))
-                    #f))))
+                    #f))
+    (test-case "Modifying and item's date nudges other items"
+      (let ((st* (~> st1 (p:set 2 date-property (v:make-date (dt:datetime 2019 11 04))))))
+        (check-equal? (p:get st* 5 order-property) (v:make-number 1))
+        (check-equal? (p:get st* 4 order-property) (v:make-number 2))
+        (check-equal? (p:get st* 1 order-property) (v:make-number 3))
+        (check-equal? (p:get st* 2 order-property) #f)))))
 
