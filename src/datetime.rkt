@@ -124,3 +124,11 @@
   (if (< (days-between start end) skip)
       (list start)
       (cons start (date-range (add-days start skip) end skip))))
+
+;; Format the date like "Tue 2019-Nov-05"
+(define (format-full-date-weekday dt)
+  (format "~a ~a-~a-~a"
+          (weekday-short-string dt)
+          (g:->year (datetime->gregor dt))
+          (month-short-string dt)
+          (~r (g:->day (datetime->gregor dt)) #:min-width 2 #:pad-string "0")))

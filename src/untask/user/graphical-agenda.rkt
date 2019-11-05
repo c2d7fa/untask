@@ -12,6 +12,7 @@
          (prefix-in ctx: untask/src/untask/core/context)
          (prefix-in cmd: untask/src/untask/command/command)
          (prefix-in a: untask/src/attribute)
+         (prefix-in dt: untask/src/datetime)
          untask/src/squiggle)
 
 (define (display-graphical-agenda! item-state agenda-view)
@@ -37,11 +38,13 @@
 
   (define task-description-text-height 18)
   (define task-description-font (make-font #:size task-description-text-height))
+  (define heading-font (make-font #:size task-description-text-height #:weight 'bold))
   (define task-box-width 300)
   (define padding 8)
   (define line-height (let-values (((_1 line-height _2 _3) (begin (send dc set-font task-description-font)
                                                                   (send dc get-text-extent ""))))
                         line-height))
+  (define header-padding (+ padding line-height padding))
 
   (define (task-box-height-for-effort effort)
     (+ (* (+ padding line-height padding) (+ 1 effort)) (* padding effort)))
@@ -50,7 +53,7 @@
     (define x (+ padding (* (+ task-box-width padding) day)))
     (define y (foldl (λ (task-effort y)
                        (+ y padding (task-box-height-for-effort task-effort)))
-                     padding
+                     (+ header-padding padding)
                      previous-tasks-efforts))
     (send dc set-pen (make-color #x00 #x00 #x00) 0 'transparent)
     (send dc set-brush (translate-color color) 'solid)
@@ -59,7 +62,13 @@
     (send dc set-font task-description-font)
     (send dc draw-text description (+ padding x) (+ padding y)))
 
-  (define (render-tasks dc item-state tasks #:day day)
+  (define (render-heading dc #:day-index day #:date date)
+    (define x (+ padding (* (+ task-box-width padding) day)))
+    (define y padding)
+    (send dc set-font heading-font)
+    (send dc draw-text (dt:format-full-date-weekday date) x y))
+
+  (define (render-day dc item-state tasks #:day-index day #:date date)
     (foldl (λ (task previous-tasks-efforts)
              (define effort (v:unwrap-number (p:get item-state task (bp:ref 'effort))))
              (define description (truncate-text (v:unwrap-string (p:get item-state task (bp:ref 'description)))))
@@ -73,13 +82,14 @@
                               #:previous-tasks-efforts previous-tasks-efforts
                               #:description description
                               #:color color)
+             (render-heading dc #:day-index day #:date date)
              (append previous-tasks-efforts (list effort)))
            (list)
            tasks))
 
   (define (render-agenda dc item-state agenda-view)
     (foldl (λ (view day)
-             (render-tasks dc item-state (cdr view) #:day day)
+             (render-day dc item-state (cdr view) #:day-index day #:date (car view))
              (+ 1 day))
            0
            agenda-view))
@@ -97,7 +107,7 @@
       (apply max (map (λ (view)
                         (foldl (λ (task height)
                                  (+ height padding (task-box-height-for-effort (v:unwrap-number (p:get item-state task (bp:ref 'effort))))))
-                               padding
+                               (+ padding header-padding)
                                (cdr view)))
                       agenda-view))))
 
