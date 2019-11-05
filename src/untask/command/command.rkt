@@ -49,20 +49,24 @@
 
 ;; Find all items matching filter expression exactly.
 (define (search* state fe)
-  (filter:search (a:get-path (state state.item-state)) fe))
+  (set->list (filter:search (a:get-path (state state.item-state)) fe)))
 
-;; Like search*, but automatically uses current contexts and returns list sorted
-;; by urgency rather than set.
+;; Like search*, but automatically uses current contexts.
 (define (search state fe)
-  (urgency:sort-items-by-urgency-descending
-   (a:get-path (state state.item-state))
-   (search* state (with-contexts state fe #:filter? #t))))
+  (search* state (with-contexts state fe #:filter? #t)))
+
+;; Like search, but sorts by urgency. Note: This is currently very slow for
+;; largeish sets. This is because calculating the urgency is slow, which is
+;; because calculating blocked items is slow, which is because it looks at the
+;; properties of every item in the database each time.
+(define (search/urgency state fe)
+  (urgency:sort-items-by-urgency-descending (a:get-path (state state.item-state)) (search state fe)))
 
 ;;;
 
 (define (cmd:list state #:filter fe)
   (check! fe #:filter? #t)
-  (search state fe))
+  (search/urgency state fe))
 
 ;; Returns a list of tree views, which can be rendered with 'render-trees'.
 (define (tree state #:filter fe #:post-filter post-fe)

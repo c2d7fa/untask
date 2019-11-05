@@ -15,11 +15,6 @@
  (prefix-in filter: untask/src/untask/command/filter)
  (prefix-in modify: untask/src/untask/command/modify)
 
- (prefix-in urgency: untask/src/untask/properties/urgency)
- (prefix-in depends: untask/src/untask/properties/dependencies)
- (prefix-in links: untask/src/untask/properties/links)
- (prefix-in date: untask/src/untask/properties/date)
-
  untask/src/untask/user/graphical-agenda
  untask/src/untask/user/render-list
 
