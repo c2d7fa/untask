@@ -295,6 +295,7 @@
    (try/p (with-context/p (normal-command/p 'info #:takes-filter? #t)))
    (try/p (normal-command/p 'exit #:takes-filter? #f))
    (try/p (with-context/p (normal-command/p 'agenda)))
+   (try/p (with-context/p (normal-command/p 'schedule)))
    (try/p (with-context/p (normal-command/p 'tree #:arguments (opt/p (list/p filter-expression/p) #:default '(())))))
    (try/p (with-context/p (f:map (λ (fe) `(,fe list)) filter-expression/p)))
    context-command/p))

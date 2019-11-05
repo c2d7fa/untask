@@ -20,6 +20,7 @@
  (prefix-in links: untask/src/untask/properties/links)
  (prefix-in date: untask/src/untask/properties/date)
 
+ untask/src/untask/user/graphical-agenda
  untask/src/untask/user/render-list
 
  (prefix-in a: untask/src/attribute)
@@ -81,6 +82,9 @@
 (define (execute-agenda! fe)
   (displayln (render-agenda (a:get-path ((state) state.item-state)) (cmd:agenda (state) #:filter fe))))
 
+(define (execute-graphical-agenda! fe)
+  (display-graphical-agenda! (a:get-path ((state) state.item-state)) (cmd:agenda (state) #:filter fe)))
+
 (define (execute-add! me)
   (define-values (state* item*) (cmd:add (state) #:modify me))
   (set-box! (*state) state*)
@@ -119,6 +123,7 @@
         (`(,fe copy-recur ,me ,start ,end ,skip) (execute-copy-recur! fe me start end skip) 'proceed)
         (`(,fe remove) (execute-remove! fe) 'proceed)
         (`(,fe agenda) (execute-agenda! fe) 'proceed)
+        (`(,fe schedule) (execute-graphical-agenda! fe) 'proceed)
         (`(,fe tree ,rhs) (execute-tree! fe rhs) 'proceed)
         (`(open ,filename)
          (let ((file-content (read-file! filename))

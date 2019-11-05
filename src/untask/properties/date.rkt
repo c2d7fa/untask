@@ -10,7 +10,14 @@
  (prefix-in p: untask/src/untask/core/property)
  (prefix-in val:  untask/src/untask/core/value)
  (prefix-in dt: untask/src/datetime)
+ (only-in untask/src/untask/properties/order order-property)
  untask/src/squiggle)
+
+;; Setting the date resets the "order" property.
+(define (translate-date item-state item value)
+  (~> item-state
+      (p:set item order-property #f)
+      (i:set item 'date value)))
 
 (define wait-property
   (p:property #:name 'wait
@@ -18,7 +25,8 @@
 
 (define date-property
   (p:property #:name 'date
-              #:type '(opt date)))
+              #:type '(opt date)
+              #:translate translate-date))
 
 (define (wait-active? item-state item)
   (let ((wait (p:get item-state item wait-property)))

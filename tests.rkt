@@ -4,17 +4,18 @@
          racket/enter
          rackunit-fancy-runner
 
-         untask/test/test-value
-         untask/test/test-item
-         untask/test/test-context
-         untask/test/test-dependencies
-         untask/test/test-date
-         untask/test/test-integration
-         untask/test/test-links
-         untask/test/test-serialization
          untask/test/test-check-expression
          untask/test/test-command
-         untask/test/test-parser)
+         untask/test/test-context
+         untask/test/test-date
+         untask/test/test-dependencies
+         untask/test/test-integration
+         untask/test/test-item
+         untask/test/test-links
+         untask/test/test-order
+         untask/test/test-parser
+         untask/test/test-serialization
+         untask/test/test-value)
 
 (provide all-tests test!)
 
@@ -30,7 +31,8 @@
     (test-suite "Properties"
       dependencies-tests
       links-tests
-      date-tests)
+      date-tests
+      order-tests)
     parser-tests))
 
 (define (test!)

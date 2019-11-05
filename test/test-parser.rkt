@@ -39,4 +39,8 @@
                     '((or (and (item . 14)))
                       modify
                       (and (wait : (date today 0))
-                           (date : (date today 7))))))))
+                           (date : (date today 7))))))
+
+    (test-case "Parsing graphical agenda command"
+      (check-equal? (parse "schedule") '((and) schedule))
+      (check-equal? (parse "!date<Today schedule") '((or (and (not (date < (date today 0))))) schedule)))))
