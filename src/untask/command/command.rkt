@@ -92,7 +92,7 @@
     (build-tree* item))
   (values (map (λ (item)
                  (build-tree item-state item))
-               (search state fe))))
+               (search/urgency state fe))))
 
 ;; Returns an agenda view, which can be rendered with 'render-agenda'.
 (define (agenda state #:filter fe)
