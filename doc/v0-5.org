@@ -1,0 +1,45 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Untask 0.5
+
+This file describes the changes between version 0.4 and version 0.5 of Untask.
+
+* Graphical agenda and new properties
+
+Version 0.5 adds a new command, =schedule=. This command works like =agenda= but
+displays the tasks in a graphical view. This view makes use of three newly added
+properties:
+1. The =color= property is used to color the tasks (and this is used the the
+   non-graphical views as well);
+2. The =effort= property is used to change the size of the task in the graphical
+   agenda view;
+3. The =order= property is used to change the order of items, when using both
+   the regular =agenda= and the new =schedule=.
+
+* Copy with recurrence
+
+Version 0.5 adds a new form of the existing =copy= command, which creates
+multiple items on different dates. For example:
+#+begin_example
+> add {Go for a walk} date:Today+1 wait:Today
+1. Go for a walk
+> 1 copy from Today+2 to Today+30 by 2
+2. Go for a walk
+3. Go for a walk
+...
+#+end_example
+This creates tasks to "Go for a walk" every other day until 30 days from
+now. The tasks will have their =date= and =wait= properties set
+automatically. As with the regular =copy= command, it is possible to specify an
+expression that will be applied to the newly created items; in this case the
+syntax becomes =<FILTER> copy <MODIFY> from <DATE> to <DATE> by <INTEGER>=.
+
+* Improvements to date values
+
+Version 0.5 adds =Today= and =Today+x= as date literals. For example, you can
+now do:
+#+begin_example
+> add {Buy groceries} date:Today+1
+#+end_example
+
+This release also implements a =-= operator on dates (which does the opposite of
+=+=).
