@@ -147,6 +147,15 @@
                                     (deserialize-item-property-data (hash-ref h 'item-property-data)))
          #:open-file open-file))
 
+;; (save-state-to-string state)
+;;
+;; Serializes the given state to a string that can later be restored with
+;; load-state-from-string.
+;;
+;; (load-state-from-string string #:open-file open-file)
+;;
+;; Deserializes the state strored in the given string. The currently open file
+;; is not saved when serializing, so it must be passed explicitly.
 (define (save-state-to-string st)
   (pretty-format #:mode 'write (serialize-state st)))
 
@@ -154,6 +163,11 @@
   (deserialize-state (read (open-input-string st))
                      #:open-file open-file))
 
+;; (save-state state)
+;; (load-state path)
+;;
+;; Save/load state to/from a file on disk. When saving, the currently open file
+;; is used as the path to save.
 (define (save-state st)
   (with-output-to-file (a:get-path (st state.open-file)) #:exists 'replace
     (thunk (displayln (save-state-to-string st)))))
