@@ -105,9 +105,10 @@
         (check-equal? (p:get st* 4 order-property) (v:make-number 3))
         (check-equal? (p:get st* 1 order-property) (v:make-number 4))))
 
-    (test-case "Deserializing file with invalid 'order' property automatically fixes them"
+    (test-case "Deserializing file with invalid 'order' properties automatically fixes them"
       (let ((st (a:get-path ((load-example "example-7.t") state.item-state))))
         (check-equal? (p:get st 5 order-property) (v:make-number 1))
         (check-equal? (p:get st 2 order-property) (v:make-number 2))
         (check-equal? (p:get st 4 order-property) (v:make-number 3))
-        (check-equal? (p:get st 1 order-property) (v:make-number 4))))))
+        (check-equal? (p:get st 1 order-property) (v:make-number 4))
+        (check-equal? (p:get st 3 order-property) (v:make-number 5))))))
