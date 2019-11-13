@@ -28,7 +28,8 @@
 ;; particular kind of table that has certain keys. Species are implemented as an
 ;; implicit concept, not a first-class value.
 
-(require (for-syntax racket/syntax))
+(require (for-syntax racket/syntax
+                     (only-in untask/src/misc flat-map)))
 
 ;;; ATTRIBUTES
 
@@ -165,8 +166,6 @@
 ;;   (point? (table 'x 2))                            ; => #f
 ;;   (update (point #:x 2 #:y -3) point.y abs)        ; => (point #:x 2 #:y 3)
 (define-syntax (define-species stx)
-  (define (flat-map proc xs)
-    (apply append (map proc xs)))
   ;; Take an argument (to the macro), for example #'key or #'(key 'default) and
   ;; return the key, in this case #'key.
   (define (arg->key arg)

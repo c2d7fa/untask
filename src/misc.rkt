@@ -57,3 +57,6 @@
                   (and (set-member? new-set x) (not (set-member? old-set x))))
                 new-set))
   (values removed added))
+
+(define (flat-map proc xs)
+  (apply append (map proc xs)))

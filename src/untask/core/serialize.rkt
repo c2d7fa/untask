@@ -11,10 +11,13 @@
          (prefix-in i: untask/src/untask/core/item)
          (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute)
+         (only-in untask/src/misc flat-map)
          untask/src/squiggle
          racket/pretty)
 
 (define file-version (make-parameter 0))
+
+(define serializable-properties '(status description notes tags urgency depends blocks children parents date wait color effort order))
 
 (define (serialize-value x)
   (cond
@@ -124,28 +127,51 @@
          cst
          x))
 
-(define (serialize-item-property-data properties)
-  (serialize-hash properties #:serialize-value (λ (h) (serialize-hash h #:serialize-value serialize-value))))
-(define (deserialize-item-property-data properties)
-  (deserialize-hash properties #:deserialize-value (λ (h) (deserialize-hash h #:deserialize-value deserialize-value))))
+(define (serialize-item-property-data item-state)
+  (flat-map (λ (item)
+              (let ((properties*
+                     (flat-map (λ (property-name)
+                                 (let ((value (i:get item-state item property-name)))  ; Don't save empty property
+                                   (if value
+                                       (list (list property-name (serialize-value value)))
+                                       (list))))
+                               serializable-properties)))
+                (if (empty? properties*)
+                    (list)
+                    (list (list item properties*)))))
+            (i:items item-state)))
 
-(define (serialize-state st)
-  (let-values (((next-item property-map) (i:dump-state (a:get-path (st state.item-state)))))
-    (serialize-hash (hash 'version (file-version)
-                          'all-contexts (serialize-defined-contexts st)
-                          'active-contexts (serialize-activated-contexts st)
-                          'next-item-id next-item
-                          'item-property-data (serialize-item-property-data property-map)))))
-(define (deserialize-state st #:open-file open-file)
-  (define h (deserialize-hash st))
-  (when (not (= (hash-ref h 'version) (file-version)))
-    (error (format "This version of Untask can only read file format version ~A, but the given file has version ~A." (file-version) (hash-ref h 'version))))
-  (state #:context-state (~> c:empty-state
-                             (deserialize-defined-contexts (hash-ref h 'all-contexts))
-                             (deserialize-activated-contexts (hash-ref h 'active-contexts)))
-         #:item-state (i:load-state (hash-ref h 'next-item-id)
-                                    (deserialize-item-property-data (hash-ref h 'item-property-data)))
-         #:open-file open-file))
+(define (deserialize-item-state state*/hash)
+  (foldl (λ (x item-state)
+           (match-let ((`(,item ,property-name ,value*) x))
+             (i:set item-state item property-name (deserialize-value value*))))
+         (i:prepare-deserialization-empty-state (hash-ref state*/hash 'next-item-id))
+         (flat-map (λ (item-and-properties)
+                     (map (λ (name-and-value)
+                            (list (first item-and-properties)
+                                  (first name-and-value)
+                                  (second name-and-value)))
+                          (second item-and-properties)))
+                   (hash-ref state*/hash 'item-property-data))))
+
+(define (serialize-state state)
+  (serialize-hash (hash 'version (file-version)
+                        'all-contexts (serialize-defined-contexts state)
+                        'active-contexts (serialize-activated-contexts state)
+                        'next-item-id (i:prepare-serialization-next-id (a:get-path (state state.item-state)))
+                        'item-property-data (serialize-item-property-data (a:get-path (state state.item-state))))))
+
+(define (deserialize-state state* #:open-file open-file)
+  (define state*/hash (deserialize-hash state*))
+  (define version (hash-ref state*/hash 'version))
+  (when (not (= version 0))
+    (error (format "This version of Untask can only read file format version 0, but the given file has version ~A." version)))
+  (parameterize ((file-version version))
+    (state #:context-state (~> c:empty-state
+                               (deserialize-defined-contexts (hash-ref state*/hash 'all-contexts))
+                               (deserialize-activated-contexts (hash-ref state*/hash 'active-contexts)))
+           #:item-state (deserialize-item-state state*/hash)
+           #:open-file open-file)))
 
 ;; (save-state-to-string state)
 ;;
