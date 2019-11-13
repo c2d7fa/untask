@@ -24,6 +24,7 @@
          (prefix-in filter: untask/src/untask/command/filter)
          (prefix-in modify: untask/src/untask/command/modify)
 
+         (prefix-in bp: untask/src/untask/properties/builtin)
          (prefix-in urgency: untask/src/untask/properties/urgency)
          (prefix-in depends: untask/src/untask/properties/dependencies)
          (prefix-in links: untask/src/untask/properties/links)
@@ -153,7 +154,7 @@
     (a:update-path (state state.item-state)
       (λ (item-state)
         (foldl (λ (item item-state)
-                 (let-values (((item-state* item*) (i:clone item-state item)))
+                 (let-values (((item-state* item*) (bp:clone item-state item)))
                    (set! var-items* (append var-items* (list item*)))
                    (modify:evaluate-modify-expression (with-contexts state me #:filter? #f)
                                                       item-state* item*)))

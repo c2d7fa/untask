@@ -25,6 +25,7 @@
                        (p:set 1 depends-property (val:make-set (set (val:make-item 2))))
                        (p:get 2 blocks-property))
                    (val:make-set (set (val:make-item 1)))))
+
    (test-case "Adding a blocked item also updates dependencies"
      (check-equal? (~> i:empty-state
                        (i:new/state)       ; id=1
@@ -32,6 +33,7 @@
                        (p:set 1 blocks-property (val:make-set (set (val:make-item 2))))
                        (p:get 2 depends-property))
                    (val:make-set (set (val:make-item 1)))))
+
    (test-case "Removing a blocked item also updates dependencies"
      (define st1 (~> i:empty-state
                      (i:new/state)       ; id=1

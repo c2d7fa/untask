@@ -8,6 +8,7 @@
          (prefix-in c: untask/src/untask/core/context)
          (prefix-in v: untask/src/untask/core/value)
          (prefix-in i: untask/src/untask/core/item)
+         (prefix-in bp: untask/src/untask/properties/builtin)
          (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute))
 
@@ -167,7 +168,12 @@
           (check-equal? (i:get item-state 6 'description) (v:make-string "Item 5")))
 
         (test-case "Modify expression is applied to item"
-          (check-equal? (i:get item-state 6 'tags) (v:make-set (set (v:make-string "other-tag") (v:make-string "added-tag")))))))
+          (check-equal? (i:get item-state 6 'tags) (v:make-set (set (v:make-string "other-tag") (v:make-string "added-tag"))))))
+
+      (test-case "Copy works with calculated property (blocks)"
+        (let-values (((st* items*) (cmd:copy st1 #:filter '(item . 3) #:modify '())))
+          (define item-state (a:get-path (st* s:state.item-state)))
+          (check-equal? (bp:get item-state 6 'blocks) (v:make-set (set (v:make-item 2)))))))  ; 6 = new item
 
     (test-suite "Copy with recurrence"
       ;; NOTE: Most of the specifics are tested in the unit tests for the "date"
