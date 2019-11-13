@@ -21,10 +21,19 @@
                                             (not (status:done? item-state (val:unwrap-item blo))))
                                           (set->list (val:unwrap-set (p:get item-state item depends:blocks-property)))))))))
 
+(define (translate-urgency item-state item value)
+  (i:set item-state
+         item
+         'urgency
+         (val:make-number (+ (val:unwrap-number (or (i:get item-state item 'urgency) (val:make-number 0)))
+                             (- (val:unwrap-number value)
+                                (val:unwrap-number (calculate-urgency item-state item)))))))
+
 (define urgency-property
   (p:property #:name 'urgency
               #:type 'number
-              #:calculate calculate-urgency))
+              #:calculate calculate-urgency
+              #:translate translate-urgency))
 
 ;; Takes item state and a set of items, returns sorted list of items.
 (define (sort-items-by-urgency-descending item-state item-set)
