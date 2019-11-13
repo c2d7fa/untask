@@ -1,9 +1,10 @@
 #lang racket
 
-(provide ref has?)
+(provide ref has? get set clone)
 
 (require
  (prefix-in p: untask/src/untask/core/property)
+ (prefix-in i: untask/src/untask/core/item)
 
  (prefix-in status: untask/src/untask/properties/status)
  (prefix-in description: untask/src/untask/properties/description)
@@ -28,8 +29,8 @@
         depends:blocks-property
         links:children-property
         links:parents-property
-        date:wait-property
         date:date-property
+        date:wait-property
         color:color-property
         effort:effort-property
         order:order-property))
@@ -44,3 +45,23 @@
 
 (define (has? name)
   (hash-has-key? builtin-properties-hash name))
+
+(define (set item-state item property-name value)
+  (when (not (has? property-name))
+    (error "Can't set unknown property ~A." property-name))
+  (p:set item-state item (ref property-name) value))
+
+(define (get item-state item property-name)
+  (when (not (has? property-name))
+    (error "Can't get unknown property ~A." property-name))
+  (p:get item-state item (ref property-name)))
+
+(define cloned-properties '(status description notes tags urgency depends blocks children parents date wait color effort order))
+
+(define (clone item-state source)
+  (let-values (((item-state* destination*) (i:new item-state)))
+    (values (foldl (λ (property-name item-state)
+                     (set item-state destination* property-name (get item-state source property-name)))
+                   item-state*
+                   cloned-properties)
+            destination*)))
