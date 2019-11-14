@@ -1,3 +1,4 @@
-*.bak
 compiled/
-doc/*.html
+/doc/*.html
+/main
+/untask
