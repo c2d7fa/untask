@@ -1,0 +1,18 @@
+#+HTML_HEAD: <style>body { max-width: 80ex; margin: auto; font: 1.15em sans-serif; }</style>
+#+TITLE: Untask 0.5.2
+
+Release version 0.5.2 is a minor relase of Untask, that contains a couple of
+improvements.
+
+When building Untask, we now wrap it in a shell script that improves the user
+experience of waiting for Untask to start somewhat. Since Racket is very slow to
+start, we now display a "Loading..." message. We also handle interrupts while
+starting up. (Previously, pressing Ctrl-C while waiting for Unatsk to start
+would print an ugly error message.) You should build Untask with =make untask=
+to use this new functionality.
+
+Optimizations to how the properties /depends/, /blocks/, /children/ and
+/parents/ are stored has greatly improved the performance of commands /list/ and
+/agenda/ (and other similar commands). Previously, an extremely inefficient
+algorithm was used to collect the output of these commands before printing it;
+we now cache certain information which increases performance significantly.
