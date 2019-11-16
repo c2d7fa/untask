@@ -11,11 +11,12 @@
 
 (define depends-property
   (~> (p:property #:name 'depends
+                  #:translate (translate-links 'depends 'blocks)
                   #:type '(set item))
       (p:default (val:make-set))))
 
 (define blocks-property
-  (p:property #:name 'blocks
-              #:type '(set any)
-              #:calculate (calculate-backlinks depends-property)
-              #:translate (translate-backlinks depends-property)))
+  (~> (p:property #:name 'blocks
+                  #:type '(set any)
+                  #:translate (translate-backlinks 'depends 'blocks))
+      (p:default (val:make-set))))

@@ -10,11 +10,12 @@
 
 (define children-property
   (~> (p:property #:name 'children
+                  #:translate (translate-links 'children 'parents)
                   #:type '(set item))
       (p:default (val:make-set))))
 
 (define parents-property
-  (p:property #:name 'parents
-              #:type '(set any)
-              #:calculate (calculate-backlinks children-property)
-              #:translate (translate-backlinks children-property)))
+  (~> (p:property #:name 'parents
+                  #:type '(set any)
+                  #:translate (translate-backlinks 'children 'parents))
+      (p:default (val:make-set))))

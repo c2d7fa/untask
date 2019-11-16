@@ -41,4 +41,5 @@
                      (p:set 1 depends-property (val:make-set (set (val:make-item 2))))))
      (check-equal? (p:get st1 2 blocks-property) (val:make-set (set (val:make-item 1))))
      (define st2 (~> st1 (p:set 2 blocks-property (val:make-set (set)))))
+     (check-equal? (p:get st2 2 blocks-property) (val:make-set (set)))
      (check-equal? (p:get st2 1 depends-property) (val:make-set (set))))))

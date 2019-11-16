@@ -9,6 +9,7 @@
          (prefix-in val: untask/src/untask/core/value)
          (prefix-in c: untask/src/untask/core/context)
          (prefix-in i: untask/src/untask/core/item)
+         (prefix-in bp: untask/src/untask/properties/builtin)
          (prefix-in order: untask/src/untask/properties/order)
          (prefix-in dt: untask/src/datetime)
          (prefix-in a: untask/src/attribute)
@@ -18,7 +19,9 @@
 
 (define file-version (make-parameter 0))
 
-(define serializable-properties '(status description notes tags urgency depends blocks children parents date wait color effort order))
+(define directly-deserializable-properties '(status description notes tags urgency date wait color effort order))
+(define translatedly-deserializable-properties '(depends children))
+(define directly-serializable-properties '(status description notes tags urgency depends children date wait color effort order))
 
 (define (serialize-value x)
   (cond
@@ -136,7 +139,7 @@
                                    (if value
                                        (list (list property-name (serialize-value value)))
                                        (list))))
-                               serializable-properties)))
+                               directly-serializable-properties)))
                 (if (empty? properties*)
                     (list)
                     (list (list item properties*)))))
@@ -146,7 +149,10 @@
   (order:fix-corrupted-order-properties
    (foldl (λ (x item-state)
             (match-let ((`(,item ,property-name ,value*) x))
-              (i:set item-state item property-name (deserialize-value value*))))
+              (cond
+                ((member property-name directly-deserializable-properties) (i:set item-state item property-name (deserialize-value value*)))
+                ((member property-name translatedly-deserializable-properties) (bp:set item-state item property-name (deserialize-value value*)))
+                (else item-state))))
           (i:prepare-deserialization-empty-state (hash-ref state*/hash 'next-item-id))
           (flat-map (λ (item-and-properties)
                       (map (λ (name-and-value)
