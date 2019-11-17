@@ -48,4 +48,7 @@
   (test!))
 
 (module+ main
-  (test!))
+  (let ((results (test!)))
+    (if (any-failed? results)
+      (exit 2)
+      (exit 0))))

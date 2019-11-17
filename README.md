@@ -34,6 +34,9 @@ MacOS is not supported.
 
 First, install the necessary dependencies (see above).
 
+Clone this repository into a directory named `untask` (the name matters for
+running tests).
+
 In the top-level directory, run:
 
     raco pkg install --auto

@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/untask
+    docker:
+      - image: c2d7fa/racket:latest
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore cached dependencies
+          keys:
+            - racket-deps-3-{{checksum "info.rkt"}}
+      - run:
+          name: Update and install missing dependencies
+          command: |
+            raco pkg install --auto --no-setup --skip-installed
+            raco pkg update --all
+      - save_cache:
+          name: Cache dependencies
+          key: racket-deps-3-{{checksum "info.rkt"}}
+          paths:
+            - ~/.racket/
+      - run:
+          name: Run tests
+          command: |
+            Xvfb :1 -screen 0 1024x768x16 &
+            DISPLAY=:1 racket tests.rkt
+
