@@ -9,7 +9,19 @@ jobs:
       - restore_cache:
           name: Restore cached dependencies
           keys:
-            - racket-deps-3-{{checksum "info.rkt"}}
+            - racket-deps-4-{{checksum "info.rkt"}}
+      - run:
+          name: Install rackunit-fancy-runner directory (workaround for pkgd.racket-lang.org being broken)
+          command: |
+            cd ~
+            if [ ! -d rackunit-fancy-runner ]; then
+              git clone 'https://github.com/c2d7fa/rackunit-fancy-runner.git'
+              cd rackunit-fancy-runner
+            else
+              cd rackunit-fancy-runner
+              git pull
+            fi
+            raco pkg install --auto --no-setup --skip-installed
       - run:
           name: Update and install missing dependencies
           command: |
@@ -17,9 +29,10 @@ jobs:
             raco pkg update --all
       - save_cache:
           name: Cache dependencies
-          key: racket-deps-3-{{checksum "info.rkt"}}
+          key: racket-deps-4-{{checksum "info.rkt"}}
           paths:
             - ~/.racket/
+            - ~/rackunit-fancy-runner
       - run:
           name: Run tests
           command: |
