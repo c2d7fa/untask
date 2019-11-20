@@ -14,6 +14,7 @@
          untask/test/test-links
          untask/test/test-order
          untask/test/test-urgency
+         untask/test/test-status
          untask/test/test-parser
          untask/test/test-serialization
          untask/test/test-value)
@@ -34,7 +35,8 @@
       links-tests
       date-tests
       order-tests
-      urgency-tests)
+      urgency-tests
+      status-tests)
     parser-tests))
 
 (define (test!)

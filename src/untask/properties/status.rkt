@@ -36,7 +36,7 @@
 
 (define status-property
   (~> (p:property #:name 'status
-                  #:type 'string
+                  #:type '(enum active inactive done)
                   #:calculate calculate-status
                   #:translate translate-status)
       (p:default (val:make-string "active"))))
