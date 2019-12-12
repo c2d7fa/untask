@@ -9,8 +9,11 @@
 (require (prefix-in g: gregor)
          (prefix-in gp: gregor/period))
 
+(define (current-year)
+  (g:->year (g:today)))
+
 (define (datetime year month day (hour #f) (minute #f))
-  (list year month day hour minute))
+  (list (or year (current-year)) month day hour minute))
 
 (define (datetime-year dt) (list-ref dt 0))
 (define (datetime-month dt) (list-ref dt 1))
@@ -110,9 +113,6 @@
 (define (this-year? dt)
   (equal? (g:->year (g:today))
           (g:->year (datetime->gregor dt))))
-
-(define (current-year)
-  (g:->year (g:today)))
 
 (define (is-valid-date? dt)
   (<= (datetime-day dt) (g:days-in-month (datetime-year dt) (datetime-month dt))))

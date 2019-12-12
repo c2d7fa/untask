@@ -21,8 +21,8 @@
                           (and (item . 2)))
                       copy-recur
                       (and (status : (string . "done")))
-                      (date 2019 01 01)
-                      (date 2019 01 10)
+                      (date #f 01 01)
+                      (date #f 01 10)
                       2)))
 
     (test-case "Copy command with recurrence without modify expression"
@@ -30,8 +30,8 @@
                     '((or (and (item . 1)))
                       copy-recur
                       (and)
-                      (date 2019 02 01)
-                      (date 2019 02 20)
+                      (date #f 02 01)
+                      (date #f 02 20)
                       1)))
 
     (test-case "Parsing command with 'Today' and 'Today+7'"

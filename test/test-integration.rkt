@@ -27,14 +27,14 @@
    (test-case "Copying item"
      (define sb (box state-empty))
      (capture-output
-       (thunk (execute! (parse "add {Item 1} #tag date:Jan-1") sb)
+       (thunk (execute! (parse "add {Item 1} #tag date:2015-Jan-1") sb)
               (execute! (parse "1 copy urgency+$1 date+$7") sb)))
      (check-equal? (capture-output (thunk (execute! (parse "list") sb)))
-                   "  2. Item 1 #tag 1 0 D:Jan-08\n  1. Item 1 #tag 0 0 D:Jan-01\n"))
+                   "  2. Item 1 #tag 1 0 D:2015-Jan-08\n  1. Item 1 #tag 0 0 D:2015-Jan-01\n"))
 
    (test-case "Copying item with recur"
      (define sb (box state-empty))
-     (capture-output (thunk (execute! (parse "add {Some item} date:Jan-4 wait:Jan-2") sb)
+     (capture-output (thunk (execute! (parse "add {Some item} date:2015-Jan-4 wait:2015-Jan-2") sb)
                             (execute! (parse "add {Another item}") sb)))
      ;; TODO: This is a hack; we copy it from the year 3000, because the output
      ;; of the command depends on the current date.

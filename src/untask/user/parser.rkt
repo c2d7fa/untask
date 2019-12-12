@@ -85,7 +85,7 @@
                  (try/p (f:do (month <- month/p)
                               (string/p "-")
                               (day <- day/p)
-                              (f:pure (list (dt:current-year) month day)))))
+                              (f:pure (list #f month day)))))
            (λ (d)
              (dt:is-valid-date? (dt:datetime (car d) (cadr d) (caddr d)))))))
     (or/p (try/p (f:do (date-part <- date-part/p)
