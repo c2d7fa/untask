@@ -54,13 +54,13 @@
     (term:render `(()
                    (
                     ;; ID
-                    ((black)
+                    ((bright black)
                      (,(~r item #:min-width 3 #:pad-string " ")
                       ". "))
                     ;; Description
                     (,@(cond
                          ((status:active? item-state item) `((bold) ,@(item-colors item-state item)))
-                         ((status:done? item-state item) '((strikethrough) (black)))
+                         ((status:done? item-state item) '((strikethrough) (bright black)))
                          (else `((white) ,@(item-colors item-state item))))
                      (,(val:unwrap-string description)))
                     ;; Notes
@@ -73,7 +73,7 @@
                       (map (λ (t)
                              (term:render
                               `(()
-                                (((black) ("#"))
+                                (((bright black) ("#"))
                                  ((blue) (,(val:unwrap-string t)))))))
                            (set->list (val:unwrap-set tags)))
                       " ")
@@ -89,13 +89,13 @@
                     ,(if (set-empty? (val:unwrap-set blocks))
                          ""
                          `((red)
-                           (((black) (" B:"))
+                           (((bright black) (" B:"))
                             ((bold) (,(~a (set-count (val:unwrap-set blocks))))))))
                     ;; Depends
                     ,(if (set-empty? (val:unwrap-set depends))
                          ""
                          `((blue)
-                           (((black) (" D:"))
+                           (((bright black) (" D:"))
                             ((bold) (,(~a (set-count (val:unwrap-set depends))))))))
                     ;; Children
                     ,(if (set-empty? (val:unwrap-set children))
@@ -107,20 +107,20 @@
                          `((blue) (bold) (" P")))
                     ;; Wait
                     ,(if (not (date:wait-active? item-state item))  ; Display only when task is waiting
-                         `(() (((black) (" W:"))
+                         `(() (((bright black) (" W:"))
                                ,(style-date (val:unwrap-date wait))))
                          (if wait                                  ; If task has "wait" but is not waiting, simply display "W"
-                             `((black) (" W"))
+                             `((bright black) (" W"))
                              ""))
                     ;; Date
                     ,(if (not date)
                          ""
-                         `(() (((black) (" D:"))
+                         `(() (((bright black) (" D:"))
                                ,(style-date (val:unwrap-date date)))))
                     ;; Order
                     ,(if (not order)
                          ""
-                         `((black) (" " ,(~a (val:unwrap-number order)) "th")))))))  ;; TODO: Correctly format as ordinal numeral
+                         `((bright black) (" " ,(~a (val:unwrap-number order)) "th")))))))  ;; TODO: Correctly format as ordinal numeral
   (string-join
    (map (λ (item) (render-item item-state item)) items)
    "\n"))
@@ -141,7 +141,7 @@
                          `(,(~a (dt:datetime-year d)) "-"))
                     ,(dt:month-short-string d) "-"
                     ,(~ (dt:datetime-day d))
-                    ((reset) (black) ("T"))
+                    ((reset) (bright black) ("T"))
                     ,(~ (dt:datetime-hour d)) ":"
                     ,(~ (dt:datetime-minute d))))
         `(,@colors (,@(if (dt:this-year? d) '()
@@ -178,12 +178,12 @@
                            "")))
                     ;; Id
                     (()
-                     (((black) ("ID:      "))
+                     (((bright black) ("ID:      "))
                       ,(~a item)))
                     "\n"
                     ;; Status
                     (()
-                     (((black) ("Status:  "))
+                     (((bright black) ("Status:  "))
                       ,(cond
                          ((status:active? item-state item) '((bold) ("active")))
                          ((status:done? item-state item) '((strikethrough) (white) ("done")))
@@ -192,44 +192,44 @@
                     ;; Wait
                     ,(if wait
                          `(()
-                           (((black) ("Wait:    "))
+                           (((bright black) ("Wait:    "))
                             ,(style-date (val:unwrap-date wait))
                             "\n"))
                          '(() ()))
                     ;; Date
                     ,(if date
                          `(()
-                           (((black) ("Date:    "))
+                           (((bright black) ("Date:    "))
                             ,(style-date (val:unwrap-date date))
                             "\n"))
                          '(() ()))
                     ;; Urgency
                     (()
-                     (((black) ("Urgency: "))
+                     (((bright black) ("Urgency: "))
                       ((bold) (yellow) (,(~a (val:unwrap-number urgency))))
                       ,(if (equal? urgency base-urgency)
                            `(() ())
-                           `((black) (" (Base " ((yellow) (,(~a (val:unwrap-number base-urgency)))) ")")))))
+                           `((bright black) (" (Base " ((yellow) (,(~a (val:unwrap-number base-urgency)))) ")")))))
                     "\n"
                     ;; Effort
                     (()
-                     (((black) ("Effort:  "))
+                     (((bright black) ("Effort:  "))
                       ((bold) (magenta) (,(~a effort)))))
                     "\n"
                     ;; Order
                     ,(if (not order)
                          ""
                          `(()
-                           (((black) ("Order:   "))
+                           (((bright black) ("Order:   "))
                             (() (,(~a (val:unwrap-number order)) "\n")))))
                     ;; Tags
                     (()
-                     (((black) ("Tags:    "))
+                     (((bright black) ("Tags:    "))
                       ,(string-join
                         (map (λ (t)
                                (term:render
                                 `(()
-                                  (((black) ("#"))
+                                  (((bright black) ("#"))
                                    ((blue) (,(val:unwrap-string t)))))))
                              (set->list (val:unwrap-set tags)))
                         " ")))
@@ -238,7 +238,7 @@
                          ""
                          `(()
                            ("\n\n"
-                            ((black) ("Depends on:\n"))
+                            ((bright black) ("Depends on:\n"))
                             ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set depends))))
                                             4))))
                     ;; Blocked
@@ -246,7 +246,7 @@
                          ""
                          `(()
                            ("\n\n"
-                            ((black) ("Blocks:\n"))
+                            ((bright black) ("Blocks:\n"))
                             ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set blocks))))
                                             4))))
                     ;; Children
@@ -254,7 +254,7 @@
                          ""
                          `(()
                            ("\n\n"
-                            ((black) ("Children:\n"))
+                            ((bright black) ("Children:\n"))
                             ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set children))))
                                             4))))
                     ;; Parents
@@ -262,7 +262,7 @@
                          ""
                          `(()
                            ("\n\n"
-                            ((black) ("Parents:\n"))
+                            ((bright black) ("Parents:\n"))
                             ,(string-indent (render-listing* item-state (map val:unwrap-item (set->list (val:unwrap-set parents))))
                                             4))))))))
   (string-join
@@ -284,7 +284,7 @@
                        ,(dt:month-short-string d) "-"
                        ,(~ (dt:datetime-day d))))
             " "
-            ((black) ("(" ((bold) (,(~r (dt:days-from-today d) #:sign '++) "d")) ")"))))))
+            ((bright black) ("(" ((bold) (,(~r (dt:days-from-today d) #:sign '++) "d")) ")"))))))
   (define (render-block block)
     (term:render `(() (,(style-date (car block))
                        "\n"
@@ -296,7 +296,7 @@
 (define (render-trees item-state trees)
   (define (render-tree tree)
     (if (null? tree)
-        (term:render '((black) ("   ...")))
+        (term:render '((bright black) ("   ...")))
         (string-join
          (filter (λ (s) (not (equal? "" s)))
                  (list (render-listing* item-state (list (car tree)))

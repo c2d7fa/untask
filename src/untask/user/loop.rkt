@@ -29,13 +29,13 @@
   (let ((contexts (string-join
                    (map (λ (c)
                           (term:render
-                           `(() (((black) ("@"))
+                           `(() (((bright black) ("@"))
                                  ((cyan) (,c))))))
                         current-contexts)
                    " ")))
     (term:render `(()
                    (,contexts
-                    ((black) (,(if open-file (if (set-empty? current-contexts) open-file (format " ~A" open-file)) "") "> ")))))))
+                    ((bright black) (,(if open-file (if (set-empty? current-contexts) open-file (format " ~A" open-file)) "") "> ")))))))
 
 (define (user-loop! state-box)
   (let* ((input (prompt-line (format-prompt-line #:open-file (a:get-path ((unbox state-box) state.open-file))
