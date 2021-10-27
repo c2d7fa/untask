@@ -326,8 +326,11 @@ In the top-level directory, run:
 
     raco pkg install --auto
 
-This will install any missing dependencies. In order to create an executable, run:
+This will install any missing dependencies. Now you can run Untask with just:
 
-    make untask
+    racket main.rkt <ARGS>
 
-This will create the file `untask`, which can be run directly.
+In order to install Untask in `/usr/local/bin/untask`, run:
+
+    make untask PREFIX=/usr/local
+

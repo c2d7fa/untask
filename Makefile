@@ -1,10 +1,12 @@
-untask: main wrapper.bash
-	rm -f untask
-	cat wrapper.bash main > untask
-	chmod +x untask
+PREFIX?=/usr/local
 
-main: main.rkt info.rkt src
-	raco exe $<
+install:
+	mkdir -p ${PREFIX}/lib/untask
+	mkdir -p ${PREFIX}/bin
+	cp -r src/ main.rkt ${PREFIX}/lib/untask
+	sed "s|/usr/local|${PREFIX}|" <run.bash >${PREFIX}/bin/untask
+	chmod +x ${PREFIX}/bin/untask
+	echo ${PREFIX}
 
 .PHONY: clean
 clean:
