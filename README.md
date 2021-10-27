@@ -334,3 +334,9 @@ In order to install Untask in `/usr/local/bin/untask`, run:
 
     make untask PREFIX=/usr/local
 
+## Nix
+
+Alternatively, try it out without manually installing anything by running:
+
+    nix-shell -p '(import ((fetchGit { url = "https://github.com/c2d7fa/untask"; ref = "nix"; }).outPath + "/default.nix") {})' --run 'untask ./tasks.t'
+
