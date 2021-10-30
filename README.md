@@ -285,52 +285,17 @@ Dates:
 - `property+$7` &mdash; Add 7 days (a week) to the property.
 - `property-$7` &mdash; Subtract 7 days (a week) from the property.
 
-## Dependencies
+## Building
 
-Untask requires Racket version 7.4 or later. It also requires `rlwrap` to be
-installed in order to run.
-
-### Ubuntu
-
-On Ubuntu, use the PPA `plt/racket` to get the latest version of Racket:
+Untask requires Racket 8.2. On Ubuntu use the PPA `plt/racket` to get the latest
+version of Racket:
 
     sudo apt-add-repository ppa:plt/racket
     sudo apt-get install racket
 
-You will also have to install `rlwrap`. This can be done with:
+Then, use `raco` to build and install the application:
 
-    sudo apt-get install rlwrap
+    raco pkg install --user --auto --copy
 
-### Arch Linux
-
-Install Racket and `rlwrap` with:
-
-    sudo pacman -S racket rlwrap
-
-### Windows
-
-Windows is not supported.
-
-### MacOS
-
-MacOS is not supported.
-
-## Building
-
-First, install the necessary dependencies (see above).
-
-Clone this repository into a directory named `untask` (the name matters for
-running tests).
-
-In the top-level directory, run:
-
-    raco pkg install --auto
-
-This will install any missing dependencies. Now you can run Untask with just:
-
-    racket main.rkt <ARGS>
-
-In order to install Untask in `/usr/local/bin/untask`, run:
-
-    make untask PREFIX=/usr/local
-
+The application will be installed in `~/.local/share/racket/8.2/bin/untask`. Add
+this directory to your `PATH` or create a symbolic link to make it available.
