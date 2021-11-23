@@ -3,17 +3,17 @@
 (provide display-graphical-agenda!)
 
 (require racket/gui
-         untask/src/untask/core/serialize
-         untask/src/untask/core/state
-         (prefix-in v: untask/src/untask/core/value)
-         (prefix-in p: untask/src/untask/core/property)
-         (prefix-in bp: untask/src/untask/properties/builtin)
-         (prefix-in status: untask/src/untask/properties/status)
-         (prefix-in ctx: untask/src/untask/core/context)
-         (prefix-in cmd: untask/src/untask/command/command)
-         (prefix-in a: untask/src/attribute)
-         (prefix-in dt: untask/src/datetime)
-         untask/src/squiggle)
+         "../../untask/core/serialize.rkt"
+         "../../untask/core/state.rkt"
+         (prefix-in v: "../../untask/core/value.rkt")
+         (prefix-in p: "../../untask/core/property.rkt")
+         (prefix-in bp: "../../untask/properties/builtin.rkt")
+         (prefix-in status: "../../untask/properties/status.rkt")
+         (prefix-in ctx: "../../untask/core/context.rkt")
+         (prefix-in cmd: "../../untask/command/command.rkt")
+         (prefix-in a: "../../attribute.rkt")
+         (prefix-in dt: "../../datetime.rkt")
+         "../../squiggle.rkt")
 
 (define (display-graphical-agenda! item-state agenda-view)
   (define frame (new frame% (label "Agenda") (width 1200) (height 800)))

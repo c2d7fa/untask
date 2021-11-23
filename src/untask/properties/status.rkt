@@ -5,13 +5,13 @@
          done?)
 
 (require
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val: untask/src/untask/core/value)
- untask/src/squiggle
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val: "../../untask/core/value.rkt")
+ "../../squiggle.rkt"
 
- (prefix-in depends: untask/src/untask/properties/dependencies)
- (prefix-in date: untask/src/untask/properties/date))
+ (prefix-in depends: "../../untask/properties/dependencies.rkt")
+ (prefix-in date: "../../untask/properties/date.rkt"))
 
 ;; Each task has a status, which is one of active, inactive and done. Active
 ;; means that the task still needs to be completed and can be worked on now;

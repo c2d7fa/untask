@@ -21,8 +21,8 @@
          toggle)
 
 (require (prefix-in rkt: racket)
-         (prefix-in a: untask/src/attribute)
-         untask/src/squiggle)
+         (prefix-in a: "../../attribute.rkt")
+         "../../squiggle.rkt")
 
 ;; A context consists of a filter and modify expression that are automatically
 ;; applied to the user's inputs when that context is active.

@@ -3,21 +3,21 @@
 (provide ref has? get set clone)
 
 (require
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in i: untask/src/untask/core/item)
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in i: "../../untask/core/item.rkt")
 
- (prefix-in status: untask/src/untask/properties/status)
- (prefix-in description: untask/src/untask/properties/description)
- (prefix-in tags: untask/src/untask/properties/tags)
- (prefix-in urgency: untask/src/untask/properties/urgency)
- (prefix-in depends: untask/src/untask/properties/dependencies)
- (prefix-in links: untask/src/untask/properties/links)
- (prefix-in date: untask/src/untask/properties/date)
- (prefix-in color: untask/src/untask/properties/color)
- (prefix-in effort: untask/src/untask/properties/effort)
- (prefix-in order: untask/src/untask/properties/order)
+ (prefix-in status: "../../untask/properties/status.rkt")
+ (prefix-in description: "../../untask/properties/description.rkt")
+ (prefix-in tags: "../../untask/properties/tags.rkt")
+ (prefix-in urgency: "../../untask/properties/urgency.rkt")
+ (prefix-in depends: "../../untask/properties/dependencies.rkt")
+ (prefix-in links: "../../untask/properties/links.rkt")
+ (prefix-in date: "../../untask/properties/date.rkt")
+ (prefix-in color: "../../untask/properties/color.rkt")
+ (prefix-in effort: "../../untask/properties/effort.rkt")
+ (prefix-in order: "../../untask/properties/order.rkt")
 
- (prefix-in a: untask/src/attribute))
+ (prefix-in a: "../../attribute.rkt"))
 
 (define builtin-properties
   (list status:status-property

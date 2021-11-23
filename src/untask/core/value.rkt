@@ -3,7 +3,7 @@
 (provide (all-defined-out))
 
 (require
- (prefix-in dt: untask/src/datetime))
+ (prefix-in dt: "../../datetime.rkt"))
 
 (define (make-string string-content)
   `(string . ,string-content))

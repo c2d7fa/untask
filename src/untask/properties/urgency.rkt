@@ -4,13 +4,13 @@
          sort-items-by-urgency-descending)
 
 (require
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val: untask/src/untask/core/value)
- untask/src/squiggle
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val: "../../untask/core/value.rkt")
+ "../../squiggle.rkt"
 
- (prefix-in depends: untask/src/untask/properties/dependencies)
- (prefix-in status: untask/src/untask/properties/status))
+ (prefix-in depends: "../../untask/properties/dependencies.rkt")
+ (prefix-in status: "../../untask/properties/status.rkt"))
 
 (define (calculate-urgency item-state item)
   (val:make-number (+ (val:unwrap-number (or (i:get item-state item 'urgency) (val:make-number 0)))

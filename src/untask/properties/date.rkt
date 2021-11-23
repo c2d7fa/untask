@@ -6,12 +6,12 @@
          copy-recur)
 
 (require
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val:  untask/src/untask/core/value)
- (prefix-in dt: untask/src/datetime)
- (only-in untask/src/untask/properties/order order-property)
- untask/src/squiggle)
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val:  "../../untask/core/value.rkt")
+ (prefix-in dt: "../../datetime.rkt")
+ (only-in "../../untask/properties/order.rkt" order-property)
+ "../../squiggle.rkt")
 
 ;; Setting the date resets the "order" property.
 (define (translate-date item-state item value)

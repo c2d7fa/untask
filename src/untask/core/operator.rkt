@@ -30,8 +30,8 @@
 ;;; will) impose constraints on its other arguments, but these are not taken
 ;;; into account when looking up which operator to call.
 
-(require (only-in untask/src/misc thread-first)
-         (prefix-in val: untask/src/untask/core/value))
+(require (only-in "../../misc.rkt" thread-first)
+         (prefix-in val: "../../untask/core/value.rkt"))
 
 (define (create-operator #:name name
                          #:object object-type

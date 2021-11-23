@@ -3,12 +3,12 @@
 (provide check-filter/modify-expression)
 
 (require
- (prefix-in val: untask/src/untask/core/value)
- (prefix-in op: untask/src/untask/core/operator)
- (prefix-in p: untask/src/untask/core/property)
- untask/src/untask/user/builtin-operators
- (prefix-in bp: untask/src/untask/properties/builtin)
- (prefix-in a: untask/src/attribute))
+ (prefix-in val: "../../untask/core/value.rkt")
+ (prefix-in op: "../../untask/core/operator.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ "../../untask/user/builtin-operators.rkt"
+ (prefix-in bp: "../../untask/properties/builtin.rkt")
+ (prefix-in a: "../../attribute.rkt"))
 
 ;; For enum types, only direct assignment/comparison of an appropriate value is valid.
 (define (check-enum property operator literal-expr)
