@@ -287,6 +287,26 @@ Dates:
 
 ## Building
 
+Untask can be built with `raco` like any application written in Racket, or it
+can be built into a portable [AppImage](https://appimage.org/).
+
+### AppImage with Earthfile
+
+This is the recommended approach, since it only requires a single dependency.
+Download and install [Earthly](https://earthly.dev/). Then just run:
+
+    earthly +build
+
+This will use the instructions in `Earthfile` to produce an AppImage, which you
+can run:
+
+    ./untask.AppImage
+
+(Building an AppImage without Earthly isn't officially supported, but it should
+be straight-forward to translate the instructions in the Earthfile.)
+
+### Manually
+
 Untask requires Racket 8.2. On Ubuntu use the PPA `plt/racket` to get the latest
 version of Racket:
 
