@@ -290,6 +290,9 @@ Dates:
 Untask can be built with `raco` like any application written in Racket, or it
 can be built into a portable [AppImage](https://appimage.org/).
 
+There is a `shell.nix` file that can be used to install some build-time
+dependencies. However, Nix cannot be used to build the actual package.
+
 ### AppImage with Earthfile
 
 This is the recommended approach, since it only requires a single dependency.
