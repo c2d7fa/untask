@@ -1,11 +1,22 @@
 #lang racket
 
-(provide render)
+(provide render with-raw! display!)
+
+(require racket/system)
 
 ;; Takes an output description and returns a string that can be printed to
 ;; terminal to display the output.
 (define (render output)
   (translate-tree output))
+
+(define (display! output)
+  (display (render output))
+  (flush-output))
+
+(define (with-raw! f)
+  (system "stty raw -echo")
+  (f)
+  (system "stty -raw echo"))
 
 (define (butlast l)
   (reverse (cdr (reverse l))))
@@ -16,6 +27,9 @@
 
 (define (csi code) (format "\e[~a" code))
 (define (sgr . codes) (csi (format "~am" (string-join (map ~a codes) ";"))))
+
+(define (fix-newlines-for-raw-output s)
+  (string-replace s "\n" "\n\r"))
 
 (define (translate item)
   (define (translate-code code)
@@ -40,10 +54,9 @@
        (sgr (+ 40 (color-index color))))
       (`(bright ,color background) #:when (color? color)
        (sgr (+ 100 (color-index color))))
-      ('() "")
-      ))
+      ('() "")))
   (if (string? item)
-      item
+      (fix-newlines-for-raw-output item)
       (translate-code item)))
 
 (define (translate-tree tree)
@@ -51,7 +64,7 @@
 
 (define (untree tree #:post (post '()))
   (define (untree-tree tree)
-   (define codes (butlast tree))
+    (define codes (butlast tree))
     (define segments (last tree))
     `(,@codes
       ,@(apply append (map (λ (segment)
