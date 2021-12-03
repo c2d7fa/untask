@@ -14,26 +14,26 @@
 ;; given. The caller is supposed to handle such errors by printing them to the
 ;; user.
 
-(require untask/src/untask/core/state
-         (prefix-in i: untask/src/untask/core/item)
-         (prefix-in c: untask/src/untask/core/context)
-         (prefix-in v: untask/src/untask/core/value)
-         (prefix-in p: untask/src/untask/core/property)
+(require "../../untask/core/state.rkt"
+         (prefix-in i: "../../untask/core/item.rkt")
+         (prefix-in c: "../../untask/core/context.rkt")
+         (prefix-in v: "../../untask/core/value.rkt")
+         (prefix-in p: "../../untask/core/property.rkt")
 
-         untask/src/untask/command/check-expression
-         (prefix-in filter: untask/src/untask/command/filter)
-         (prefix-in modify: untask/src/untask/command/modify)
+         "../../untask/command/check-expression.rkt"
+         (prefix-in filter: "../../untask/command/filter.rkt")
+         (prefix-in modify: "../../untask/command/modify.rkt")
 
-         (prefix-in bp: untask/src/untask/properties/builtin)
-         (prefix-in urgency: untask/src/untask/properties/urgency)
-         (prefix-in depends: untask/src/untask/properties/dependencies)
-         (prefix-in links: untask/src/untask/properties/links)
-         (prefix-in date: untask/src/untask/properties/date)
-         (prefix-in order: untask/src/untask/properties/order)
+         (prefix-in bp: "../../untask/properties/builtin.rkt")
+         (prefix-in urgency: "../../untask/properties/urgency.rkt")
+         (prefix-in depends: "../../untask/properties/dependencies.rkt")
+         (prefix-in links: "../../untask/properties/links.rkt")
+         (prefix-in date: "../../untask/properties/date.rkt")
+         (prefix-in order: "../../untask/properties/order.rkt")
 
-         untask/src/squiggle
-         (prefix-in dt: untask/src/datetime)
-         (prefix-in a: untask/src/attribute))
+         "../../squiggle.rkt"
+         (prefix-in dt: "../../datetime.rkt")
+         (prefix-in a: "../../attribute.rkt"))
 
 ;; Check whether fme is a valid filter or modify expression. If it isn't, throw
 ;; an exception.

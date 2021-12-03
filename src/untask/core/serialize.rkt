@@ -5,16 +5,16 @@
          save-state
          load-state)
 
-(require untask/src/untask/core/state
-         (prefix-in val: untask/src/untask/core/value)
-         (prefix-in c: untask/src/untask/core/context)
-         (prefix-in i: untask/src/untask/core/item)
-         (prefix-in bp: untask/src/untask/properties/builtin)
-         (prefix-in order: untask/src/untask/properties/order)
-         (prefix-in dt: untask/src/datetime)
-         (prefix-in a: untask/src/attribute)
-         (only-in untask/src/misc flat-map)
-         untask/src/squiggle
+(require "../../untask/core/state.rkt"
+         (prefix-in val: "../../untask/core/value.rkt")
+         (prefix-in c: "../../untask/core/context.rkt")
+         (prefix-in i: "../../untask/core/item.rkt")
+         (prefix-in bp: "../../untask/properties/builtin.rkt")
+         (prefix-in order: "../../untask/properties/order.rkt")
+         (prefix-in dt: "../../datetime.rkt")
+         (prefix-in a: "../../attribute.rkt")
+         (only-in "../../misc.rkt" flat-map)
+         "../../squiggle.rkt"
          racket/pretty)
 
 (define file-version (make-parameter 0))

@@ -3,9 +3,9 @@
 (provide order-property fix-corrupted-order-properties)
 
 (require
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in v: untask/src/untask/core/value))
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in v: "../../untask/core/value.rkt"))
 
 (define (translate-order item-state item value)
   (define date (i:get item-state item 'date))

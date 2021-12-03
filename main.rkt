@@ -1,10 +1,10 @@
 #lang racket
 
 (require
- (prefix-in state: untask/src/untask/core/state)
+ (prefix-in state: "src/untask/core/state.rkt")
 
- untask/src/untask/user/execute
- untask/src/untask/user/loop)
+ "src/untask/user/execute.rkt"
+ "src/untask/user/loop.rkt")
 
 (define (main arguments)
   (define state-box (box state:state-empty))

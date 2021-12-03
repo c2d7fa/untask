@@ -3,26 +3,26 @@
 (provide execute!)
 
 (require
- untask/src/untask/core/state
- (prefix-in c: untask/src/untask/core/context)
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val: untask/src/untask/core/value)
- (prefix-in serialize: untask/src/untask/core/serialize)
+ "../../untask/core/state.rkt"
+ (prefix-in c: "../../untask/core/context.rkt")
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val: "../../untask/core/value.rkt")
+ (prefix-in serialize: "../../untask/core/serialize.rkt")
 
- untask/src/untask/command/check-expression
- (prefix-in cmd: untask/src/untask/command/command)
- (prefix-in filter: untask/src/untask/command/filter)
- (prefix-in modify: untask/src/untask/command/modify)
+ "../../untask/command/check-expression.rkt"
+ (prefix-in cmd: "../../untask/command/command.rkt")
+ (prefix-in filter: "../../untask/command/filter.rkt")
+ (prefix-in modify: "../../untask/command/modify.rkt")
 
- untask/src/untask/user/graphical-agenda
- untask/src/untask/user/render-list
+ "../../untask/user/graphical-agenda.rkt"
+ "../../untask/user/render-list.rkt"
 
- (prefix-in a: untask/src/attribute)
- (prefix-in term: untask/src/terminal)
- (prefix-in dt: untask/src/datetime)
- (only-in untask/src/misc try-read-line)
- untask/src/squiggle)
+ (prefix-in a: "../../attribute.rkt")
+ (prefix-in term: "../../terminal.rkt")
+ (prefix-in dt: "../../datetime.rkt")
+ (only-in "../../misc.rkt" try-read-line)
+ "../../squiggle.rkt")
 
 ;; For convenience, the internal procedures in this module pass boxed state
 ;; around as a parameter. Error reporting is done using exceptions.

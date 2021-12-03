@@ -29,7 +29,7 @@
 ;; implicit concept, not a first-class value.
 
 (require (for-syntax racket/syntax
-                     (only-in untask/src/misc flat-map)))
+                     (only-in "misc.rkt" flat-map)))
 
 ;;; ATTRIBUTES
 

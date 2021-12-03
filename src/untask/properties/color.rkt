@@ -2,7 +2,7 @@
 
 (provide color-property)
 
-(require (prefix-in p: untask/src/untask/core/property))
+(require (prefix-in p: "../../untask/core/property.rkt"))
 
 (define color-property
   (p:property #:name 'color

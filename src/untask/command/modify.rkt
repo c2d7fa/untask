@@ -4,13 +4,13 @@
          modify-items)
 
 (require
- (prefix-in operators: untask/src/untask/core/operator)
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val: untask/src/untask/core/value)
- (prefix-in bp: untask/src/untask/properties/builtin)
- untask/src/untask/user/builtin-operators
- untask/src/squiggle
+ (prefix-in operators: "../../untask/core/operator.rkt")
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val: "../../untask/core/value.rkt")
+ (prefix-in bp: "../../untask/properties/builtin.rkt")
+ "../../untask/user/builtin-operators.rkt"
+ "../../squiggle.rkt"
  racket/system)
 
 ;; TODO: Correctly detect editor on other platforms.

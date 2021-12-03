@@ -3,10 +3,10 @@
 (provide translate-links translate-backlinks)
 
 (require
- (prefix-in i: untask/src/untask/core/item)
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val: untask/src/untask/core/value)
- (only-in untask/src/misc set-diff))
+ (prefix-in i: "../../untask/core/item.rkt")
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val: "../../untask/core/value.rkt")
+ (only-in "../../misc.rkt" set-diff))
 
 (define (unwrap-set-or-empty val-set)
   (val:unwrap-set (or val-set (val:make-set (set)))))

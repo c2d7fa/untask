@@ -2,10 +2,10 @@
 
 (provide builtin-operators)
 
-(require untask/src/untask/core/operator
-         (prefix-in val: untask/src/untask/core/value)
-         (prefix-in dt: untask/src/datetime)
-         untask/src/squiggle)
+(require "../../untask/core/operator.rkt"
+         (prefix-in val: "../../untask/core/value.rkt")
+         (prefix-in dt: "../../datetime.rkt")
+         "../../squiggle.rkt")
 
 (define ((check-argument expected-argument-type) object-type argument-value)
   (if (val:has-type? argument-value expected-argument-type)

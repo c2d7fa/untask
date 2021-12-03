@@ -4,9 +4,9 @@
          notes-property)
 
 (require
- (prefix-in p: untask/src/untask/core/property)
- (prefix-in val: untask/src/untask/core/value)
- untask/src/squiggle)
+ (prefix-in p: "../../untask/core/property.rkt")
+ (prefix-in val: "../../untask/core/value.rkt")
+ "../../squiggle.rkt")
 
 (define description-property
   (~> (p:property #:name 'description
