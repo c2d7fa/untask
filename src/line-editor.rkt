@@ -7,12 +7,14 @@
   (prefix-in a: "attribute.rkt")
   "squiggle.rkt")
 
-(a:define-species line-editor (history buffer cursor))
+(a:define-species line-editor (history history-index buffer cursor))
 
 (define line-editor-empty
   (line-editor #:history (list)
+               #:history-index 0
                #:buffer ""
                #:cursor 0))
+
 (define special-keys
   '#hash((#\u0004 . (ctrl #\d))
          (#\u0003 . (ctrl #\c))
@@ -55,9 +57,25 @@
 (define (push-buffer line-editor)
   (~> line-editor
       (a:update line-editor.history (lambda (history)
-                                      (cons (a:get line-editor line-editor.buffer) history)))
+                                      (append history (list (a:get line-editor line-editor.buffer)))))
+      (a:set line-editor.history-index (+ 1 (length (a:get line-editor line-editor.history))))
       (a:set line-editor.buffer "")
       (a:set line-editor.cursor 0)))
+
+(define (pull-buffer line-editor history-index)
+  (define history-length (length (a:get line-editor line-editor.history)))
+  (define history-index* (max 0 (min history-length history-index)))
+  (define buffer
+    (if (>= history-index* history-length)
+      ""
+      (a:get-path (line-editor line-editor.history (a:list. history-index*)))))
+  (~> line-editor
+      (a:set line-editor.history-index history-index*)
+      (a:set line-editor.buffer buffer)
+      (a:set line-editor.cursor (string-length buffer))))
+
+(define (move-history line-editor offset)
+  (pull-buffer line-editor (+ (a:get line-editor line-editor.history-index) offset)))
 
 (define (string-insert s i r)
   (string-append (substring s 0 i) r (substring s i)))
@@ -123,11 +141,16 @@
   (define (push* le)
     (cond ((equal? k 'enter) (push-buffer le))
           (else le)))
+  (define (history* le)
+    (cond ((equal? k 'up) (move-history le -1))
+          ((equal? k 'down) (move-history le 1))
+          (else le)))
   (values submitted
           (~> line-editor
               (insert*)
               (move*)
               (position*)
               (delete*)
-              (push*))))
+              (push*)
+              (history*))))
 
