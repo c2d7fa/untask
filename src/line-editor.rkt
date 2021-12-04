@@ -1,19 +1,13 @@
 #lang racket
 
-(provide line-editor-empty accept output done-reading-key? ->key)
+(provide line-editor-empty accept output)
 
 (require
   (prefix-in term: "terminal.rkt")
   (prefix-in a: "attribute.rkt")
   "squiggle.rkt")
 
-(a:define-species line-editor (history history-index buffer cursor))
-
-(define line-editor-empty
-  (line-editor #:history (list)
-               #:history-index 0
-               #:buffer ""
-               #:cursor 0))
+;; Keys {{{
 
 (define special-keys
   '#hash((#\u0004 . (ctrl #\d))
@@ -53,6 +47,17 @@
     ((unit-string? input) (->key (string-ref input 0)))
     ((char? input) input)
     (else #f)))
+
+;; }}}
+
+(a:define-species line-editor (history history-index key-buffer buffer cursor))
+
+(define line-editor-empty
+  (line-editor #:history (list)
+               #:history-index 0
+               #:key-buffer (list)
+               #:buffer ""
+               #:cursor 0))
 
 (define (push-buffer line-editor)
   (~> line-editor
@@ -115,7 +120,7 @@
   (define end-cursor (string-length (a:get line-editor line-editor.buffer)))
   (~> line-editor (a:set line-editor.cursor end-cursor)))
 
-(define (accept line-editor k)
+(define (accept-key line-editor k)
   (define submitted
     (cond ((equal? k '(ctrl #\d)) "exit")
           ((equal? k '(ctrl #\c)) "exit")
@@ -153,4 +158,14 @@
               (delete*)
               (push*)
               (history*))))
+
+(define (accept line-editor c)
+  (define key-buffer*
+    (append (a:get line-editor line-editor.key-buffer)
+            (list c)))
+  (define (clear-key-buffer line-editor)
+    (a:set line-editor line-editor.key-buffer (list)))
+  (if (done-reading-key? (apply string key-buffer*))
+    (accept-key (clear-key-buffer line-editor) (->key (apply string key-buffer*)))
+    (values #f (a:set line-editor line-editor.key-buffer key-buffer*))))
 
