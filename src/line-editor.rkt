@@ -91,6 +91,12 @@
   (define end-cursor (string-length (a:get line-editor line-editor.buffer)))
   (~> line-editor (a:set line-editor.cursor end-cursor)))
 
+(define (move-cursor line-editor n)
+  (define max-cursor (string-length (a:get line-editor line-editor.buffer)))
+  (define cursor (a:get line-editor line-editor.cursor))
+  (define new-cursor (max 0 (min (+ cursor n) max-cursor)))
+  (~> line-editor (a:set line-editor.cursor new-cursor)))
+
 (define (accept line-editor k)
   (cond
     ((equal? 'enter k) (accept-eol line-editor))
@@ -99,5 +105,7 @@
     ((equal? 'backspace k) (values #f (backspace line-editor)))
     ((equal? 'home k) (values #f (home line-editor)))
     ((equal? 'end k) (values #f (end line-editor)))
+    ((equal? 'left k) (values #f (move-cursor line-editor -1)))
+    ((equal? 'right k) (values #f (move-cursor line-editor 1)))
     ((char? k) (accept-char line-editor k))
     (else (values #f line-editor))))
