@@ -52,9 +52,6 @@
     ((char? input) input)
     (else #f)))
 
-(define (accept-eof line-editor)
-  (values "exit" line-editor))
-
 (define (push-buffer line-editor)
   (~> line-editor
       (a:update line-editor.history (lambda (history)
@@ -62,25 +59,25 @@
       (a:set line-editor.buffer "")
       (a:set line-editor.cursor 0)))
 
-(define (accept-eol line-editor)
-  (values (a:get line-editor line-editor.buffer)
-          (push-buffer line-editor)))
-
 (define (string-insert s i r)
   (string-append (substring s 0 i) r (substring s i)))
 
+(define (string-delete s i)
+  (string-append (substring s 0 i) (substring s (+ i 1))))
+
 (define (insert line-editor c)
   (define cursor (a:get line-editor line-editor.cursor))
-  (~> line-editor
-      (a:update line-editor.buffer (λ> (string-insert cursor (string c))))
-      (a:update line-editor.cursor (λ> (+ 1)))))
+  (a:update line-editor line-editor.buffer (λ> (string-insert cursor (string c)))))
 
-(define (accept-char line-editor c)
-  (values #f (insert line-editor c)))
+(define (delete line-editor)
+  (define cursor (a:get line-editor line-editor.cursor))
+  (a:update line-editor line-editor.buffer (λ> (string-delete cursor))))
 
-(define ((without-value f) state . args)
-  (let-values (((value state) (apply f state args)))
-    state))
+(define (move-cursor line-editor n)
+  (define max-cursor (string-length (a:get line-editor line-editor.buffer)))
+  (define cursor (a:get line-editor line-editor.cursor))
+  (define new-cursor (max 0 (min (+ cursor n) max-cursor)))
+  (~> line-editor (a:set line-editor.cursor new-cursor)))
 
 (define (colorize-default buffer)
   `((bold) (,buffer)))
@@ -93,11 +90,6 @@
       (((cursor-at 0) (,prompt))
        ((cursor-at ,(term:text-length prompt)) (,(colorize (a:get line-editor line-editor.buffer)))))))))
 
-(define (backspace line-editor)
-  (~> line-editor
-      (a:set line-editor.buffer "")
-      (a:set line-editor.cursor 0)))
-
 (define (home line-editor)
   (~> line-editor (a:set line-editor.cursor 0)))
 
@@ -105,21 +97,37 @@
   (define end-cursor (string-length (a:get line-editor line-editor.buffer)))
   (~> line-editor (a:set line-editor.cursor end-cursor)))
 
-(define (move-cursor line-editor n)
-  (define max-cursor (string-length (a:get line-editor line-editor.buffer)))
-  (define cursor (a:get line-editor line-editor.cursor))
-  (define new-cursor (max 0 (min (+ cursor n) max-cursor)))
-  (~> line-editor (a:set line-editor.cursor new-cursor)))
-
 (define (accept line-editor k)
-  (cond
-    ((equal? 'enter k) (accept-eol line-editor))
-    ((equal? '(ctrl #\d) k) (accept-eof line-editor))
-    ((equal? '(ctrl #\c) k) (accept-eof line-editor))
-    ((equal? 'backspace k) (values #f (backspace line-editor)))
-    ((equal? 'home k) (values #f (home line-editor)))
-    ((equal? 'end k) (values #f (end line-editor)))
-    ((equal? 'left k) (values #f (move-cursor line-editor -1)))
-    ((equal? 'right k) (values #f (move-cursor line-editor 1)))
-    ((char? k) (accept-char line-editor k))
-    (else (values #f line-editor))))
+  (define submitted
+    (cond ((equal? k '(ctrl #\d)) "exit")
+          ((equal? k '(ctrl #\c)) "exit")
+          ((equal? k 'enter) (a:get line-editor line-editor.buffer))
+          (else #f)))
+  (define (insert* le)
+    (cond ((char? k) (insert le k))
+          (else le)))
+  (define (move* le)
+    (cond ((char? k) (move-cursor le 1))
+          ((equal? k 'left) (move-cursor le -1))
+          ((equal? k 'right) (move-cursor le 1))
+          ((equal? k 'backspace) (move-cursor le -1))
+          (else le)))
+  (define (position* le)
+    (cond ((equal? k 'home) (home le))
+          ((equal? k 'end) (end le))
+          (else le)))
+  (define (delete* le)
+    (cond ((equal? k 'backspace) (delete le))
+          ((equal? k 'delete) (delete le))
+          (else le)))
+  (define (push* le)
+    (cond ((equal? k 'enter) (push-buffer le))
+          (else le)))
+  (values submitted
+          (~> line-editor
+              (insert*)
+              (move*)
+              (position*)
+              (delete*)
+              (push*))))
+
