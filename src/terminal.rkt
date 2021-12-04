@@ -2,7 +2,7 @@
 
 (provide render with-raw! display!)
 
-(require racket/system)
+(require racket/system (for-syntax racket/syntax))
 
 ;; Takes an output description and returns a string that can be printed to
 ;; terminal to display the output.
@@ -13,10 +13,11 @@
   (display (render output))
   (flush-output))
 
-(define (with-raw! f)
-  (system "stty raw -echo")
-  (f)
-  (system "stty -raw echo"))
+(define-syntax-rule (with-raw! body ...)
+  (begin (system "stty raw -echo")
+         (let ((result (begin body ...)))
+           (system "stty -raw echo")
+           result)))
 
 (define (butlast l)
   (reverse (cdr (reverse l))))

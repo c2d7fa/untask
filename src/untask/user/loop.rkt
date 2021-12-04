@@ -12,14 +12,31 @@
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
 
- (only-in "../../misc.rkt" try-read-line*)
  "../../squiggle.rkt")
+
+(define (read-line-raw!)
+  (define (eol? c) (eq? c #\return))
+  (define (eof? c) (eq? c #\u0004))
+  (define buffer "")
+  (define (continue-reading!)
+    (let ((c (read-char)))
+      (when (not (or (eol? c)
+                     (eof? c)))
+        (set! buffer (string-append buffer (string c))))
+      (cond
+        ((eol? c) (term:display! '(() ("\n")))
+                  buffer)
+        ((eof? c) #f)
+        (else (term:display! `(() (,(string c))))
+              (continue-reading!)))))
+  (continue-reading!))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
 (define (prompt-line prompt)
-  (display prompt)
-  (try-read-line*))
+  (term:with-raw!
+    (term:display! prompt)
+    (read-line-raw!)))
 
 (define (try-parse input)
   (with-handlers ((exn? (λ (e) '(parse-error))))
