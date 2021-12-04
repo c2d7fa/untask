@@ -1,6 +1,6 @@
 #lang racket
 
-(provide render with-raw! display!)
+(provide render with-raw! display! text-length)
 
 (require racket/system (for-syntax racket/syntax))
 
@@ -55,10 +55,18 @@
        (sgr (+ 40 (color-index color))))
       (`(bright ,color background) #:when (color? color)
        (sgr (+ 100 (color-index color))))
+      (`(cursor-at ,x)
+       (format "\e[~aG" (+ x 1)))
       ('() "")))
   (if (string? item)
       (fix-newlines-for-raw-output item)
       (translate-code item)))
+
+(define (text-length tree)
+  (cond
+    ((string? tree) (string-length tree))
+    ((list? tree) (foldl + 0 (map text-length tree)))
+    (else 0)))
 
 (define (translate-tree tree)
   (string-join (map translate (untree tree)) ""))

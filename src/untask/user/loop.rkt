@@ -11,32 +11,29 @@
  (prefix-in c: "../../untask/core/context.rkt")
  (prefix-in a: "../../attribute.rkt")
  (prefix-in term: "../../terminal.rkt")
+ (prefix-in line: "../../line-editor.rkt")
 
  "../../squiggle.rkt")
 
+(define line-editor-box (box line:line-editor-empty))
+
 (define (read-line-raw!)
-  (define (eol? c) (eq? c #\return))
-  (define (eof? c) (eq? c #\u0004))
-  (define buffer "")
   (define (continue-reading!)
+    (term:display! (line:output (unbox line-editor-box)))
     (let ((c (read-char)))
-      (when (not (or (eol? c)
-                     (eof? c)))
-        (set! buffer (string-append buffer (string c))))
-      (cond
-        ((eol? c) (term:display! '(() ("\n")))
-                  buffer)
-        ((eof? c) #f)
-        (else (term:display! `(() (,(string c))))
-              (continue-reading!)))))
+      (let-values (((value state) (line:accept (unbox line-editor-box) c)))
+        (set-box! line-editor-box state)
+        (cond
+          ((eq? value 'eof) #f)
+          ((not value) (continue-reading!))
+          (else (term:display! '(() ("\n")))
+                value)))))
   (continue-reading!))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
 (define (prompt-line prompt)
-  (term:with-raw!
-    (term:display! prompt)
-    (read-line-raw!)))
+  (term:with-raw! (read-line-raw!)))
 
 (define (try-parse input)
   (with-handlers ((exn? (λ (e) '(parse-error))))
