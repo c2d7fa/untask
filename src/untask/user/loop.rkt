@@ -18,16 +18,13 @@
 (define line-editor-box (box line:line-editor-empty))
 
 (define (read-line-raw!)
-  (define (continue-reading!)
-    (term:display! (line:output (unbox line-editor-box)))
-    (let* ((c (read-char)))
-      (let-values (((value state) (line:accept (unbox line-editor-box) c)))
-        (set-box! line-editor-box state)
-        (if value
-          (begin (term:display! '(("\n")))
-                 value)
-          (continue-reading!)))))
-  (continue-reading!))
+  (term:display! (line:output (unbox line-editor-box)))
+  (define-values (line-text line-editor*)
+    (line:accept (unbox line-editor-box)
+                 (read-char)))
+  (set-box! line-editor-box line-editor*)
+  (when line-text (term:display! '(("\n"))))
+  (or line-text (read-line-raw!)))
 
 ;; Print prompt and return input. Returns #f if user interrupts program while
 ;; waiting for input.
