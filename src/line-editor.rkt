@@ -82,11 +82,19 @@
 (define (move-history line-editor offset)
   (pull-buffer line-editor (+ (a:get line-editor line-editor.history-index) offset)))
 
+(define (substring/truncated string start (end (string-length string)))
+  (substring string
+             (max 0 (min (string-length string) start))
+             (min (string-length string) end)))
+
 (define (string-insert s i r)
-  (string-append (substring s 0 i) r (substring s i)))
+  (string-append (substring/truncated s 0 i)
+                 r
+                 (substring/truncated s i)))
 
 (define (string-delete s i)
-  (string-append (substring s 0 i) (substring s (+ i 1))))
+  (string-append (substring/truncated s 0 i)
+                 (substring/truncated s (+ i 1))))
 
 (define (insert line-editor c)
   (define cursor (a:get line-editor line-editor.cursor))
@@ -96,11 +104,15 @@
   (define cursor (a:get line-editor line-editor.cursor))
   (a:update line-editor line-editor.buffer (λ> (string-delete cursor))))
 
+(define (buffer-length line-editor)
+  (string-length (a:get line-editor line-editor.buffer)))
+
+(define (place-cursor line-editor i)
+  (define i* (max 0 (min (buffer-length line-editor) i)))
+  (~> line-editor (a:set line-editor.cursor i*)))
+
 (define (move-cursor line-editor n)
-  (define max-cursor (string-length (a:get line-editor line-editor.buffer)))
-  (define cursor (a:get line-editor line-editor.cursor))
-  (define new-cursor (max 0 (min (+ cursor n) max-cursor)))
-  (~> line-editor (a:set line-editor.cursor new-cursor)))
+  (place-cursor line-editor (+ (a:get line-editor line-editor.cursor) n)))
 
 (define (colorize-default buffer)
   `((bold) (,buffer)))
