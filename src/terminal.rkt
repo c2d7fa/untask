@@ -77,7 +77,10 @@
   (define (untree-tree tree)
     (define codes (butlast tree))
     (define post-codes (filter (lambda (code)
-                                 (not (equal? code '(clear-line))))
+                                 (and (not (equal? code '(clear-line)))
+                                      (not (and (list? code)
+                                                (not (equal? '() code))
+                                                (equal? (car code) 'cursor-at)))))
                                codes))
     (define segments (last tree))
     `(,@codes

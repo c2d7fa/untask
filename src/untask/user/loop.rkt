@@ -6,6 +6,7 @@
  "../../untask/user/render-list.rkt"
  "../../untask/user/parser.rkt"
  "../../untask/user/execute.rkt"
+ "./colorizer.rkt"
 
  "../../untask/core/state.rkt"
  (prefix-in c: "../../untask/core/context.rkt")
@@ -18,7 +19,8 @@
 (define line-editor-box (box line:line-editor-empty))
 
 (define (read-line-raw!)
-  (term:display! (line:output (unbox line-editor-box)))
+  (term:display! (line:output (unbox line-editor-box)
+                              #:colorize colorize))
   (define-values (line-text line-editor*)
     (line:accept (unbox line-editor-box)
                  (read-char)))
