@@ -26,18 +26,68 @@
            `((underline) (red) (,(apply string chars))))
          (many/p any-char/p)))
 
-(define known-input/p
-  (or/p known-keyword/p))
+(define whitespace/p
+  (f:map (lambda (chars)
+           `((white) (,(apply string chars))))
+         (many+/p (char-in/p " "))))
 
-(define (concat/p . parsers)
-  (f:map (lambda (results)
-           (list results))
-         (apply list/p parsers)))
+(define (standalone/p p)
+  (f:do (result <- p)
+        (lookahead/p (or/p (try/p whitespace/p)
+                           eof/p))
+        (f:pure result)))
+
+(define incomplete-curly-string/p
+  (f:do (string/p "{")
+        [body <- (many/p (char-not-in/p "}"))]
+        (f:pure
+          `((((white) ("{"))
+             ((green) (underline) (italic) (,(apply string body))))))))
+
+(define complete-curly-string/p
+  (f:do (string/p "{")
+        [body <- (many/p (char-not-in/p "}"))]
+        (string/p "}")
+        (f:pure
+          `((((white) ("{"))
+             ((green) (italic) (,(apply string body)))
+             ((white) ("}")))))))
+
+(define bareword-string/p
+  (standalone/p
+    (f:map (lambda (chars)
+             `((green) (italic) (,(apply string chars))))
+           (many+/p (char-between/p #\a #\z)))))
+
+(define string-literal/p
+  (or/p (try/p complete-curly-string/p)
+        (try/p incomplete-curly-string/p)
+        (try/p bareword-string/p)))
+
+
+(define token/p
+  (or/p (try/p known-keyword/p)
+        (try/p string-literal/p)
+        (try/p (f:map (lambda (chars)
+                        `((white) (,(apply string chars))))
+                      (many+/p (char-not-in/p " "))))))
+
+(define (sep/p main sep)
+  (many/p (or/p (try/p (f:map (lambda (results)
+                                (list results))
+                              (list/p
+                                (f:do [x <- main]
+                                      (lookahead/p sep)
+                                      (f:pure x))
+                                sep)))
+                (f:do [x <- main]
+                      (lookahead/p eof/p)
+                      (f:pure x)))))
 
 (define input/p
-  (concat/p (or/p (try/p known-input/p)
-                  unknown/p)
-            unknown/p))
+  (f:map (lambda (results)
+           (list results))
+         (sep/p token/p whitespace/p)))
 
 (define (colorize input)
   (parse-result! (parse-string input/p input)))
