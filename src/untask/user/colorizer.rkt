@@ -106,15 +106,8 @@
         (try/p date-literal/p)
         (try/p number-literal/p)))
 
-(define lowercase-az-string/p
-  (f:do (chars <- (many+/p (char-between/p #\a #\z)))
-        (f:pure (apply string chars))))
-
 (define property-name/p
-  (colorized/p '((blue)) lowercase-az-string/p))
-
-(define incomplete-property-name/p
-  (colorized/p '((blue) (underline)) lowercase-az-string/p))
+  (colorized/p '((blue)) (chars->string/p (many+/p (char-between/p #\a #\z)))))
 
 (define tag-expression/p
   (let ((hash/p (or/p (try/p (colorized/p '((blue)) (string/p "-#")))
@@ -122,18 +115,19 @@
     (or/p (try/p (concat/p hash/p bareword-string/p))
           (try/p (colorized/p '((underline)) hash/p)))))
 
+(define prefix-operators/p
+  (colorized/p '((bold)) (chars->string/p (many/p (char-in/p "!")))))
+
 (define expression/p
   (standalone/p
-    (or/p (try/p (concat/p property-name/p known-operator/p literal/p))
-          (try/p tag-expression/p)
-          (try/p (concat/p known-operator/p literal/p))
-          (try/p complete-curly-string/p)
-          (try/p incomplete-curly-string/p)
-          (try/p (colorized/p '((underline))
-                    (concat/p property-name/p known-operator/p unknown/p)))
-          (try/p (colorized/p '((underline))
-                    (concat/p property-name/p known-operator/p)))
-          (try/p incomplete-property-name/p))))
+    (or/p
+      (try/p tag-expression/p)
+      (try/p (concat/p known-operator/p literal/p))
+      (try/p (concat/p prefix-operators/p property-name/p known-operator/p literal/p))
+      (try/p (colorized/p '((underline)) (concat/p prefix-operators/p property-name/p known-operator/p)))
+      (try/p (colorized/p '((underline)) (concat/p prefix-operators/p property-name/p)))
+      (try/p complete-curly-string/p)
+      (try/p incomplete-curly-string/p))))
 
 (define token/p
   (or/p (try/p known-keyword/p)
