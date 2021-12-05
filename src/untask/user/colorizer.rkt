@@ -92,10 +92,15 @@
         (try/p string-literal/p)
         (try/p number-literal/p)))
 
+(define lowercase-az-string/p
+  (f:do (chars <- (many+/p (char-between/p #\a #\z)))
+        (f:pure (apply string chars))))
+
 (define property-name/p
-  (f:map (lambda (chars)
-           `((blue) (,(apply string chars))))
-         (many+/p (char-between/p #\a #\z))))
+  (colorized/p '((blue)) lowercase-az-string/p))
+
+(define incomplete-property-name/p
+  (colorized/p '((blue) (underline)) lowercase-az-string/p))
 
 (define tag-expression/p
   (concat/p
@@ -109,6 +114,11 @@
           (try/p (concat/p known-operator/p literal/p))
           (try/p complete-curly-string/p)
           (try/p incomplete-curly-string/p)
+          (try/p (colorized/p '((underline))
+                    (concat/p property-name/p known-operator/p unknown/p)))
+          (try/p (colorized/p '((underline))
+                    (concat/p property-name/p known-operator/p)))
+          (try/p incomplete-property-name/p)
           (try/p tag-expression/p))))
 
 (define token/p
@@ -137,4 +147,13 @@
 
 (define (colorize input)
   (parse-result! (parse-string input/p input)))
+
+(require "../../terminal.rkt")
+(display! (colorize "dat"))
+(displayln "")
+(display! (colorize "date:"))
+(displayln "")
+(display! (colorize "date:Tod"))
+(displayln "")
+(display! (colorize "date:Today modify #tag description:{some string} $123 /{hello}"))
 
