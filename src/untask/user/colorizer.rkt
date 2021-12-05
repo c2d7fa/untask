@@ -102,8 +102,8 @@
         (try/p (colorized/p '((yellow) (underline)) (any-prefix-of/p "Today")))))
 
 (define literal/p
-  (or/p (try/p date-literal/p)
-        (try/p string-literal/p)
+  (or/p (try/p string-literal/p)
+        (try/p date-literal/p)
         (try/p number-literal/p)))
 
 (define lowercase-az-string/p
@@ -117,14 +117,15 @@
   (colorized/p '((blue) (underline)) lowercase-az-string/p))
 
 (define tag-expression/p
-  (concat/p
-    (or/p (try/p (colorized/p '((blue)) (string/p "-#")))
-          (try/p (colorized/p '((blue)) (string/p "#"))))
-    bareword-string/p))
+  (let ((hash/p (or/p (try/p (colorized/p '((blue)) (string/p "-#")))
+                      (try/p (colorized/p '((blue)) (string/p "#"))))))
+    (or/p (try/p (concat/p hash/p bareword-string/p))
+          (try/p (colorized/p '((underline)) hash/p)))))
 
 (define expression/p
   (standalone/p
     (or/p (try/p (concat/p property-name/p known-operator/p literal/p))
+          (try/p tag-expression/p)
           (try/p (concat/p known-operator/p literal/p))
           (try/p complete-curly-string/p)
           (try/p incomplete-curly-string/p)
@@ -132,8 +133,7 @@
                     (concat/p property-name/p known-operator/p unknown/p)))
           (try/p (colorized/p '((underline))
                     (concat/p property-name/p known-operator/p)))
-          (try/p incomplete-property-name/p)
-          (try/p tag-expression/p))))
+          (try/p incomplete-property-name/p))))
 
 (define token/p
   (or/p (try/p known-keyword/p)
