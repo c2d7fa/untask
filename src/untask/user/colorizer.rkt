@@ -102,9 +102,9 @@
         (try/p (colorized/p '((yellow) (underline)) (any-prefix-of/p "Today")))))
 
 (define literal/p
-  (or/p (try/p string-literal/p)
-        (try/p date-literal/p)
-        (try/p number-literal/p)))
+  (or/p (try/p number-literal/p)
+        (try/p string-literal/p)
+        (try/p date-literal/p)))
 
 (define property-name/p
   (colorized/p '((blue)) (chars->string/p (many+/p (char-between/p #\a #\z)))))
