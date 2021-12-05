@@ -76,16 +76,30 @@
         (try/p incomplete-curly-string/p)
         (try/p bareword-string/p)))
 
+(define incomplete-number-literal/p
+  (colorized/p '((underline) (white)) (string/p "$")))
+
+(define (chars->string/p p)
+  (f:map (lambda (chars)
+           (apply string chars))
+         p))
+
+(define complete-number-literal/p
+  (concat/p (colorized/p '((black)) (string/p "$"))
+            (colorized/p '((magenta)) (chars->string/p (many+/p (char-in/p "0123456789"))))))
+
 (define number-literal/p
-  (f:do (string/p "$")
-        (chars <- (many/p (char-in/p "0123456789")))
-        (f:pure
-          `((((bright black) ("$"))
-             ((magenta) (,(apply string chars))))))))
+  (or/p (try/p complete-number-literal/p)
+        (try/p incomplete-number-literal/p)))
+
+(define (any-prefix-of/p s)
+  (guard/p (chars->string/p (many/p (char-in/p s)))
+           (lambda (r)
+             (string-prefix? s r))))
 
 (define date-literal/p
-  (colorized/p '((yellow))
-               (or/p (string/p "Today"))))
+  (or/p (try/p (colorized/p '((yellow)) (string/p "Today")))
+        (try/p (colorized/p '((yellow) (underline)) (any-prefix-of/p "Today")))))
 
 (define literal/p
   (or/p (try/p date-literal/p)
@@ -155,5 +169,5 @@
 (displayln "")
 (display! (colorize "date:Tod"))
 (displayln "")
-(display! (colorize "date:Today modify #tag description:{some string} $123 /{hello}"))
+(display! (colorize "date:Today modify #tag description:{some string} urgency:$10 /{hello}"))
 
