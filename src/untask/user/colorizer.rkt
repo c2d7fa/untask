@@ -101,8 +101,12 @@
   (or/p (try/p (colorized/p '((yellow)) (string/p "Today")))
         (try/p (colorized/p '((yellow) (underline)) (any-prefix-of/p "Today")))))
 
+(define id-literal/p
+  (colorized/p '((bold) (magenta)) (chars->string/p (many+/p (char-between/p #\0 #\9)))))
+
 (define literal/p
   (or/p (try/p number-literal/p)
+        (try/p id-literal/p)
         (try/p string-literal/p)
         (try/p date-literal/p)))
 
@@ -126,6 +130,7 @@
       (try/p (concat/p prefix-operators/p property-name/p known-operator/p literal/p))
       (try/p (colorized/p '((underline)) (concat/p prefix-operators/p property-name/p known-operator/p)))
       (try/p (colorized/p '((underline)) (concat/p prefix-operators/p property-name/p)))
+      (try/p id-literal/p)
       (try/p complete-curly-string/p)
       (try/p incomplete-curly-string/p))))
 
